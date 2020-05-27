@@ -1,0 +1,33 @@
+name: reproducibility
+on: [push, pull_request]
+env:
+  ARGS: --full
+  DOCKER_WORKDIR: /usr/src/app
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-16.04, ubuntu-18.04]
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v2
+      - name: Build Docker code
+        run: docker build -t docker-image-name .
+      - name: Run Docker code
+        run: docker run --rm -v $GITHUB_WORKSPACE/:${{ env.DOCKER_WORKDIR }} docker-image-name python3 main.py ${{ env.ARGS }}
+      - name: Run Docker latex
+        run: docker run -v $GITHUB_WORKSPACE/paper/:/doc/ thomasweise/docker-texlive-full latexmk -pdf -quiet -cd /doc/ms.tex
+      - name: Upload pdf for comparison
+        uses: actions/upload-artifact@master
+        with:
+          name: output-${{ matrix.os }}
+          path: ./paper/ms.pdf
+  compare:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download pdfs from build
+        uses: actions/download-artifact@master
+      - name: Compare pdf binaries
+        run: diff output-ubuntu-16.04/ms.pdf output-ubuntu-18.04/ms.pdf
