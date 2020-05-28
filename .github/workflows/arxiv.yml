@@ -3,7 +3,7 @@ on: [push, pull_request]
 env:
   ARGS: --full
   DOCKER_WORKDIR: /usr/src/app
-  ARXIV_ID: 2005.12660
+  ARXIV_ID: "2005.12660"
 jobs:
   build:
     runs-on: ubuntu-latest
