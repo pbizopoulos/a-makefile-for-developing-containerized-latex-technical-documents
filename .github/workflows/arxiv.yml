@@ -3,6 +3,7 @@ on: [push, pull_request]
 env:
   ARGS: --full
   DOCKER_WORKDIR: /usr/src/app
+  ARXIV_ID: 2005.12660
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,9 +27,9 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v2
       - name: Get arxiv results
-        run: curl -LO https://arxiv.org/e-print/2005.12660
+        run: curl -LO https://arxiv.org/e-print/${{ env.ARXIV_ID }}
       - name: Uncompress arxiv
-        run: tar -xvf 2005.12660
+        run: tar -xvf ${{ env.ARXIV_ID }}
       - name: Run Docker latex
         run: docker run -v $GITHUB_WORKSPACE/:/doc/ thomasweise/docker-texlive-full latexmk -pdf -quiet -cd /doc/ms.tex
       - name: Upload pdf for comparison

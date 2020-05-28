@@ -17,7 +17,7 @@ if __name__ == '__main__':
     if args.full:
         num_samples = 200
     else:
-        num_samples = 200
+        num_samples = 20
     if args.gpu:
         device = 'cuda'
     else:
