@@ -15,9 +15,20 @@ jobs:
       - name: Build Docker code
         run: docker build -t docker-image-name .
       - name: Run Docker code
-        run: docker run --rm -v $GITHUB_WORKSPACE/:${{ env.DOCKER_WORKDIR }} docker-image-name python3 main.py ${{ env.ARGS }}
+        run: |
+          docker run --rm \
+          -w ${{ env.DOCKER_WORKDIR }} \
+          -e HOME=${{ env.DOCKER_WORKDIR }}/tmp \
+          -e TORCH_HOME=${{ env.DOCKER_WORKDIR }}/tmp \
+          -v $GITHUB_WORKSPACE/:${{ env.DOCKER_WORKDIR }} \
+          docker-image-name \
+          python3 main.py ${{ env.ARGS }}
       - name: Run Docker latex
-        run: docker run -v $GITHUB_WORKSPACE/paper/:/doc/ thomasweise/docker-texlive-full latexmk -pdf -quiet -cd /doc/ms.tex
+        run: |
+          docker run --rm \
+          -v $GITHUB_WORKSPACE/paper/:/doc/ \
+          thomasweise/docker-texlive-full \
+          latexmk -pdf -quiet -cd /doc/ms.tex
       - name: Upload pdf for comparison
         uses: actions/upload-artifact@master
         with:
