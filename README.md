@@ -29,7 +29,7 @@ For example you can choose one of the following:
 - `make clean`
 	- Restores the repo in its initial state by removing all figures, tables and downloaded datasets.
 
-# Citation:
+# Citation
 If you use this repository cite the following:
 ```
 @article{bizopoulos2020reconciler,
