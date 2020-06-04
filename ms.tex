@@ -24,7 +24,7 @@
 \pdftrailerid{}
 
 \begin{document}
-\DTLloaddb{keys_values}{keys_values.csv}
+\DTLloaddb{keys_values}{results/keys_values.csv}
 
 \title{Reconciler: A Workflow for Certifying Computational Research Reproducibility}
 
@@ -261,7 +261,7 @@ For example Fig.~\ref{fig:image} depicts the signal:
 ,where $Z(t)\sim\mathcal{N}$.
 
 \begin{figure}[h]
-	\includegraphics[width=\linewidth]{images/image.pdf}
+	\includegraphics[width=\linewidth]{results/image.pdf}
 	\caption{Image example created from results code.}
 	\label{fig:image}
 \end{figure}
@@ -280,7 +280,7 @@ df.to_latex('table.tex', float_format="%.2f")
 	\caption{Table example created from results code.}
 	\label{table:table}
 	\setlength\tabcolsep{4.2pt}
-	\input{tables/table.tex}
+	\input{results/table.tex}
 \end{table}
 
 \bibliographystyle{IEEEtran}

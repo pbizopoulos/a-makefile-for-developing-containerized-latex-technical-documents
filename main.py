@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 import argparse
 import numpy as np
+import os
 import pandas as pd
 
 from matplotlib import pyplot as plt
-from pathlib import Path
 
 plt.rcParams.update({'font.size': 12})
 
 if __name__ == '__main__':
     np.random.seed(0)
+    path_results = 'results'
+    if not os.path.exists(path_results):
+        os.mkdir(path_results)
     parser = argparse.ArgumentParser()
     parser.add_argument('--full', default=False, action='store_true')
     parser.add_argument('--gpu', default=False, action='store_true')
@@ -22,11 +25,6 @@ if __name__ == '__main__':
         device = 'cuda'
     else:
         device = 'cpu'
-    path_paper = './paper'
-    path_images = f'{path_paper}/images'
-    path_tables = f'{path_paper}/tables'
-    Path(path_images).mkdir(parents=True, exist_ok=True)
-    Path(path_tables).mkdir(parents=True, exist_ok=True)
 
     # Creating pdf images
     mu = 0.42
@@ -39,15 +37,15 @@ if __name__ == '__main__':
     plt.ylabel('Y label')
     plt.ylim([-2, 7])
     plt.autoscale(enable=True, axis='x', tight=True)
-    plt.savefig(f'{path_images}/image.pdf')
+    plt.savefig(f'{path_results}/image.pdf')
     plt.close()
 
     # Creating tables
     num_columns = 11
     table = np.random.random((3, num_columns))
     df = pd.DataFrame(table)
-    df.to_latex(f'{path_tables}/table.tex', float_format="%.2f")
+    df.to_latex(f'{path_results}/table.tex', float_format="%.2f")
 
     # Creating variables
     df = pd.DataFrame({'key': ['num_samples', 'num_columns', 'mu', 'sigma'], 'value': [num_samples, num_columns, mu, sigma]})
-    df.to_csv(f'{path_paper}/keys_values.csv', index=False, float_format='%.1f')
+    df.to_csv(f'{path_results}/keys_values.csv', index=False, float_format='%.1f')
