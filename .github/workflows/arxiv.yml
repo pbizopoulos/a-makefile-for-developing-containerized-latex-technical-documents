@@ -24,14 +24,14 @@ jobs:
       - name: Run Docker latex
         run: |
           docker run --rm \
-          -v $GITHUB_WORKSPACE/paper/:/doc/ \
+          -v $GITHUB_WORKSPACE/:/doc/ \
           thomasweise/docker-texlive-full \
           latexmk -pdf -quiet -cd /doc/ms.tex
       - name: Upload pdf for comparison
         uses: actions/upload-artifact@master
         with:
           name: output
-          path: ./paper/ms.pdf
+          path: ./ms.pdf
   build-arxiv:
     runs-on: ubuntu-latest
     steps:
