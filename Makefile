@@ -31,7 +31,6 @@ PROJECT=$(notdir $(shell pwd))
 WORKDIR=/usr/src/app
 GPU != if [[ "$(ARGS)" == *"--gpu"* ]]; then echo "--gpus=all"; fi
 docker:
-	make clean
 	docker build -t $(PROJECT) .
 	docker run --rm \
 		--user $(shell id -u):$(shell id -g) \
