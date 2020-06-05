@@ -12,17 +12,8 @@ jobs:
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v2
-      - name: Build Docker code
-        run: docker build -t docker-image-name .
-      - name: Run Docker code
-        run: |
-          docker run --rm \
-          -w ${{ env.DOCKER_WORKDIR }} \
-          -e HOME=${{ env.DOCKER_WORKDIR }}/cache \
-          -e TORCH_HOME=${{ env.DOCKER_WORKDIR }}/cache \
-          -v $GITHUB_WORKSPACE/:${{ env.DOCKER_WORKDIR }} \
-          docker-image-name \
-          ./main.py ${{ env.ARGS }}
+      - name: Build/Run Docker code
+        run: make results ARGS={{ env.ARGS }}
       - name: Run Docker latex
         run: |
           docker run --rm \
