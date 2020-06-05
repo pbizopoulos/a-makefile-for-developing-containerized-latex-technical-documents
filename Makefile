@@ -4,7 +4,7 @@ all:
 	make ms.pdf
 
 clean:
-	rm -rf __pycache__/ cache/ venv/
+	rm -rf __pycache__/ cache/ venv/ upload_to_arxiv.tar
 	make clean-results
 
 clean-results:
@@ -27,6 +27,13 @@ ms.pdf: ms.tex ms.bib
 view:
 	xdg-open ms.pdf
 
+docker-ms.pdf:
+	docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
+		-v $(PWD)/:/doc/ \
+		thomasweise/docker-texlive-full \
+		latexmk -gg -pdf -quiet -cd /doc/ms.tex
+
 PROJECT=$(notdir $(shell pwd))
 WORKDIR=/usr/src/app
 GPU != if [[ "$(ARGS)" == *"--gpu"* ]]; then echo "--gpus=all"; fi
@@ -40,21 +47,13 @@ docker:
 		-v $(PWD):$(WORKDIR) \
 		$(GPU) $(PROJECT) \
 		./main.py $(ARGS)
-	docker run --rm \
-		--user $(shell id -u):$(shell id -g) \
-		-v $(PWD)/:/doc/ \
-		thomasweise/docker-texlive-full \
-		latexmk -gg -pdf -quiet -cd /doc/ms.tex
+	make docker-ms.pdf
 
 arxiv:
 	curl -LO https://arxiv.org/e-print/$(ARXIV_ID)
 	tar -xvf $(ARXIV_ID)
 	docker build -t $(PROJECT)-arxiv .
-	docker run --rm \
-		--user $(shell id -u):$(shell id -g) \
-		-v $(PWD)/:/doc/ \
-		thomasweise/docker-texlive-full \
-		latexmk -gg -pdf -quiet -cd /doc/ms.tex
+	make docker-ms.pdf
 	rm $(ARXIV_ID)
 
 arxiv-tar:
