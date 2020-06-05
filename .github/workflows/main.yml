@@ -18,8 +18,8 @@ jobs:
         run: |
           docker run --rm \
           -w ${{ env.DOCKER_WORKDIR }} \
-          -e HOME=${{ env.DOCKER_WORKDIR }}/tmp \
-          -e TORCH_HOME=${{ env.DOCKER_WORKDIR }}/tmp \
+          -e HOME=${{ env.DOCKER_WORKDIR }}/cache \
+          -e TORCH_HOME=${{ env.DOCKER_WORKDIR }}/cache \
           -v $GITHUB_WORKSPACE/:${{ env.DOCKER_WORKDIR }} \
           docker-image-name \
           ./main.py ${{ env.ARGS }}
