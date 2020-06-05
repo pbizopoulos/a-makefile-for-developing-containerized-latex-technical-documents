@@ -22,11 +22,7 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v2
       - name: Get arxiv results
-        run: curl -LO https://arxiv.org/e-print/${{ env.ARXIV_ID }}
-      - name: Uncompress arxiv
-        run: tar -xvf ${{ env.ARXIV_ID }}
-      - name: Run Docker latex
-        run: docker run -v $GITHUB_WORKSPACE/:/doc/ thomasweise/docker-texlive-full latexmk -pdf -quiet -cd /doc/ms.tex
+        run: make arxiv ARXIV_ID=${{ env.ARXIV_ID }}
       - name: Upload pdf for comparison
         uses: actions/upload-artifact@master
         with:

@@ -45,3 +45,17 @@ docker:
 		-v $(PWD)/:/doc/ \
 		thomasweise/docker-texlive-full \
 		latexmk -gg -pdf -quiet -cd /doc/ms.tex
+
+arxiv:
+	curl -LO https://arxiv.org/e-print/$(ARXIV_ID)
+	tar -xvf $(ARXIV_ID)
+	docker build -t $(PROJECT)-arxiv .
+	docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
+		-v $(PWD)/:/doc/ \
+		thomasweise/docker-texlive-full \
+		latexmk -gg -pdf -quiet -cd /doc/ms.tex
+	rm $(ARXIV_ID)
+
+arxiv-tar:
+	tar -cvf upload_to_arxiv.tar ms.tex ms.bib ms.bbl results/
