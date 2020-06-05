@@ -11,7 +11,7 @@ clean-results:
 	latexmk -C ms.tex
 	rm -rf results/ ms.bbl
 
-results: main.py
+results: $(shell find . -maxdepth 1 -name '*.py')
 	make venv
 	. venv/bin/activate; ./main.py $(ARGS)
 	touch results
