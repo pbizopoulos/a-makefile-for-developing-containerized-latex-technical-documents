@@ -11,7 +11,7 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v2
       - name: Build/Run Docker code
-        run: make docker {{ env.ARGS }}
+        run: make docker ARGS="{{ env.ARGS }}"
       - name: Run Docker latex
         run: |
           docker run --rm \
