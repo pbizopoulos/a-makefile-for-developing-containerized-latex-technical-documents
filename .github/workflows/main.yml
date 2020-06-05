@@ -2,7 +2,6 @@ name: reproducibility
 on: [push, pull_request]
 env:
   ARGS: --full
-  DOCKER_WORKDIR: /usr/src/app
 jobs:
   build:
     runs-on: ubuntu-latest
