@@ -10,3 +10,4 @@ jobs:
         uses: pbizopoulos/reconciler-arxiv-action@master
         with:
           arxiv_id: "2005.12660"
+          args: "--full"
