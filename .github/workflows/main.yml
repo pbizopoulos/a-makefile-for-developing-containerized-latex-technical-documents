@@ -7,4 +7,4 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v2
       - name: Build/Run Docker code
-        uses: pbizopoulos/reconciler-action
+        uses: pbizopoulos/reconciler-action@master
