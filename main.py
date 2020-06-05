@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 plt.rcParams.update({'font.size': 12})
 
 if __name__ == '__main__':
-    #np.random.seed(0)
+    np.random.seed(0)
     path_results = 'results'
     if not os.path.exists(path_results):
         os.mkdir(path_results)
