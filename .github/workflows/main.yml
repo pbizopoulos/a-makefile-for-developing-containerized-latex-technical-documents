@@ -7,8 +7,4 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v2
       - name: Certify Paper
-        run: |
-          pwd
-          ls
-      - name: Certify Paper
         uses: pbizopoulos/reconciler-action@master
