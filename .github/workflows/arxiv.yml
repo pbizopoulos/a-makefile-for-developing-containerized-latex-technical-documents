@@ -11,10 +11,7 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v2
       - name: Build/Run Docker code
-        run: |
-          python3 -m pip install -U pip wheel
-          python3 -m pip install -Ur requirements.txt
-          python3 main.py $(ARGS)
+        run: make docker {{ env.ARGS }}
       - name: Run Docker latex
         run: |
           docker run --rm \
