@@ -8,3 +8,6 @@ jobs:
         uses: actions/checkout@v2
       - name: Certify paper reproducibility
         uses: pbizopoulos/reconciler-action@master
+        with:
+          root_code: main.py
+          args: "--full"
