@@ -10,5 +10,5 @@ jobs:
         uses: pbizopoulos/reconciler-arxiv-action@master
         with:
           root_code: main.py
-          args: "--full"
+          root_code_args: "--full"
           arxiv_id: "2005.12660"

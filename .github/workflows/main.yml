@@ -10,4 +10,4 @@ jobs:
         uses: pbizopoulos/reconciler-action@master
         with:
           root_code: main.py
-          args: "--full"
+          root_code_args: "--full"
