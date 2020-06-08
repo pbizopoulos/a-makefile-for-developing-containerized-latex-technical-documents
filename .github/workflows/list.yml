@@ -7,4 +7,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run curl
-        run: curl --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/search/code?q=pbizopoulos/reconciler-action+path:.github/workflows'
+        run: curl --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' 'https://api.github.com/search/code?q=pbizopoulos/reconciler-action+path:.github/workflows'
