@@ -9,4 +9,4 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v2
       - name: Run curl
-        run: curl --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -s 'https://api.github.com/search/code?q=pbizopoulos/reconciler-action+path:.github/workflows'
+        run: curl 'https://api.github.com/search/code?q=pbizopoulos/reconciler-action+path:.github/workflows'
