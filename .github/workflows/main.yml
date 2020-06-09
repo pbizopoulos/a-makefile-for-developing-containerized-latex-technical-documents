@@ -9,5 +9,4 @@ jobs:
       - name: Certify paper reproducibility
         uses: pbizopoulos/reconciler-action@master
         with:
-          root_code: main.py
-          root_code_args: "--full"
+          root_code_call: "python3 main.py ARGS='--full'"
