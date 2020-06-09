@@ -9,5 +9,5 @@ jobs:
       - name: Certify arxiv paper reproducibility
         uses: pbizopoulos/reconciler-arxiv-action@master
         with:
-          root_code_call: "python3 main.py ARGS='--full'"
+          root_code_call: "python3 main.py --full"
           arxiv_id: "2005.12660"
