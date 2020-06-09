@@ -14,17 +14,17 @@ if __name__ == '__main__':
     if not os.path.exists(path_results):
         os.mkdir(path_results)
     parser = argparse.ArgumentParser()
-    parser.add_argument('--full', default=False, action='store_true')
     parser.add_argument('--gpu', default=False, action='store_true')
+    parser.add_argument('--full', default=False, action='store_true')
     args = parser.parse_args()
-    if args.full:
-        num_samples = 200
-    else:
-        num_samples = 20
     if args.gpu:
         device = 'cuda'
     else:
         device = 'cpu'
+    if args.full:
+        num_samples = 200
+    else:
+        num_samples = 20
 
     # Creating pdf images
     mu = 0.42
