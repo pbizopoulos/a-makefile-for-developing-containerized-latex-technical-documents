@@ -9,7 +9,13 @@ from matplotlib import pyplot as plt
 plt.rcParams.update({'font.size': 12})
 
 if __name__ == '__main__':
+    torch.manual_seed(0)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
     np.random.seed(0)
+    path_cache = 'cache'
+    if not os.path.exists(path_cache):
+        os.mkdir(path_cache)
     path_results = 'results'
     if not os.path.exists(path_results):
         os.mkdir(path_results)
