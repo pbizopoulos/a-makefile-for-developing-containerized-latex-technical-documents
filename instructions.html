@@ -1,27 +1,21 @@
-<!DOCTYPE html>
-<html>
-	<body>
-		The syntax of the make command is as follows:
+The syntax of the make command is as follows:
 
-		make [docker] [ARGS='[--full] [--gpu]']
+make [docker] [ARGS='[--full] [--gpu]']
 
-		where [...] denotes an optional argument.
+where [...] denotes an optional argument.
 
-		For example you can choose one of the following:
+For example you can choose one of the following:
+make
+- Requires local installation of texlive-full and populates the figures and tables.
 
-		make
-		- Requires local installation of texlive-full and populates the figures and tables.
+make ARGS='--full --gpu'
+- Requires local installation of texlive-full.
 
-		make ARGS='--full --gpu'
-		- Requires local installation of texlive-full.
+make docker
+- Requires local installation of docker and populates the figures and tables.
 
-		make docker
-		- Requires local installation of docker and populates the figures and tables.
+make docker ARGS='--full --gpu'
+- Requires local installation of nvidia-container-toolkit.
 
-		make docker ARGS='--full --gpu'
-		- Requires local installation of nvidia-container-toolkit.
-
-		make clean
-		- Restores the repo in its initial state by removing all figures, tables and downloaded datasets.
-	</body>
-</html>
+make clean
+- Restores the repo in its initial state by removing all figures, tables and downloaded datasets.
