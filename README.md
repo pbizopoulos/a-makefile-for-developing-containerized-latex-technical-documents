@@ -6,6 +6,9 @@ This repository contains the code that generates the results of the paper **Reco
 
 ArXiv link: <https://arxiv.org/abs/2005.12660>
 
+# Instructions
+<https://pbizopoulos.github.io/reconciler-a-workflow-for-certifying-computational-research-reproducibility/instructions.txt>
+
 # Citation
 If you use this repository cite the following:
 ```
