@@ -8,4 +8,4 @@ This repository contains the code that generates the results of the paper **Reco
 
 [ArXiv](https://arxiv.org/abs/2005.12660)
 
-[Citation](https://scholar.googleusercontent.com/scholar.bib?q=info:fXVmwwkWuQUJ:scholar.google.com/&output=citation&scisdr=CgWvzqYGEKP43xH3EP0:AAGBfm0AAAAAXuTyCP0u4SZKl6TumQTlPmb0sdnks1uz&scisig=AAGBfm0AAAAAXuTyCEvbod1aCV6X-4Uj9EqKIHo3vpC2&scisf=4&ct=citation&cd=-1&hl=en)
+[Citation](https://scholar.google.com/scholar?q=Reconciler%3A%20A%20Workflow%20for%20Certifying%20Computational%20Research%20Reproducibility.%20arXiv%202020)
