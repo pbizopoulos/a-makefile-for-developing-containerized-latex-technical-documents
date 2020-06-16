@@ -6,4 +6,4 @@
 # Reconciler: A Workflow for Certifying Computational Research Reproducibility
 This repository contains the code that generates the results of the paper **Reconciler: A Workflow for Certifying Computational Research Reproducibility**.
 
-[Instructions](https://pbizopoulos.github.io/reconciler-a-workflow-for-certifying-computational-research-reproducibility/instructions.txt)
+[Build instructions](https://pbizopoulos.github.io/reconciler-a-workflow-for-certifying-computational-research-reproducibility/instructions.txt)
