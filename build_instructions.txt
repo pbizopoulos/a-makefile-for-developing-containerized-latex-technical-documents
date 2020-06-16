@@ -1,0 +1,16 @@
+1. git clone https://github.com/<user>/<repo>
+2. cd <repo>
+3. make [docker] [ARGS='[--full] [--gpu]']
+where [...] denotes an optional argument.
+
+Choose one of the following when calling make:
+
+make # Requires local installation of texlive-full and it populates the figures and tables.
+
+make ARGS='--full --gpu' # Requires local installation of texlive-full.
+
+make docker # Requires local installation of docker and populates the figures and tables.
+
+make docker ARGS='--full --gpu' # Requires local installation of nvidia-container-toolkit.
+
+make clean # Restores <repo> in its initial state by removing all figures, tables and downloaded datasets.
