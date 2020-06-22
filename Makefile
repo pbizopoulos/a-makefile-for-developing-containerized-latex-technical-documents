@@ -11,7 +11,7 @@ ms.pdf: results ms.tex ms.bib
 	latexmk -gg -pdf -quiet ms.tex
 
 venv: requirements.txt
-	python -m venv venv
+	python3 -m venv venv
 	. venv/bin/activate; pip install -U pip wheel; pip install -Ur requirements.txt
 	touch -c venv
 
@@ -19,7 +19,7 @@ clean:
 	rm -rf __pycache__/ cache/ venv/ upload_to_arxiv.tar results/ ms.bbl
 	latexmk -C ms.tex
 
-docker-pdf:
+docker-ms.pdf:
 	docker run --rm \
 		--user $(shell id -u):$(shell id -g) \
 		-v $(PWD)/:/home/latex \
