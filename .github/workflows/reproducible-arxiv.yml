@@ -9,5 +9,5 @@ jobs:
       - name: Certify arxiv paper reproducibility
         uses: pbizopoulos/reproducible-arxiv-action@master
         with:
-          make_call: "make ARGS='--full'"
+          make_call: "make ARGS=--full"
           arxiv_id: "2005.12660"
