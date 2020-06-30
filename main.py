@@ -51,4 +51,4 @@ if __name__ == '__main__':
 
     # Creating variables
     df = pd.DataFrame({'key': ['num_samples', 'num_columns', 'mu', 'sigma'], 'value': [num_samples, num_columns, mu, sigma]})
-    df.to_csv(f'{path_results}/keys_values.csv', index=False, float_format='%.1f')
+    df.to_csv(f'{path_results}/keys-values.csv', index=False, float_format='%.1f')
