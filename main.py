@@ -7,7 +7,7 @@ import torch
 
 from matplotlib import pyplot as plt
 
-plt.rcParams['font.size'] = 20
+plt.rcParams['font.size'] = 12
 plt.rcParams['savefig.format'] = 'pdf'
 
 
