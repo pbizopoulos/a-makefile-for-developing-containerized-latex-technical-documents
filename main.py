@@ -7,7 +7,9 @@ import torch
 
 from matplotlib import pyplot as plt
 
-plt.rcParams.update({'font.size': 12})
+plt.rcParams['font.size'] = 20
+plt.rcParams['savefig.format'] = 'pdf'
+
 
 if __name__ == '__main__':
     torch.manual_seed(0)
@@ -40,7 +42,7 @@ if __name__ == '__main__':
     plt.ylabel('Y label')
     plt.ylim([-2, 7])
     plt.autoscale(enable=True, axis='x', tight=True)
-    plt.savefig(f'{path_results}/image.pdf')
+    plt.savefig(f'{path_results}/image')
     plt.close()
 
     # Creating tables
