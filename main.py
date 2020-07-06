@@ -15,15 +15,15 @@ if __name__ == '__main__':
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     np.random.seed(0)
-    path_cache = 'cache'
-    if not os.path.exists(path_cache):
-        os.mkdir(path_cache)
-    path_results = 'results'
-    if not os.path.exists(path_results):
-        os.mkdir(path_results)
     parser = argparse.ArgumentParser()
     parser.add_argument('--full', default=False, action='store_true')
+    parser.add_argument('--cache-dir', default='cache')
+    parser.add_argument('--results-dir', default='results')
     args = parser.parse_args()
+    if not os.path.exists(args.cache_dir):
+        os.mkdir(args.cache_dir)
+    if not os.path.exists(args.results_dir):
+        os.mkdir(args.results_dir)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if args.full:
         num_samples = 200
@@ -41,15 +41,15 @@ if __name__ == '__main__':
     plt.ylabel('Y label')
     plt.ylim([-2, 7])
     plt.autoscale(enable=True, axis='x', tight=True)
-    plt.savefig(f'{path_results}/image')
+    plt.savefig(f'{args.results_dir}/image')
     plt.close()
 
     # Creating tables
     num_columns = 11
     table = np.random.random((3, num_columns))
     df = pd.DataFrame(table)
-    df.to_latex(f'{path_results}/table.tex', float_format="%.2f")
+    df.to_latex(f'{args.results_dir}/table.tex', float_format="%.2f")
 
     # Creating variables
     df = pd.DataFrame({'key': ['num_samples', 'num_columns', 'mu', 'sigma'], 'value': [num_samples, num_columns, mu, sigma]})
-    df.to_csv(f'{path_results}/keys-values.csv', index=False, float_format='%.1f')
+    df.to_csv(f'{args.results_dir}/keys-values.csv', index=False, float_format='%.1f')
