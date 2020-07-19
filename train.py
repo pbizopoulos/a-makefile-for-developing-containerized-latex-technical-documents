@@ -5,11 +5,15 @@ import pandas as pd
 import torch
 
 
-if __name__ == '__main__':
+def set_seed():
     torch.manual_seed(0)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     np.random.seed(0)
+
+
+if __name__ == '__main__':
+    set_seed()
     parser = argparse.ArgumentParser()
     parser.add_argument('--full', default=False, action='store_true')
     parser.add_argument('--cache-dir', default='cache')

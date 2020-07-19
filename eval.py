@@ -6,15 +6,14 @@ import torch
 
 from matplotlib import pyplot as plt
 
+from train import set_seed
+
 plt.rcParams['font.size'] = 12
 plt.rcParams['savefig.format'] = 'pdf'
 
 
 if __name__ == '__main__':
-    torch.manual_seed(0)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    np.random.seed(0)
+    set_seed()
     parser = argparse.ArgumentParser()
     parser.add_argument('--full', default=False, action='store_true')
     parser.add_argument('--cache-dir', default='cache')
