@@ -18,10 +18,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--full', default=False, action='store_true')
     parser.add_argument('--cache-dir', default='cache')
+    parser.add_argument('--results-train-dir', default='results-train')
     parser.add_argument('--results-dir', default='results')
     args = parser.parse_args()
-    if not os.path.exists(args.cache_dir):
-        os.mkdir(args.cache_dir)
     if not os.path.exists(args.results_dir):
         os.mkdir(args.results_dir)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
