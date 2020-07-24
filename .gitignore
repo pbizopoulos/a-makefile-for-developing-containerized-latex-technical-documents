@@ -12,5 +12,4 @@ __pycache__/
 arxiv.tar
 cache/
 results/
-results-train/
 venv/
