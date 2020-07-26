@@ -45,7 +45,7 @@ jobs:
       - name: Compare pdf binaries
         run: diff output/ms.pdf output-arxiv/ms.pdf
       - name: Create file with sha256sum name
-        run: echo ::set-env name=sha256sumfilename::$(sha256sum output/ms.pdf)
+        run: echo ::set-env name=sha256sumfilename::($(sha256sum output/ms.pdf))
       - name: Upload file with sha256sum name
         uses: actions/upload-artifact@v2
         with:
