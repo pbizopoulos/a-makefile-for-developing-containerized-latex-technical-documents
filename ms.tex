@@ -26,7 +26,7 @@
 \begin{document}
 \DTLloaddb{keys_values}{results/keys-values.csv}
 
-\title{Reconciler: A Workflow for Certifying Computational Research Reproducibility}
+\title{Reconciler: A Workflow for writing Reproducible Computational Research Papers}
 
 \author{Paschalis~Bizopoulos and Dimitris~Bizopoulos
 \thanks{P. Bizopoulos and D. Bizopoulos are Independent Researchers, Thessaloniki, Greece e-mail: pbizopoulos@protonmail.com, dimitrisbizopoulos@gmail.com}}
@@ -79,10 +79,8 @@ For the rest of the paper we will refer to:
 				child{node[draw, anchor=west]{Makefile}}
 				child{node[draw, anchor=west, fill=blue!20]{Dockerfile}}
 				child{node[draw, anchor=west, fill=blue!20]{main.py}}
-				child{node[draw, anchor=west, fill=red!20]{paper}
 				child{node[draw, anchor=west, fill=red!20]{ms.tex}}
-				child{node[draw, anchor=west, fill=red!20]{ms.bib}}
-				};
+				child{node[draw, anchor=west, fill=red!20]{ms.bib}};
 		\end{tikzpicture}
 		\label{subfig:filehierarchy}}
 	\end{minipage}

@@ -7,6 +7,8 @@ on:
     branches:
       - master
   schedule:
+    branches:
+      - master
     - cron: '0 0 * * *'
 env:
   ARGS: --full
