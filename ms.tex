@@ -26,7 +26,7 @@
 \begin{document}
 \DTLloaddb{keys_values}{results/keys-values.csv}
 
-\title{Reconciler: A Workflow for writing Reproducible Computational Research Papers}
+\title{Reconciler: A Workflow for Writing Reproducible Computational Research Papers}
 
 \author{Paschalis~Bizopoulos and Dimitris~Bizopoulos
 \thanks{P. Bizopoulos and D. Bizopoulos are Independent Researchers, Thessaloniki, Greece e-mail: pbizopoulos@protonmail.com, dimitrisbizopoulos@gmail.com}}
@@ -84,60 +84,42 @@ For the rest of the paper we will refer to:
 		\end{tikzpicture}
 		\label{subfig:filehierarchy}}
 	\end{minipage}
-	\begin{minipage}{0.4\linewidth}
+	\begin{minipage}{0.8\linewidth}
 		\centering
 		\subfloat[]{\begin{tikzpicture}[node distance=1.9cm, minimum height=1cm]
 			\node[draw, rounded corners] (localrepo) {Local Repo};
 			\node[draw, rounded corners, above of=localrepo] (remoterepo) {Remote Repo};
-			\node[draw, rounded corners, above left of=remoterepo, fill=blue!20] (builddocker1) {Build Docker};
+			\node[draw, rounded corners, above left=1cm of remoterepo, fill=blue!20] (builddocker1) {Build Docker};
 			\node[draw, rounded corners, above of=builddocker1, fill=red!20] (compilelatex1) {Compile \LaTeX};
-			\node[draw, rounded corners, above right of=compilelatex1, fill=white] (comparison) {Comparison};
-			\node[draw, rounded corners, above right of=remoterepo, fill=blue!20] (builddocker2) {Build Docker};
+			\node[draw, rounded corners, above of=remoterepo, fill=blue!20] (builddocker2) {Build Docker};
 			\node[draw, rounded corners, above of=builddocker2, fill=red!20] (compilelatex2) {Compile \LaTeX};
+			\node[draw, rounded corners, above right=1cm of remoterepo] (arxivrepo) {arXiv Repo};
+			\node[draw, rounded corners, above of=arxivrepo, fill=red!30] (compilelatex3) {Compile \LaTeX};
+			\node[draw, rounded corners, above of=compilelatex2, fill=white] (comparison) {Comparison};
 			\path[draw, ->] (localrepo) -- node[left]{push} (remoterepo);
 			\path[draw, ->] (remoterepo) -| node[left]{checkout} (builddocker1);
 			\path[draw, ->] (builddocker1) -- node[left]{\LaTeX+results}(compilelatex1);
 			\path[draw, ->] (compilelatex1) |- node[left]{pdf} (comparison);
-			\path[draw, ->] (remoterepo) -| node[right]{checkout} (builddocker2);
+			\path[draw, ->] (remoterepo) -- node[right]{checkout} (builddocker2);
+			\path[draw, ->, dashed] (remoterepo) -| node[right]{checkout} (arxivrepo);
 			\path[draw, ->] (builddocker2) -- node[right]{\LaTeX+results} (compilelatex2);
-			\path[draw, ->] (compilelatex2) |- node[right]{pdf} (comparison);
+			\path[draw, ->, dashed] (arxivrepo) -- node[right]{\LaTeX+results} (compilelatex3);
+			\path[draw, ->] (compilelatex2) -- node[right]{pdf} (comparison);
+			\path[draw, ->, dashed] (compilelatex3) |- node[right]{pdf} (comparison);
 			\begin{scope}[on background layer]
-				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(builddocker1) (compilelatex1) (builddocker1.west), label={[black!50]110:$VM_1$}]{};
-				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(builddocker2) (compilelatex2) (builddocker2.west), label={[black!50]70:$VM_2$}]{};
-				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(comparison), label={[black!50]above:$VM_3$}]{};
+				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(builddocker1) (compilelatex1) (builddocker1.west), label={[black!50]110:$VM_{OS_1}$}]{};
+				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(builddocker2) (compilelatex2) (builddocker2.west), label={[black!50]70:$VM_{OS_n}$}]{};
+				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(compilelatex3), label={[black!50]50:$VM_{arxiv}$}]{};
+				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(comparison), label={[black!50]above:$VM_{comp}$}]{};
 			\end{scope}
 		\end{tikzpicture}
 		\label{subfig:workflow}}
 	\end{minipage}
-	\begin{minipage}{0.4\linewidth}
-		\centering
-		\subfloat[]{\begin{tikzpicture}[node distance=1.9cm, minimum height=1cm]
-			\node[draw, rounded corners] (localrepo) {Local Repo};
-			\node[draw, rounded corners, above of=localrepo] (remoterepo) {Remote Repo};
-			\node[draw, rounded corners, above of=remoterepo, fill=blue!20] (builddocker1) {Build Docker};
-			\node[draw, rounded corners, above of=builddocker1, fill=red!20] (compilelatex1) {Compile \LaTeX};
-			\node[draw, rounded corners, above right of=compilelatex1, fill=white] (comparison) {Comparison};
-			\node[draw, rounded corners, below right of=comparison, fill=red!20] (compilelatex2) {Compile \LaTeX};
-			\node[draw, rounded corners, below = 2.8cm of compilelatex2] (arxivrepo) {arXiv Repo};
-			\path[draw, ->] (localrepo) -- node[left]{push} (remoterepo);
-			\path[draw, ->] (remoterepo) -- node[left]{checkout} (builddocker1);
-			\path[draw, ->] (builddocker1) -- node[left]{\LaTeX+results}(compilelatex1);
-			\path[draw, ->] (compilelatex1) |- node[left]{pdf} (comparison);
-			\path[draw, ->] (arxivrepo) -- node[right]{\LaTeX+results} (compilelatex2);
-			\path[draw, ->] (compilelatex2) |- node[right]{pdf} (comparison);
-			\begin{scope}[on background layer]
-				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(builddocker1) (compilelatex1) (builddocker1.west), label={[black!50]110:$VM_1$}]{};
-				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(compilelatex2), label={[black!50]50:$VM_2$}]{};
-				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(comparison), label={[black!50]above:$VM_3$}]{};
-			\end{scope}
-		\end{tikzpicture}
-		\label{subfig:workflowarxiv}}
-	\end{minipage}
-	\caption{In (a) the template Reconciler file hierarchy is depicted as a file tree directory.
+	\caption{In \protect\subref{subfig:filehierarchy} the template Reconciler file hierarchy is depicted as a file tree directory.
 	Results and \LaTeX\ code reside in the same repository but this is optional.
-	In (b) the proposed Reconciler workflow with the two independent branches is depicted, and in (c) a variation of the Reconciler applied on certifying arXiv papers, where the right branch fetches the results and the \LaTeX\ code from the arXiv servers.
+	In \protect\subref{subfig:workflow} the proposed Reconciler workflow with the $n$ independent branches is depicted one for each VM and the optional branch for certifying arXiv papers, where the branch fetches the results and the \LaTeX\ code from the arXiv servers.
 	Blue denotes results code file or procedure, red denotes \LaTeX\ code file or procedure and gray background denotes that the encapsulated procedures is happening in a VM.
-	Arrows in (b) and (c) denote the data flow direction, complemented by descriptive labels.}
+	Arrows in \protect\subref{subfig:workflow} denote the data flow direction, complemented by descriptive labels, while the dashed arrows on the right denote the optional branch for the arxiv.}
 	\label{fig:filehierarchyworkflow}
 \end{figure*}
 
@@ -166,7 +148,7 @@ Alternatively the code could just be open source to enable reviewers inspect the
 
 Variations of the Reconciler main workflow include:
 \begin{itemize}
-	\item preprint server (such as arXiv) results reproducibility certification shown in Fig.~\ref{fig:filehierarchyworkflow}\subref{subfig:workflowarxiv}.
+	\item preprint server (such as arXiv) results reproducibility certification shown in Fig.~\ref{fig:filehierarchyworkflow}\subref{subfig:workflow}.
 		The difference with the main workflow is that one of the VMs checkouts the \LaTeX\ code and the results from the arXiv server instead of executing the results code.
 	\item one branch local certification where the last VM returns the hash of the resulted pdf enabling reviewers certifying the pdf output of their local branch.
 		Using the previous workflow the Reconciler could also be used for regression testing and debugging, to ensure that changes to the code do not alter the results.
@@ -181,28 +163,24 @@ E.g.\ the debug flag in the concept of neural networks could set the number of e
 Some possible executions that the Reconciler provides are summarized in the following syntax:
 \begin{lstlisting}[language=Bash, style=lststyle, caption={Makefile call syntax from the shell.}, captionpos=b]
 # SYNTAX
-make [docker] [ARGS="[--full] [--gpu]"] [GPU="--gpus all"]
-
+make [docker[-gpu]] [ARGS=--full]
 # where [...] denotes an optional argument.
 
-# For example you can choose one of the following:
+# Requires local installation of texlive-full
+# and it populates the figures and tables.
 make
-# Requires local installation of
-# requirements.txt and texlive-full.
-# Takes ~1 minute and populates the figures and table.
-make ARGS="--full --gpu"
-# Requires local installation of
-# requirements.txt and texlive-full.
-# Takes ~1 minute on an NVIDIA Titan X.
+# Requires local installation of texlive-full.
+# and it populates the figures and tables.
+make ARGS=--full
+# Requires local installation of docker
+# and populates the figures and tables.
 make docker
-# Requires local installation of docker.
-# Takes ~1 minute.
-make docker ARGS="--full --gpu" GPU="--gpus all"
 # Requires local installation of nvidia-container-toolkit.
-# Takes ~1 minute on an NVIDIA Titan X.
+make docker-gpu ARGS=--full
+# Restores <repo> in its initial state
+# by removing all figures, tables and downloaded datasets.
 make clean
-# Restores the repo in its initial state by removing
-# all figures, tables and downloaded datasets.
+
 \end{lstlisting}
 
 \section{Discussion}
