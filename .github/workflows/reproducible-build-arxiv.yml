@@ -1,4 +1,4 @@
-name: reproducible-arxiv
+name: reproducible-build-arxiv
 on:
   push:
     branches:
@@ -14,6 +14,9 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v2
@@ -22,7 +25,7 @@ jobs:
       - name: Upload pdf for comparison
         uses: actions/upload-artifact@v2
         with:
-          name: output
+          name: output-${{ matrix.os }}
           path: ./ms.pdf
   build-arxiv:
     runs-on: ubuntu-latest
@@ -43,9 +46,9 @@ jobs:
       - name: Download pdfs from build
         uses: actions/download-artifact@v2
       - name: Compare pdf binaries
-        run: diff output/ms.pdf output-arxiv/ms.pdf
+        run: diff --from-file output-ubuntu-latest/ms.pdf output-windows-latest/ms.pdf output-windows-latest/ms.pdf output-arxiv/ms.pdf
       - name: Create file with sha256sum name
-        run: echo ::set-env name=sha256sumfilename::($(sha256sum output/ms.pdf))
+        run: echo ::set-env name=sha256sumfilename::$(sha256sum output-ubuntu-latest/ms.pdf | cut -d ' ' -f1)
       - name: Upload file with sha256sum name
         uses: actions/upload-artifact@v2
         with:
