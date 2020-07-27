@@ -12,7 +12,7 @@ ROOT_TEX_NO_EXT = ms
 SRC_CODE = $(shell find . -maxdepth 1 -name '*.py')
 
 $(ROOT_TEX_NO_EXT).pdf: $(ROOT_TEX_NO_EXT).tex $(ROOT_TEX_NO_EXT).bib $(RESULTS_DIR)
-	latexmk -usepretex="\pdfinfoomitdate=1\pdfsuppressptexinfo=-1\pdftrailerid{}" -gg -pdf $<
+	latexmk -usepretex="\pdfinfo{/Creator () /Producer ()}\pdfinfoomitdate=1\pdfsuppressptexinfo=-1\pdftrailerid{}" -gg -pdf $<
 	sha256sum $(ROOT_TEX_NO_EXT).pdf
 
 
@@ -56,7 +56,7 @@ docker-pdf:
 		--user $(shell id -u):$(shell id -g) \
 		-v $(PWD)/:/home/latex \
 		aergus/latex \
-		latexmk -usepretex="\pdfinfoomitdate=1\pdfsuppressptexinfo=-1\pdftrailerid{}" -gg -pdf -cd /home/latex/$(ROOT_TEX_NO_EXT).tex
+		latexmk -usepretex="\pdfinfo{/Creator () /Producer ()}\pdfinfoomitdate=1\pdfsuppressptexinfo=-1\pdftrailerid{}" -gg -pdf -cd /home/latex/$(ROOT_TEX_NO_EXT).tex
 	sha256sum $(ROOT_TEX_NO_EXT).pdf
 
 arxiv:
