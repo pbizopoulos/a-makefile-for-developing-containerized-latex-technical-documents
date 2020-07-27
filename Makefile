@@ -1,6 +1,6 @@
 .POSIX:
 
-ARXIV_ID = '2005.12660'
+ARXIV_ID = 
 CACHE_DIR = cache
 DOCKER_WORKDIR = /usr/src/app
 NAME_CURRENT_DIR = $(notdir $(shell pwd))
