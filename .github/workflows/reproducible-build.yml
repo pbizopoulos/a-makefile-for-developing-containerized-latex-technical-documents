@@ -73,7 +73,7 @@ jobs:
           name: docker-${{ matrix.os }}-${{ matrix.index }}
           path: ./ms.pdf
   compare-and-upload-release-assets:
-    needs: [compare, release, build-arxiv, build-local, build-docker]
+    needs: [release, build-arxiv, build-local, build-docker]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -96,12 +96,6 @@ jobs:
           asset_path: ./${{ matrix.var }}-${{ matrix.os }}.pdf
           asset_name: ${{ matrix.var }}-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
-  upload-sha256sum:
-    needs: [release, compare-and-upload-release-assets]
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Download pdfs from build
-        uses: actions/download-artifact@v2
       - name: Create sha256sum asset
         run: sha256sum -b arxiv-ubuntu-20.04-0/ms.pdf local-ubuntu-20.04-0/ms.pdf docker-ubuntu-20.04-0/ms.pdf > sha256sum.txt
       - name: Upload sha256sum artifact
