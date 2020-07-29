@@ -72,8 +72,8 @@ jobs:
         with:
           name: docker-${{ matrix.os }}-${{ matrix.index }}
           path: ./ms.pdf
-  compare:
-    needs: [build-arxiv, build-local, build-docker]
+  compare-and-upload-release-assets:
+    needs: [compare, release, build-arxiv, build-local, build-docker]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -86,14 +86,6 @@ jobs:
         run: diff ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf ${{ matrix.var }}-${{ matrix.os }}-1/ms.pdf
       - name: Compare pdf binaries
         run: mv ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf ${{ matrix.var }}-${{ matrix.os }}.pdf
-  release-assets:
-    needs: [compare, release]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-20.04]
-        var: [arxiv, local, docker]
-    steps:
       - name: Upload Release Asset
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1
@@ -105,7 +97,7 @@ jobs:
           asset_name: ${{ matrix.var }}-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
   upload-sha256sum:
-    needs: [release, compare]
+    needs: [release, compare-and-upload-release-assets]
     runs-on: ubuntu-20.04
     steps:
       - name: Download pdfs from build
