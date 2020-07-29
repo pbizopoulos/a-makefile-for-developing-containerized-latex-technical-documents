@@ -96,7 +96,7 @@ jobs:
           asset_name: ${{ matrix.var }}-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
       - name: Create sha256sum asset
-        run: sha256sum -b arxiv-ubuntu-20.04/ms.pdf local-ubuntu-20.04/ms.pdf docker-ubuntu-20.04/ms.pdf > sha256sum.txt
+        run: sha256sum ${{ matrix.var }}-${{ matrix.os }}.pdf > ${{ matrix.var }}-${{ matrix.os }}-sha256sum.txt
       - name: Upload sha256sum artifact
         uses: actions/upload-artifact@v2
         with:
@@ -108,6 +108,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./sha256sum.txt
-          asset_name: sha256sum.txt
+          asset_path: ./${{ matrix.var }}-${{ matrix.os }}-sha256sum.txt
+          asset_name: ${{ matrix.var }}-${{ matrix.os }}-sha256sum.txt
           asset_content_type: application/text
