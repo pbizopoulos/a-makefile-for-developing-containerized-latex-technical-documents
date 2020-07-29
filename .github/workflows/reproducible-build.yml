@@ -73,7 +73,7 @@ jobs:
           name: docker-${{ matrix.os }}-${{ matrix.index }}
           path: ./ms.pdf
   compare-arxiv:
-    needs: [release, build-arxiv]
+    needs: [release, build-arxiv-ubuntu-20-04]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
