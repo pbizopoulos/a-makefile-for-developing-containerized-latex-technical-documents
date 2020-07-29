@@ -15,8 +15,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          tag_name: v1
+          release_name: Release v1
           draft: false
           prerelease: false
   build-arxiv:
@@ -84,8 +84,6 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Compare pdf binaries
         run: diff ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf ${{ matrix.var }}-${{ matrix.os }}-1/ms.pdf
-      - name: Compare pdf binaries
-        run: mv ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf ${{ matrix.var }}-${{ matrix.os }}.pdf
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
