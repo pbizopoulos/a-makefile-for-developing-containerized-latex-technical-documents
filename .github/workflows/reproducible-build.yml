@@ -8,8 +8,8 @@ jobs:
     outputs: 
       upload_url: ${{ steps.create_release.outputs.upload_url }} 
     steps:
+      - id: create_release
       - name: Create Release
-        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,7 +56,7 @@ jobs:
           name: docker-${{ matrix.os }}-${{ matrix.index }}
           path: ./ms.pdf
   compare-local-ubuntu-20-04:
-    needs: [build-local]
+    needs: [release, build-local]
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -79,7 +79,7 @@ jobs:
           asset_name: local-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
   compare-docker-ubuntu-20-04:
-    needs: [build-docker]
+    needs: [release, build-docker]
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -102,7 +102,7 @@ jobs:
           asset_name: docker-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
   compare-docker-ubuntu-18-04:
-    needs: [build-docker]
+    needs: [release, build-docker]
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -125,7 +125,7 @@ jobs:
           asset_name: docker-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
   compare-docker-ubuntu-16-04:
-    needs: [build-docker]
+    needs: [release, build-docker]
     runs-on: ubuntu-20.04
     strategy:
       matrix:
