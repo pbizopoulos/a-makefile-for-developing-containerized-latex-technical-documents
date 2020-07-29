@@ -19,7 +19,7 @@ jobs:
           release_name: ${{ github.ref }}
           draft: false
           prerelease: false
-  build-arxiv-ubuntu-20-04:
+  build-arxiv:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -73,7 +73,7 @@ jobs:
           name: docker-${{ matrix.os }}-${{ matrix.index }}
           path: ./ms.pdf
   compare:
-    needs: [release, build-arxiv, build-local, build-docker]
+    needs: [build-arxiv, build-local, build-docker]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -105,7 +105,7 @@ jobs:
           asset_name: ${{ matrix.var }}-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
   upload-sha256sum:
-    needs: [release, compare-arxiv-ubuntu-20-04, compare-local-ubuntu-20-04, compare-docker-ubuntu-20-04]
+    needs: [release, compare]
     runs-on: ubuntu-20.04
     steps:
       - name: Download pdfs from build
