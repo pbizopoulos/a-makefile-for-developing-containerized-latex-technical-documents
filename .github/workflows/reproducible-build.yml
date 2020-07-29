@@ -19,8 +19,12 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-  build-arxiv:
-    runs-on: ubuntu-20.04
+  build-arxiv-ubuntu-20-04:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ubuntu-20.04
+        index: [0, 1]
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v2
@@ -29,13 +33,13 @@ jobs:
       - name: Upload pdf for comparison
         uses: actions/upload-artifact@v2
         with:
-          name: arxiv
+          name: arxiv-${{ matrix.os }}-${{ matrix.index }}
           path: ./ms.pdf
   build-local:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: ubuntu-20.04
         index: [0, 1]
     steps:
       - name: Set up Git repository
@@ -56,7 +60,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04]
+        os: ubuntu-20.04
         index: [0, 1]
     steps:
       - name: Set up Git repository
@@ -68,33 +72,35 @@ jobs:
         with:
           name: docker-${{ matrix.os }}-${{ matrix.index }}
           path: ./ms.pdf
-  build-linux-other:
-    runs-on: ubuntu-latest
+  compare-arxiv:
+    needs: [release, build-arxiv]
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ['centos', 'archlinux']
-        index: [0, 1]
-    container: ${{ matrix.os }}
+        os: ubuntu-20.04
     steps:
-      - name: install toolchain
-        if: contains(matrix.os, 'centos')
-        run: yum install -y make docker
-      - name: install toolchain
-        if: contains(matrix.os, 'archlinux')
-        run: pacman -Syy --noconfirm make docker
-      - name: Build/Run Docker code
-        run: make docker ARGS=${{ env.ARGS }}
-      - name: Upload pdf for comparison
-        uses: actions/upload-artifact@v2
+      - name: Download pdfs from build
+        uses: actions/download-artifact@v2
+      - name: Compare pdf binaries
+        run: diff arxiv-${{ matrix.os }}-0/ms.pdf arxiv-${{ matrix.os }}-1/ms.pdf
+      - name: Compare pdf binaries
+        run: mv arxiv-${{ matrix.os }}-0/ms.pdf arxiv-${{ matrix.os }}.pdf
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: docker-${{ matrix.os }}-${{ matrix.index }}
-          path: ./ms.pdf
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./arxiv-${{ matrix.os }}.pdf
+          asset_name: arxiv-${{ matrix.os }}.pdf
+          asset_content_type: application/pdf
   compare-local-ubuntu-20-04:
     needs: [release, build-local]
-    runs-on: ubuntu-20.04
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: ubuntu-20.04
     steps:
       - name: Download pdfs from build
         uses: actions/download-artifact@v2
@@ -114,102 +120,10 @@ jobs:
           asset_content_type: application/pdf
   compare-docker-ubuntu-20-04:
     needs: [release, build-docker]
-    runs-on: ubuntu-20.04
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04]
-    steps:
-      - name: Download pdfs from build
-        uses: actions/download-artifact@v2
-      - name: Compare pdf binaries
-        run: diff docker-${{ matrix.os }}-0/ms.pdf docker-${{ matrix.os }}-1/ms.pdf
-      - name: Compare pdf binaries
-        run: mv docker-${{ matrix.os }}-0/ms.pdf docker-${{ matrix.os }}.pdf
-      - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./docker-${{ matrix.os }}.pdf
-          asset_name: docker-${{ matrix.os }}.pdf
-          asset_content_type: application/pdf
-  compare-docker-ubuntu-18-04:
-    needs: [release, build-docker]
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        os: [ubuntu-18.04]
-    steps:
-      - name: Download pdfs from build
-        uses: actions/download-artifact@v2
-      - name: Compare pdf binaries
-        run: diff docker-${{ matrix.os }}-0/ms.pdf docker-${{ matrix.os }}-1/ms.pdf
-      - name: Compare pdf binaries
-        run: mv docker-${{ matrix.os }}-0/ms.pdf docker-${{ matrix.os }}.pdf
-      - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./docker-${{ matrix.os }}.pdf
-          asset_name: docker-${{ matrix.os }}.pdf
-          asset_content_type: application/pdf
-  compare-docker-ubuntu-16-04:
-    needs: [release, build-docker]
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        os: [ubuntu-16.04]
-    steps:
-      - name: Download pdfs from build
-        uses: actions/download-artifact@v2
-      - name: Compare pdf binaries
-        run: diff docker-${{ matrix.os }}-0/ms.pdf docker-${{ matrix.os }}-1/ms.pdf
-      - name: Compare pdf binaries
-        run: mv docker-${{ matrix.os }}-0/ms.pdf docker-${{ matrix.os }}.pdf
-      - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./docker-${{ matrix.os }}.pdf
-          asset_name: docker-${{ matrix.os }}.pdf
-          asset_content_type: application/pdf
-  compare-docker-archlinux:
-    needs: [release, build-linux-other]
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        os: [archlinux]
-    steps:
-      - name: Download pdfs from build
-        uses: actions/download-artifact@v2
-      - name: Compare pdf binaries
-        run: diff docker-${{ matrix.os }}-0/ms.pdf docker-${{ matrix.os }}-1/ms.pdf
-      - name: Compare pdf binaries
-        run: mv docker-${{ matrix.os }}-0/ms.pdf docker-${{ matrix.os }}.pdf
-      - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./docker-${{ matrix.os }}.pdf
-          asset_name: docker-${{ matrix.os }}.pdf
-          asset_content_type: application/pdf
-  compare-docker-centos:
-    needs: [release, build-linux-other]
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        os: [centos]
+        os: ubuntu-20.04
     steps:
       - name: Download pdfs from build
         uses: actions/download-artifact@v2
@@ -228,13 +142,13 @@ jobs:
           asset_name: docker-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
   compare:
-    needs: [build-arxiv, compare-local-ubuntu-20-04, compare-docker-ubuntu-20-04, compare-docker-ubuntu-18-04, compare-docker-ubuntu-16-04, compare-docker-archlinux, compare-docker-centos]
+    needs: [compare-arxiv-ubuntu-20-04, compare-local-ubuntu-20-04, compare-docker-ubuntu-20-04]
     runs-on: ubuntu-20.04
     steps:
       - name: Download pdfs from build
         uses: actions/download-artifact@v2
       - name: Compare pdf binaries
-        run: diff --from-file arxiv/ms.pdf local-ubuntu-20.04-0/ms.pdf docker-ubuntu-20.04-0/ms.pdf docker-ubuntu-18.04-0/ms.pdf docker-ubuntu-16.04-0/ms.pdf
+        run: diff --from-file arxiv-ubuntu-20.04-0/ms.pdf local-ubuntu-20.04-0/ms.pdf docker-ubuntu-20.04-0/ms.pdf
       - name: Create file with sha256sum name
         run: echo ::set-env name=sha256sumfilename::$(sha256sum local-ubuntu-20.04/ms.pdf | cut -d ' ' -f1)
       - name: Upload file with sha256sum name
