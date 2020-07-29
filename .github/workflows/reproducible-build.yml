@@ -7,7 +7,6 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Create Release
-        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +71,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ jobs.create-release.outputs.upload_url }}
           asset_path: ./local-${{ matrix.os }}.pdf
           asset_name: local-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
@@ -95,7 +94,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ jobs.create-release.outputs.upload_url }}
           asset_path: ./docker-${{ matrix.os }}.pdf
           asset_name: docker-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
@@ -118,7 +117,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ jobs.create-release.outputs.upload_url }}
           asset_path: ./docker-${{ matrix.os }}.pdf
           asset_name: docker-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
@@ -141,7 +140,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ jobs.create-release.outputs.upload_url }}
           asset_path: ./docker-${{ matrix.os }}.pdf
           asset_name: docker-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
