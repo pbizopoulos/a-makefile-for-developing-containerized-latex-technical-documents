@@ -1,5 +1,5 @@
 name: reproducible-build
-on: release
+on: [push, pull_request]
 env:
   ARGS: --full
   ARXIV_ID: '2005.12660'
