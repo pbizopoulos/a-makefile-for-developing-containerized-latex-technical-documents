@@ -148,11 +148,19 @@ jobs:
       - name: Download pdfs from build
         uses: actions/download-artifact@v2
       - name: Compare pdf binaries
-        run: diff --from-file arxiv-ubuntu-20.04-0/ms.pdf local-ubuntu-20.04-0/ms.pdf docker-ubuntu-20.04-0/ms.pdf
-      - name: Create file with sha256sum name
-        run: echo ::set-env name=sha256sumfilename::$(sha256sum local-ubuntu-20.04/ms.pdf | cut -d ' ' -f1)
+        run: sha256sum -b arxiv-ubuntu-20.04-0/ms.pdf local-ubuntu-20.04-0/ms.pdf docker-ubuntu-20.04-0/ms.pdf > sha256sum.txt
       - name: Upload file with sha256sum name
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.sha256sumfilename }}
+          name: sha256sum.txt
           path: .
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./sha256sum.txt
+          asset_name: sha256sum.txt
+          asset_content_type: application/text
