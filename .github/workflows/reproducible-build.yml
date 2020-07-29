@@ -84,6 +84,8 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Compare pdf binaries
         run: diff ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf ${{ matrix.var }}-${{ matrix.os }}-1/ms.pdf
+      - name: Rename pdf binaries
+        run: mv ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf ${{ matrix.var }}-${{ matrix.os }}.pdf
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
@@ -94,7 +96,7 @@ jobs:
           asset_name: ${{ matrix.var }}-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
       - name: Create sha256sum asset
-        run: sha256sum -b arxiv-ubuntu-20.04-0/ms.pdf local-ubuntu-20.04-0/ms.pdf docker-ubuntu-20.04-0/ms.pdf > sha256sum.txt
+        run: sha256sum -b arxiv-ubuntu-20.04/ms.pdf local-ubuntu-20.04/ms.pdf docker-ubuntu-20.04/ms.pdf > sha256sum.txt
       - name: Upload sha256sum artifact
         uses: actions/upload-artifact@v2
         with:
