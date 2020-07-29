@@ -92,13 +92,7 @@ jobs:
       - name: Download pdfs from build
         uses: actions/download-artifact@v2
       - name: Compare pdf binaries
-        run: |
-          diff --from-file
-          local-ubuntu-20.04-0/ms.pdf
-          docker-ubuntu-20.04-0/ms.pdf
-          docker-ubuntu-18.04-0/ms.pdf
-          docker-ubuntu-16.04-0/ms.pdf
-          output-arxiv/ms.pdf
+        run: diff --from-file local-ubuntu-20.04-0/ms.pdf docker-ubuntu-20.04-0/ms.pdf docker-ubuntu-18.04-0/ms.pdf docker-ubuntu-16.04-0/ms.pdf output-arxiv/ms.pdf
       - name: Create file with sha256sum name
         run: echo ::set-env name=sha256sumfilename::$(sha256sum local-ubuntu-20.04/ms.pdf | cut -d ' ' -f1)
       - name: Upload file with sha256sum name
