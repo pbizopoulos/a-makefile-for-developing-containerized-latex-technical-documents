@@ -10,16 +10,16 @@ jobs:
         os: [ubuntu-20.04]
         index: [0, 1]
     steps:
-        uses: actions/checkout@v2
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-venv
-        shell: bash
-        run: make ARGS=${{ env.ARGS }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: local-${{ matrix.os }}-${{ matrix.index }}
-          path: ./ms.pdf
+      uses: actions/checkout@v2
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-venv
+      shell: bash
+      run: make ARGS=${{ env.ARGS }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: local-${{ matrix.os }}-${{ matrix.index }}
+        path: ./ms.pdf
   build-docker:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -27,57 +27,57 @@ jobs:
         os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04]
         index: [0, 1]
     steps:
-        uses: actions/checkout@v2
-        run: make docker ARGS=${{ env.ARGS }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: docker-${{ matrix.os }}-${{ matrix.index }}
-          path: ./ms.pdf
+      uses: actions/checkout@v2
+      run: make docker ARGS=${{ env.ARGS }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: docker-${{ matrix.os }}-${{ matrix.index }}
+        path: ./ms.pdf
   compare-local-ubuntu-20-04:
     needs: [build-local]
     runs-on: ubuntu-20.04
     steps:
-        uses: actions/download-artifact@v2
-        with:
-          name: [local-ubuntu-20.04-0, local-ubuntu-20.04-1]
+      uses: actions/download-artifact@v2
+      with:
+        name: [local-ubuntu-20.04-0, local-ubuntu-20.04-1]
         run: diff local-ubuntu-20.04-0/ms.pdf local-ubuntu-20.04-1/ms.pdf
   compare-docker-ubuntu-20-04:
     needs: [build-docker]
     runs-on: ubuntu-20.04
     steps:
-        uses: actions/download-artifact@v2
-        with:
-          name: [docker-ubuntu-20.04-0, docker-ubuntu-20.04-1]
+      uses: actions/download-artifact@v2
+      with:
+        name: [docker-ubuntu-20.04-0, docker-ubuntu-20.04-1]
         run: diff docker-ubuntu-20.04-0/ms.pdf docker-ubuntu-20.04-1/ms.pdf
   compare-docker-ubuntu-18-04:
     needs: [build-docker]
     runs-on: ubuntu-20.04
     steps:
-        uses: actions/download-artifact@v2
-        with:
-          name: [docker-ubuntu-18.04-0, docker-ubuntu-18.04-1]
+      uses: actions/download-artifact@v2
+      with:
+        name: [docker-ubuntu-18.04-0, docker-ubuntu-18.04-1]
         run: diff docker-ubuntu-18.04-0/ms.pdf docker-ubuntu-18.04-1/ms.pdf
   compare-docker-ubuntu-16-04:
     needs: [build-docker]
     runs-on: ubuntu-20.04
     steps:
-        uses: actions/download-artifact@v2
-        with:
-          name: [docker-ubuntu-16.04-0, docker-ubuntu-16.04-1]
+      uses: actions/download-artifact@v2
+      with:
+        name: [docker-ubuntu-16.04-0, docker-ubuntu-16.04-1]
         run: diff docker-ubuntu-16.04-0/ms.pdf docker-ubuntu-16.04-1/ms.pdf
   compare:
     needs: [compare-local-ubuntu-20-04, compare-docker-ubuntu-20-04, compare-docker-ubuntu-18-04, compare-docker-ubuntu-16-04]
     runs-on: ubuntu-20.04
     steps:
-        uses: actions/download-artifact@v2
-        run: |
-          diff --from-file
-          local-ubuntu-20.04/ms.pdf
-          docker-ubuntu-20.04/ms.pdf
-          docker-ubuntu-18.04/ms.pdf
-          docker-ubuntu-16.04/ms.pdf
-        run: echo ::set-env name=sha256sumfilename::$(sha256sum local-ubuntu-20.04/ms.pdf | cut -d ' ' -f1)
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.sha256sumfilename }}
-          path: .
+      uses: actions/download-artifact@v2
+      run: |
+        diff --from-file
+        local-ubuntu-20.04/ms.pdf
+        docker-ubuntu-20.04/ms.pdf
+        docker-ubuntu-18.04/ms.pdf
+        docker-ubuntu-16.04/ms.pdf
+      run: echo ::set-env name=sha256sumfilename::$(sha256sum local-ubuntu-20.04/ms.pdf | cut -d ' ' -f1)
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.sha256sumfilename }}
+        path: .
