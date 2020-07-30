@@ -96,12 +96,7 @@ jobs:
           asset_name: ${{ matrix.var }}-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
       - name: Create sha256sum asset
-        run: sha256sum ${{ matrix.var }}-${{ matrix.os }}.pdf > ${{ matrix.var }}-${{ matrix.os }}-sha256sum.txt
-      - name: Upload sha256sum artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: sha256sum.txt
-          path: .
+        run: sha256sum ${{ matrix.var }}-${{ matrix.os }}.pdf | cut -d " " -f 1 > ${{ matrix.var }}-${{ matrix.os }}-sha256sum.txt
       - name: Upload sha256sum to releases
         uses: actions/upload-release-asset@v1
         env:
