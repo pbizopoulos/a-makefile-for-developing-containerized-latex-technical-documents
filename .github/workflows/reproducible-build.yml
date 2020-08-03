@@ -6,7 +6,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04]
+        os: [ubuntu-20.04, ubuntu-18.04]
         index: [0, 1]
         var: [local, docker, arxiv]
     steps:
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04]
+        os: [ubuntu-20.04, ubuntu-18.04]
         var: [local, docker, arxiv]
     steps:
       - name: Download pdfs from build
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04]
+        os: [ubuntu-20.04, ubuntu-18.04]
         var: [local, docker, arxiv]
     steps:
       - name: Download pdfs from build
