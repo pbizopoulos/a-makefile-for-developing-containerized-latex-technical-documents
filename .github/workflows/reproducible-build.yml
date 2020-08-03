@@ -107,6 +107,14 @@ jobs:
       - name: Download pdfs from build
         uses: actions/download-artifact@v2
       - name: Upload Release Asset
+        run: |
+          ls
+          echo this
+          ls ${{ matrix.var }}-${{ matrix.os }}-0.pdf
+          echo this
+          ls ${{ matrix.var }}-${{ matrix.os }}.pdf
+          echo this
+      - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
