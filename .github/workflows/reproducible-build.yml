@@ -6,22 +6,23 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04]
         index: [0, 1]
         var: [local, docker, arxiv]
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v2
-      - if: ${{ matrix.var }} == 'local'
-        name: install prerequisites
+      - name: make ubuntu
+        if: ${{ matrix.var }} == 'local'
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-venv
           make ARGS=--full
-      - if: ${{ matrix.var }} == 'docker'
-        name: Build/Run Docker code
+      - name: make docker
+        if: ${{ matrix.var }} == 'docker'
         run: make docker ARGS=--full
-      - if: ${{ matrix.var }} == 'arxiv'
+      - name: make arxiv
+        if: ${{ matrix.var }} == 'arxiv'
         run: make arxiv ARXIV_ID=$(echo ${{ github.event.head_commit.message }} | awk -F'[][]' '{print $2}')
       - name: Upload pdf for comparison
         uses: actions/upload-artifact@v2
@@ -33,7 +34,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04]
         var: [local, docker, arxiv]
     steps:
       - name: Download pdfs from build
@@ -61,7 +62,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04]
         var: [local, docker, arxiv]
     steps:
       - name: Download pdfs from build
