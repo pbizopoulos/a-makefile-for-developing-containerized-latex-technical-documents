@@ -53,7 +53,7 @@ jobs:
       - if: contains(github.event.head_commit.message, '{full}')
         name: make
         run: make ARGS=--full
-      - if: !contains(github.event.head_commit.message, '{full}')
+      - if: "!contains(github.event.head_commit.message, '{full}')"
         name: make
         run: make
       - name: Upload pdf for comparison
@@ -74,7 +74,7 @@ jobs:
       - if: contains(github.event.head_commit.message, '{full}')
         name: Build/Run Docker code
         run: make docker ARGS=--full
-      - if: !contains(github.event.head_commit.message, '{full}')
+      - if: "!contains(github.event.head_commit.message, '{full}')"
         name: Build/Run Docker code
         run: make docker
       - name: Upload pdf for comparison
