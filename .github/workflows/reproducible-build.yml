@@ -2,8 +2,8 @@ name: reproducible-build
 on: [push, pull_request]
 env:
   ARGS: --full
-  ARXIV_ID: '2005.12660'
 jobs:
+  setenv:
   release:
     runs-on: ubuntu-20.04
     outputs: 
@@ -25,11 +25,13 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         index: [0, 1]
+    if: "contains(github.event.head_commit.message, '[')"
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v2
       - name: make arxiv
-        run: make arxiv ARXIV_ID=${{ env.ARXIV_ID }}
+        run: |
+          make arxiv ARXIV_ID=$(echo ${{ github.event.head_commit.message }} | awk -F'[][]' '{print $2}')
       - name: Upload pdf for comparison
         uses: actions/upload-artifact@v2
         with:
