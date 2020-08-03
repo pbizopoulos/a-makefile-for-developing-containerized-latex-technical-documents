@@ -13,16 +13,16 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v2
       - name: make ubuntu
-        if: ${{ matrix.var }} == 'local'
+        if: matrix.var == 'local'
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-venv
           make ARGS=--full
       - name: make docker
-        if: ${{ matrix.var }} == 'docker'
+        if: matrix.var == 'docker'
         run: make docker ARGS=--full
       - name: make arxiv
-        if: ${{ matrix.var }} == 'arxiv'
+        if: matrix.var == 'arxiv'
         run: make arxiv ARXIV_ID=$(echo ${{ github.event.head_commit.message }} | awk -F'[][]' '{print $2}')
       - name: Upload pdf for comparison
         uses: actions/upload-artifact@v2
