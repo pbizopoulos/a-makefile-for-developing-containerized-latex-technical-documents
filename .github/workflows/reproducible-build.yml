@@ -68,7 +68,7 @@ jobs:
   compare-release-assets:
     if: contains(github.event.head_commit.message, '{') || contains(github.event.head_commit.message, '[')
     needs: [build-arxiv, build-local, build-docker]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         os: [ubuntu-20.04]
@@ -79,8 +79,7 @@ jobs:
       - name: Compare pdf binaries
         run: diff ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf ${{ matrix.var }}-${{ matrix.os }}-1/ms.pdf
   release:
-    if: contains(github.event.head_commit.message, '{release}')
-    needs: [build-arxiv, build-local, build-docker]
+    needs: [compare-release-assets, build-arxiv, build-local, build-docker]
     runs-on: ubuntu-20.04
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }} 
@@ -96,9 +95,8 @@ jobs:
           draft: false
           prerelease: false
   upload-release-assets:
-    if: contains(github.event.head_commit.message, '{release}')
     needs: [release]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         os: [ubuntu-20.04]
@@ -106,11 +104,8 @@ jobs:
     steps:
       - name: Download pdfs from build
         uses: actions/download-artifact@v2
-      - name: test
-        run: |
-          ls
-          echo this
-          ls ${{ matrix.var }}-${{ matrix.os }}-0
+      - name: Create sha256sum var
+        run: sha256sumvar=$(sha256sum ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf | cut -d " " -f 1)
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
@@ -118,16 +113,5 @@ jobs:
         with:
           upload_url: ${{ needs.release.outputs.upload_url }} 
           asset_path: ./${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf
-          asset_name: ${{ matrix.var }}-${{ matrix.os }}.pdf
+          asset_name: ${{ matrix.var }}-${{ matrix.os }}-$sha256sumvar.pdf
           asset_content_type: application/pdf
-      - name: Create sha256sum asset
-        run: sha256sum ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf | cut -d " " -f 1 > ${{ matrix.var }}-${{ matrix.os }}.sha256
-      - name: Upload sha256sum to releases
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./${{ matrix.var }}-${{ matrix.os }}.sha256
-          asset_name: ${{ matrix.var }}-${{ matrix.os }}.sha256
-          asset_content_type: application/text
