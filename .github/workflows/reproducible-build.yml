@@ -78,7 +78,7 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Compare pdf binaries
         run: diff ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf ${{ matrix.var }}-${{ matrix.os }}-1/ms.pdf
-  create-release:
+  release:
     if: contains(github.event.head_commit.message, '{release}')
     needs: [build-arxiv, build-local, build-docker]
     runs-on: ubuntu-20.04
@@ -97,7 +97,7 @@ jobs:
           prerelease: false
   upload-release-assets:
     if: contains(github.event.head_commit.message, '{release}')
-    needs: [create-release]
+    needs: [release]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -117,11 +117,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }} 
-          asset_path: ./${{ matrix.var }}-${{ matrix.os }}-0.pdf
+          asset_path: ./${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf
           asset_name: ${{ matrix.var }}-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
       - name: Create sha256sum asset
-        run: sha256sum ${{ matrix.var }}-${{ matrix.os }}-0.pdf | cut -d " " -f 1 > ${{ matrix.var }}-${{ matrix.os }}.sha256
+        run: sha256sum ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf | cut -d " " -f 1 > ${{ matrix.var }}-${{ matrix.os }}.sha256
       - name: Upload sha256sum to releases
         uses: actions/upload-release-asset@v1
         env:
