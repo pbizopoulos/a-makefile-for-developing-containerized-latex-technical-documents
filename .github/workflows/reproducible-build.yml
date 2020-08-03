@@ -1,8 +1,8 @@
 name: reproducible-build
 on: [push, pull_request]
-if: "!contains(github.event.head_commit.message, '{skip}')"
 jobs:
   release:
+    if: "!contains(github.event.head_commit.message, '{skip}')"
     if: "contains(github.event.head_commit.message, '{release}')"
     runs-on: ubuntu-20.04
     outputs: 
@@ -19,6 +19,7 @@ jobs:
           draft: false
           prerelease: false
   build-arxiv:
+    if: "!contains(github.event.head_commit.message, '{skip}')"
     if: "contains(github.event.head_commit.message, '[')"
     runs-on: ${{ matrix.os }}
     strategy:
@@ -37,6 +38,7 @@ jobs:
           name: arxiv-${{ matrix.os }}-${{ matrix.index }}
           path: ./ms.pdf
   build-local:
+    if: "!contains(github.event.head_commit.message, '{skip}')"
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -62,6 +64,7 @@ jobs:
           name: local-${{ matrix.os }}-${{ matrix.index }}
           path: ./ms.pdf
   build-docker:
+    if: "!contains(github.event.head_commit.message, '{skip}')"
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -82,6 +85,7 @@ jobs:
           name: docker-${{ matrix.os }}-${{ matrix.index }}
           path: ./ms.pdf
   compare-and-upload-release-assets:
+    if: "!contains(github.event.head_commit.message, '{skip}')"
     needs: [release, build-arxiv, build-local, build-docker]
     runs-on: ${{ matrix.os }}
     strategy:
