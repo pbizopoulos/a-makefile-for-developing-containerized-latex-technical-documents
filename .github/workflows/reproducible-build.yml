@@ -110,9 +110,7 @@ jobs:
         run: |
           ls
           echo this
-          ls ${{ matrix.var }}-${{ matrix.os }}-0.pdf
-          echo this
-          ls ${{ matrix.var }}-${{ matrix.os }}.pdf
+          ls ${{ matrix.var }}-${{ matrix.os }}-0
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
