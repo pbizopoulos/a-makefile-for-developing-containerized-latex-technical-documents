@@ -80,7 +80,7 @@ jobs:
         run: diff ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf ${{ matrix.var }}-${{ matrix.os }}-1/ms.pdf
   upload-release-assets:
     if: contains(github.event.head_commit.message, '{release}')
-    needs: [release, build-arxiv, build-local, build-docker]
+    needs: [build-arxiv, build-local, build-docker]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
