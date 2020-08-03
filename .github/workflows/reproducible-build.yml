@@ -82,9 +82,9 @@ jobs:
         with:
           name: docker-${{ matrix.os }}-${{ matrix.index }}
           path: ./ms.pdf
-  compare-and-upload-release-assets:
+  compare-release-assets:
     if: contains(github.event.head_commit.message, '{') || contains(github.event.head_commit.message, '[')
-    needs: [release, build-arxiv, build-local, build-docker]
+    needs: [build-arxiv, build-local, build-docker]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -95,20 +95,22 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Compare pdf binaries
         run: diff ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf ${{ matrix.var }}-${{ matrix.os }}-1/ms.pdf
-      - name: Rename pdf binaries
-        run: mv ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf ${{ matrix.var }}-${{ matrix.os }}.pdf
-      - if: contains(github.event.head_commit.message, '{release}')
-        name: Upload Release Asset
+  upload-release-assets:
+    if: contains(github.event.head_commit.message, '{release}')
+    needs: [release, build-arxiv, build-local, build-docker]
+      - name: Download pdfs from build
+        uses: actions/download-artifact@v2
+      - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./${{ matrix.var }}-${{ matrix.os }}.pdf
+          asset_path: ./${{ matrix.var }}-${{ matrix.os }}-0.pdf
           asset_name: ${{ matrix.var }}-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
       - name: Create sha256sum asset
-        run: sha256sum ${{ matrix.var }}-${{ matrix.os }}.pdf | cut -d " " -f 1 > ${{ matrix.var }}-${{ matrix.os }}.sha256
+        run: sha256sum ${{ matrix.var }}-${{ matrix.os }}-0.pdf | cut -d " " -f 1 > ${{ matrix.var }}-${{ matrix.os }}.sha256
       - name: Upload sha256sum to releases
         uses: actions/upload-release-asset@v1
         env:
