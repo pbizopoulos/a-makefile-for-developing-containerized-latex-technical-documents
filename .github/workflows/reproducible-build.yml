@@ -78,17 +78,16 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Compare pdf binaries
         run: diff ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf ${{ matrix.var }}-${{ matrix.os }}-1/ms.pdf
-  upload-release-assets:
+  create-release:
     if: contains(github.event.head_commit.message, '{release}')
     needs: [build-arxiv, build-local, build-docker]
     runs-on: ${{ matrix.os }}
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }} 
     strategy:
       matrix:
         os: [ubuntu-20.04]
-        var: [arxiv, local, docker]
     steps:
-      - name: Download pdfs from build
-        uses: actions/download-artifact@v2
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -99,6 +98,17 @@ jobs:
           release_name: Release v1
           draft: false
           prerelease: false
+  upload-release-assets:
+    if: contains(github.event.head_commit.message, '{release}')
+    needs: [release]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+        var: [arxiv, local, docker]
+    steps:
+      - name: Download pdfs from build
+        uses: actions/download-artifact@v2
       - name: test
         run: |
           ls
@@ -111,7 +121,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          upload_url: ${{ needs.release.outputs.upload_url }} 
           asset_path: ./${{ matrix.var }}-${{ matrix.os }}-0.pdf
           asset_name: ${{ matrix.var }}-${{ matrix.os }}.pdf
           asset_content_type: application/pdf
