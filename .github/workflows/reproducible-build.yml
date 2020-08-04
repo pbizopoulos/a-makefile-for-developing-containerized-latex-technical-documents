@@ -13,23 +13,14 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v2
       - name: make ubuntu full
-        if: matrix.var == 'local' && !contains(github.event.head_commit.message, '[not-full]')
+        if: matrix.var == 'local'
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-venv
           make ARGS=--full
-      - name: make ubuntu not-full
-        if: matrix.var == 'local' && contains(github.event.head_commit.message, '[not-full]')
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-venv
-          make
       - name: make docker full
-        if: matrix.var == 'docker' && !contains(github.event.head_commit.message, '[not-full]')
+        if: matrix.var == 'docker'
         run: make docker ARGS=--full
-      - name: make docker not-full
-        if: matrix.var == 'docker' && contains(github.event.head_commit.message, '[not-full]')
-        run: make docker
       - name: make arxiv
         run: make arxiv ARXIV_ID=$(echo ${{ github.event.head_commit.message }} | awk -F'[][]' '{print $2}')
       - name: Upload pdf for comparison
