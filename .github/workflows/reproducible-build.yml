@@ -31,7 +31,6 @@ jobs:
         if: matrix.var == 'docker' && contains(github.event.head_commit.message, '[not-full]')
         run: make docker
       - name: make arxiv
-        if: matrix.var == 'arxiv' && !contains(github.event.head_commit.message, '[not-full]')
         run: make arxiv ARXIV_ID=$(echo ${{ github.event.head_commit.message }} | awk -F'[][]' '{print $2}')
       - name: Upload pdf for comparison
         uses: actions/upload-artifact@v2
