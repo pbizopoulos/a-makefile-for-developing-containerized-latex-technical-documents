@@ -22,6 +22,7 @@ jobs:
         if: matrix.var == 'docker'
         run: make docker ARGS=--full
       - name: make arxiv
+        if: matrix.var == 'arxiv'
         run: make arxiv ARXIV_ID=$(echo ${{ github.event.head_commit.message }} | awk -F'[][]' '{print $2}')
       - name: Upload pdf for comparison
         uses: actions/upload-artifact@v2
