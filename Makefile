@@ -36,7 +36,6 @@ docker:
 	docker run --rm \
 		--user $(shell id -u):$(shell id -g) \
 		-w $(DOCKER_WORKDIR) \
-		-e HOME=$(DOCKER_WORKDIR)/$(CACHE_DIR) \
 		-v $(PWD):$(DOCKER_WORKDIR) \
 		$(NAME_CURRENT_DIR) \
 		$(PYTHON) $(ROOT_CODE) $(ARGS) --cache-dir $(CACHE_DIR) --results-dir $(RESULTS_DIR)
@@ -47,7 +46,6 @@ docker-gpu:
 	docker run --rm \
 		--user $(shell id -u):$(shell id -g) \
 		-w $(DOCKER_WORKDIR) \
-		-e HOME=$(DOCKER_WORKDIR)/$(CACHE_DIR) \
 		-v $(PWD):$(DOCKER_WORKDIR) \
 		--gpus all $(NAME_CURRENT_DIR) \
 		$(PYTHON) $(ROOT_CODE) $(ARGS) --cache-dir $(CACHE_DIR) --results-dir $(RESULTS_DIR)
@@ -58,7 +56,7 @@ docker-pdf:
 		--user $(shell id -u):$(shell id -g) \
 		-v $(PWD)/:/home/latex \
 		aergus/latex \
-		latexmk -usepretex="\pdfinfo{/Author () /Title () /Subject () /Keywords () /Creator () /Producer () /CreationDate () /ModDate ()}\pdfsuppressptexinfo=-1\pdftrailerid{}" -gg -pdf -cd /home/latex/$(ROOT_TEX_NO_EXT).tex
+		latexmk -usepretex="\pdfinfoomitdate=1\pdfsuppressptexinfo=-1\pdftrailerid{}" -gg -pdf -cd /home/latex/$(ROOT_TEX_NO_EXT).tex
 	sha256sum $(ROOT_TEX_NO_EXT).pdf
 
 arxiv:
