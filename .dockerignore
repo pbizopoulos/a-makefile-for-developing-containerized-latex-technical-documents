@@ -6,11 +6,9 @@
 *.log
 *.out
 *.pdf
-
 __pycache__/
 arxiv.tar
 cache/
 results/
 venv/
-
 .git/

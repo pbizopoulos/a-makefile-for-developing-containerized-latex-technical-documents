@@ -4,5 +4,3 @@
 
 # Reconciler: A Template for Reproducible Computational Research Papers
 This repository contains the code that generates the results of the paper **Reconciler: A Template for Reproducible Computational Research Papers**.
-
-[Build instructions](https://pbizopoulos.github.io/reconciler-a-template-for-reproducible-computational-research-papers/build_instructions.txt)

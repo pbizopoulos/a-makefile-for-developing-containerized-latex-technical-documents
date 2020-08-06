@@ -10,21 +10,22 @@ RESULTS_DIR = results
 ROOT_CODE = main.py
 ROOT_TEX_NO_EXT = ms
 SRC_CODE = $(shell find . -maxdepth 1 -name '*.py')
+VENV_DIR = venv
 
 $(ROOT_TEX_NO_EXT).pdf: $(ROOT_TEX_NO_EXT).tex $(ROOT_TEX_NO_EXT).bib $(RESULTS_DIR)
 	make docker-pdf
 
-$(RESULTS_DIR): venv $(SRC_CODE)
+$(RESULTS_DIR): $(VENV_DIR) $(SRC_CODE)
 	rm -rf $@/
 	. $</bin/activate; $(PYTHON) $(ROOT_CODE) $(ARGS) --cache-dir $(CACHE_DIR) --results-dir $(RESULTS_DIR)
 
-venv: requirements.txt
+$(VENV_DIR): requirements.txt
 	rm -rf $@/
-	$(PYTHON) -m $@ $@/
+	$(PYTHON) -m venv $@/
 	. $@/bin/activate; $(PYTHON) -m pip install -U pip wheel; $(PYTHON) -m pip install -Ur $<
 
 clean:
-	rm -rf __pycache__/ $(CACHE_DIR)/ $(RESULTS_DIR)/ venv/ arxiv.tar $(ROOT_TEX_NO_EXT).bbl
+	rm -rf __pycache__/ $(CACHE_DIR)/ $(RESULTS_DIR)/ $(VENV_DIR)/ arxiv.tar $(ROOT_TEX_NO_EXT).bbl
 	docker run --rm \
 		--user $(shell id -u):$(shell id -g) \
 		-v $(PWD)/:/home/latex \
@@ -78,3 +79,28 @@ download-results:
 delete-results:
 	hub release delete $(RELEASE_NAME)
 	git push origin :$(RELEASE_NAME)
+
+.gitignore: Makefile
+	echo "*.aux" > .gitignore
+	echo "*.bbl" >> .gitignore
+	echo "*.blg" >> .gitignore
+	echo "*.fdb_latexmk" >> .gitignore
+	echo "*.fls" >> .gitignore
+	echo "*.log" >> .gitignore
+	echo "*.out" >> .gitignore
+	echo "*.pdf" >> .gitignore
+	echo __pycache__/ >> .gitignore
+	echo arxiv.tar >> .gitignore
+	echo $(CACHE_DIR)/ >> .gitignore
+	echo $(RESULTS_DIR)/ >> .gitignore
+	echo $(VENV_DIR)/ >> .gitignore
+
+.dockerignore: Makefile
+	cat .gitignore > .dockerignore
+	echo .git/ >> .dockerignore
+
+.github/workflows/reproducible-build.yml: Makefile
+	mkdir -p .github/workflows
+	curl -L -o .github/workflows/reproducible-build.yml https://raw.githubusercontent.com/pbizopoulos/reconciler-a-template-for-reproducible-computational-research-papers/master/.github/workflows/reproducible-build.yml
+
+init: .gitignore .dockerignore .github/workflows/reproducible-build.yml
