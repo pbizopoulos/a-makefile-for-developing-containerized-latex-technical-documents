@@ -4,3 +4,16 @@
 
 # Reconciler: A Template for Reproducible Computational Research Papers
 This repository contains the code that generates the results of the paper **Reconciler: A Template for Reproducible Computational Research Papers**.
+
+## Requirements
+- docker
+- grep
+- make
+- nvidia-container-toolkit [required only for using cuda]
+- python3-venv
+
+## Instructions
+1. `git clone https://github.com/pbizopoulos/reconciler-a-template-for-reproducible-computational-research-papers`
+2. `cd reconciler-a-template-for-reproducible-computational-research-papers`
+3. `sudo systemctl start docker`
+4. `make venv-verify` or `make docker-verify`
