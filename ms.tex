@@ -21,7 +21,7 @@
 \begin{document}
 \DTLloaddb{keys_values}{results/keys-values.csv}
 
-\title{Reconciler: A Template for Reproducible Computational Research Papers}
+\title{Reproducible builds for computational research papers}
 
 \author{Paschalis~Bizopoulos and Dimitris~Bizopoulos
 \thanks{P. Bizopoulos and D. Bizopoulos are Independent Researchers, Thessaloniki, Greece e-mail: pbizopoulos@protonmail.com, dimitrisbizopoulos@gmail.com}}
@@ -29,13 +29,15 @@
 \maketitle
 
 \begin{abstract}
-	Previous work in reproducibility focused on providing frameworks to make research reproducible, however fewer work was done on reproducibility certification.
-	We propose the Reconciler, which is a template for writing reproducible computational research papers written in \LaTeX.
-	A predetermined number of docker containers are built and run in separate Virtual Machines (VMs) reproducing the figures, tables and variables (results) of the paper.
+	Previous work in reproducibility focused on providing frameworks to make research reproducible, however without taking in consideration the cost of extra work that needs to be done by the authors.
+	We propose applying the concept of reproducible builds on computational research papers written in \LaTeX.
+	The authors use a template that allows them to verify the reproducibility of their paper locally.
+	The authors can share the reproducibility status of their paper with reviewers using the following procedure.
+	When they push their code to their remote repository a predetermined number of docker containers are built and run in separate Virtual Machines (VMs) reproducing the figures, tables and variables (results) of the paper.
 	The previous results are used during the \LaTeX\ compilation in each VM, to produce corresponding pdf files.
-	Lastly a third VM certifies the research paper as reproducible, if and only if the resulted pdf files are identical.
-	The two builds are needed to enable comparison between different builds of the same source code and any non-deterministic stochasticity would produce different pdf files for different builds, thus making the certifier VM report the paper as non-reproducible.
-	We release an open source implementation of the Reconciler, that certifies the reproducibility of this paper.
+	Lastly another VM certifies the research paper as reproducible, if and only if the resulted pdf files are identical.
+	The first builds are needed to enable comparison between different builds of the same source code and any non-deterministic stochasticity would produce different pdf files for different builds, thus making the certifier VM report the paper as non-reproducible.
+	We release an open source implementation of this procedure and certify the reproducibility of this paper.
 \end{abstract}
 
 \section{Introduction}
@@ -44,11 +46,11 @@ More specifically, computational research reproducibility requires the presence 
 Open sourcing the code and the raw data of a computational research paper helps in increasing the credibility of the research results but this is not enough to certify its reproducibility.
 A common workflow among researchers for certifying computational research papers will push the direction towards creating reproducible research, thus tackling the `reproducibility crisis' problem.
 
-We propose the Reconciler workflow, that certifies the reproducibility of computational research papers written in \LaTeX.
-The Reconciler workflow consists of two separate Virtual Machines (VMs) that build and run the Docker container which produces the figures, tables, variables (results), and later compile the \LaTeX\ to produce two pdf files.
-Lastly, a third VM compares the pdf files and certifies the research paper as reproducible, if and only if the pdf files are identical bit by bit.
+We propose reproducible builds that certify the reproducibility of computational research papers written in \LaTeX.
+The workflow consists of multiple separate Virtual Machines (VMs) that build and run the Docker container which produces the figures, tables, variables (results), and later compile the \LaTeX\ to produce pdf files.
+Lastly, another VM compares the pdf files and certifies the research paper as reproducible, if and only if the pdf files are identical bit by bit.
 
-We provide an implementation\footnote{\url{https://github.com/pbizopoulos/reconciler-a-template-for-reproducible-computational-research-papers}} of the Reconciler, that certifies the reproducibility of the arXiv version of this paper\footnote{\url{https://arxiv.org/abs/2005.12660}}.
+We provide an implementation\footnote{\url{https://github.com/pbizopoulos/reproducible-builds-for-computational-research-papers}} of the Reconciler, that certifies the reproducibility of the arXiv version of this paper\footnote{\url{https://arxiv.org/abs/2005.12660}}.
 We use Python~\cite{van2007python} for producing the results, however other scientific-oriented programming languages such as R~\cite{ihaka1996r} and Julia~\cite{bezanson2017julia} can be used.
 
 For the rest of the paper we will refer to:
@@ -128,7 +130,7 @@ The Reconciler workflow fits in the researcher workflow in the following way (as
 	\item the researcher writes or edits code,
 	\item the researcher commits and pushes the changes to the remote repository, which triggers the Reconciler workflow:
 		\begin{enumerate}
-			\item two VMs (builders) independently build and run the Dockerfile of the results code,
+			\item multiple VMs (builders) independently build and run the Dockerfile of the results code,
 			\item the results along with the \LaTeX\ code are used to compile the pdf files,
 			\item the pdf files are sent to a third VM (certifier),
 			\item the certifier VM certifies the research paper as reproducible if and only if the pdf files are the same using bit comparison.
@@ -136,7 +138,7 @@ The Reconciler workflow fits in the researcher workflow in the following way (as
 \end{enumerate}
 
 Docker usage in the Reconciler provides portability of the environment of the research while the VM provides trust in the procedure (in contrast in executing these local, thus having low credibility in reporting reproducibility).
-The reason that two independent builder VMs are needed is to enable comparison between different builds of the same source code and any non-deterministic stochasticity (such as not applying a specific seed to random generators) would produce different pdfs, thus making the certifier VM report the paper as non-reproducible.
+The reason that multiple independent builder VMs are needed is to enable comparison between different builds of the same source code and any non-deterministic stochasticity (such as not applying a specific seed to random generators) would produce different pdfs, thus making the certifier VM report the paper as non-reproducible.
 
 Additional constraints could be imposed in the VMs such as disallowing images in the code and monitoring the network connections of the code to ensure that results are generated from the code and not fetching them from an external source.
 Alternatively the code could just be open source to enable reviewers inspect the result generation procedure.
