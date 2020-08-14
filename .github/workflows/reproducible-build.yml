@@ -1,48 +1,43 @@
 name: reproducible-build
 on: [push, pull_request]
 jobs:
-  build:
-    if: contains(github.event.head_commit.message, '[')
+  build-venv:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-20.04, ubuntu-18.04]
-        index: [0, 1]
-        var: [local, docker, arxiv]
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v2
-      - name: make ubuntu full
-        if: matrix.var == 'local'
+      - name: Install prerequisites
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-venv
-          make ARGS=--full
-      - name: make docker full
-        if: matrix.var == 'docker'
-        run: make docker ARGS=--full
-      - name: make arxiv
-        if: matrix.var == 'arxiv'
-        run: make arxiv ARXIV_ID=$(echo ${{ github.event.head_commit.message }} | awk -F'[][]' '{print $2}')
+      - name: make venv-verify
+        run: make venv-verify ARGS=--full
       - name: Upload pdf for comparison
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.var }}-${{ matrix.os }}-${{ matrix.index }}
+          name: venv-${{ matrix.os }}
           path: ./ms.pdf
-  compare-release-assets:
-    needs: [build]
-    runs-on: ubuntu-20.04
+  build-docker:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-20.04, ubuntu-18.04]
-        var: [local, docker, arxiv]
     steps:
-      - name: Download pdfs from build
-        uses: actions/download-artifact@v2
-      - name: Compare pdf binaries
-        run: diff ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf ${{ matrix.var }}-${{ matrix.os }}-1/ms.pdf
+      - name: Set up Git repository
+        uses: actions/checkout@v2
+      - name: make docker-verify
+        run: make docker-verify ARGS=--full
+      - name: Upload pdf for comparison
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-${{ matrix.os }}
+          path: ./ms.pdf
   release:
-    needs: [compare-release-assets]
+    if: contains(github.event.commit_head.message, '{release}')
+    needs: [build-venv, build-docker]
     runs-on: ubuntu-20.04
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }} 
@@ -63,18 +58,18 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-20.04, ubuntu-18.04]
-        var: [local, docker, arxiv]
+        var: [venv, docker]
     steps:
       - name: Download pdfs from build
         uses: actions/download-artifact@v2
       - name: Create sha256sum var
-        run: echo "::set-env name=sha256sumvar::$(sha256sum ${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf | cut -d ' ' -f 1)"
+        run: echo "::set-env name=sha256sumvar::$(sha256sum ${{ matrix.var }}-${{ matrix.os }}/ms.pdf | cut -d ' ' -f 1)"
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }} 
-          asset_path: ./${{ matrix.var }}-${{ matrix.os }}-0/ms.pdf
+          asset_path: ./${{ matrix.var }}-${{ matrix.os }}/ms.pdf
           asset_name: ${{ matrix.var }}-${{ matrix.os }}-${{ env.sha256sumvar }}.pdf
           asset_content_type: application/pdf
