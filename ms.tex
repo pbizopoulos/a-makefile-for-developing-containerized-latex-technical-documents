@@ -32,14 +32,11 @@
 \begin{abstract}
 	Previous work in reproducibility focused on providing frameworks to make research reproducible, however without taking in consideration the cost of extra work that needs to be done by the authors.
 	We propose applying the concept of `reproducible builds' (RBs) on computational research papers written in \LaTeX.
-	A Makefile allows the authors to verify the reproducibility of their paper locally.
-	The authors may also share the reproducibility status of their paper with reviewers using the following procedure.
-	When a code update is pushed on the remote repository, a predetermined number of Virtual Machines (VMs) build and run the code that reproduces the figures, tables and variables (results) of the paper.
-	These results are then used during the \LaTeX\ compilation in each VM, to produce corresponding pdf files.
+	The reproducibility of a paper can be verified locally with the use of a Makefile and remotely through a workflow that uses Virtual Machines (VMs) in the cloud.
+	The verifier (author or reviewer) may execute the code that reproduces the figures, tables and variables (results) of the paper that are then used during the \LaTeX\ compilation, to produce corresponding pdf files.
 	The previous procedure is completed twice and the research paper is verified as reproducible, if and only if the resulted pdf files are identical.
-	The two builds in each VM are needed to enable comparison between different builds of the same source code.
-	Any non-deterministic stochasticity would produce different pdf files for different builds, thus making the paper non-reproducible.
-	We release an open source implementation of this procedure and verify the reproducibility of this paper.
+	The two builds are needed to enable comparison between different builds of the same source code such that any non-deterministic stochasticity would produce different pdf files, thus making the paper non-reproducible.
+	We release an open source template of RBs and use it to write and verify the reproducibility of this paper.
 \end{abstract}
 
 \section{Introduction}
