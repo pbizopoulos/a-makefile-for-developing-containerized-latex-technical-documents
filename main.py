@@ -120,16 +120,21 @@ if __name__ == '__main__':
     plt.plot(train_loss_array)
     plt.plot(validation_loss_array)
     plt.grid(True)
-    plt.xlabel('Loss')
-    plt.ylabel('Epochs')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
     plt.autoscale(enable=True, axis='x', tight=True)
+    plt.ylim([0, 3])
+    plt.legend(['Train', 'Validation'])
     plt.savefig(f'{args.results_dir}/image')
     plt.close()
 
     # Create tables.
     table = [train_loss_array[-1], validation_loss_array[-1], validation_accuracy_best]
-    df = pd.DataFrame(table)
-    df.to_latex(f'{args.results_dir}/table.tex', float_format="%.2f")
+    index = ['Train Loss', 'Val Loss', 'Val Acc']
+    columns = ['MNIST']
+    df = pd.DataFrame(table, index=index, columns=columns)
+    df.index.names = ['Metric']
+    df.to_latex(f'{args.results_dir}/table.tex', float_format="%.2f", bold_rows=True)
 
     # Create variables.
     df = pd.DataFrame({'key': ['lr', 'batch_size', 'validation_accuracy_best'], 'value': [lr, batch_size, validation_accuracy_best]})
