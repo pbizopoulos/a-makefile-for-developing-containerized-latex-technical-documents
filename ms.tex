@@ -10,6 +10,7 @@
 \usetikzlibrary{fit}
 \usetikzlibrary{backgrounds}
 \usepackage[hyphens]{url}
+\usepackage{hyperref}
 
 \lstdefinestyle{lststyle}{
 	aboveskip=20pt,
@@ -30,7 +31,7 @@
 
 \begin{abstract}
 	Previous work in reproducibility focused on providing frameworks to make research reproducible, however without taking in consideration the cost of extra work that needs to be done by the authors.
-	We propose applying the concept of reproducible builds on computational research papers written in \LaTeX.
+	We propose applying the concept of `reproducible builds' (RBs) on computational research papers written in \LaTeX.
 	A Makefile allows the authors to verify the reproducibility of their paper locally.
 	The authors may also share the reproducibility status of their paper with reviewers using the following procedure.
 	When a code update is pushed on the remote repository, a predetermined number of Virtual Machines (VMs) build and run the code that reproduces the figures, tables and variables (results) of the paper.
@@ -43,16 +44,16 @@
 
 \section{Introduction}
 A research paper is considered reproducible when reviewers are able to reproduce its results, given the data and experimental procedure.
-More specifically, computational research reproducibility requires the presence of source code that produces or fetches data from external sources which then transforms them creating the figures, tables and variables of the paper.
+More specifically, computational research reproducibility requires the presence of source code that produces or fetches data from external sources which then transforms into the figures, tables and variables of the paper.
 Open sourcing the code and the raw data of a computational research paper helps in increasing the credibility of the research results but this is not enough to verify its reproducibility.
-A common workflow among researchers for verifying computational research papers will push the direction towards creating reproducible research, thus tackling the `reproducibility crisis' problem.
+The use of a common template for verifying computational research papers will push the direction towards creating reproducible research, thus tackling the `reproducibility crisis' problem.
 
-We propose reproducible builds that verify the reproducibility of computational research papers written in \LaTeX.
-The workflow consists of multiple separate Virtual Machines (VMs) that build and run the Docker container which produces the figures, tables, variables (results), and later compile the \LaTeX\ to produce pdf files.
-Lastly, another VM compares the pdf files and verifies the research paper as reproducible, if and only if the pdf files are identical bit by bit.
+We propose the use of `reproducible builds' (RBs) that verify the reproducibility of computational research papers written in \LaTeX.
+The workflow consists of multiple Virtual Machines (VMs) that execute the source code that produces the figures, tables, variables (results), and later compile the \LaTeX\ to produce pdf files.
+The previous procedure is executed twice and the research paper is verified as reproducible, if and only if the resulting pdf files are identical.
 
-We provide an implementation\footnote{\url{https://github.com/pbizopoulos/reproducible-builds-for-computational-research-papers}} of the Reconciler, that verifies the reproducibility of the arXiv version of this paper\footnote{\url{https://arxiv.org/abs/2005.12660}}.
-We use Python~\cite{van2007python} for producing the results, however other scientific-oriented programming languages such as R~\cite{ihaka1996r} and Julia~\cite{bezanson2017julia} can be used.
+We provide a template\footnote{\url{https://github.com/pbizopoulos/cookiecutter-reproducible-builds-for-computational-research-papers}} for writing papers with RBs and use it to write this paper\footnote{\url{https://arxiv.org/abs/2005.12660}} and verify its reproducibility\footnote{\url{https://github.com/pbizopoulos/reproducible-builds-for-computational-research-papers}}.
+We use Python~\cite{van2007python} for producing the results, however other scientific oriented programming languages such as R~\cite{ihaka1996r} and Julia~\cite{bezanson2017julia} can be used.
 
 For the rest of the paper we will refer to:
 \begin{itemize}
@@ -63,7 +64,7 @@ For the rest of the paper we will refer to:
 	\item `code' as both the `\LaTeX\ code' and `results code'.
 \end{itemize}
 
-\section{The Reconciler Workflow}
+\section{Reproducible Builds}
 
 \begin{figure*}[!t]
 	\begin{minipage}{0.2\linewidth}
@@ -113,52 +114,52 @@ For the rest of the paper we will refer to:
 		\end{tikzpicture}
 		\label{subfig:workflow}}
 	\end{minipage}
-	\caption{In \protect\subref{subfig:filehierarchy} the template Reconciler file hierarchy is depicted as a file tree directory.
+	\caption{In \protect\subref{subfig:filehierarchy} the RBs template file hierarchy is depicted as a file tree directory.
 	Results and \LaTeX\ code reside in the same repository but this is optional.
-	In \protect\subref{subfig:workflow} the proposed Reconciler workflow with the $n$ independent branches is depicted one for each VM and the optional branch for verifying arXiv papers, where the branch fetches the results and the \LaTeX\ code from the arXiv servers.
+	In \protect\subref{subfig:workflow} the proposed workflow with the $n$ independent branches is depicted one for each VM and the optional branch for verifying arXiv papers, where the branch fetches the results and the \LaTeX\ code from the arXiv servers.
 	Blue denotes results code file or procedure, red denotes \LaTeX\ code file or procedure and gray background denotes that the encapsulated procedures is happening in a VM.
 	Arrows in \protect\subref{subfig:workflow} denote the data flow direction, complemented by descriptive labels, while the dashed arrows on the right denote the optional branch for the arxiv.}
 	\label{fig:filehierarchyworkflow}
 \end{figure*}
 
-The Reconciler workflow can be applied on computational research papers that are written in \LaTeX~\cite{lamport1994latex} and the results code can be executed within a Docker container.
+The proposed workflow can be applied on computational research papers that are written in \LaTeX~\cite{lamport1994latex} and the results code can be executed within a Docker container.
 \LaTeX\ is a typesetting system for publishing high quality research papers, and Docker~\cite{merkel2014docker} is a container system that allows portable execution of a codebase between different operating systems/environments and has shown great promise in reproducible science~\cite{boettiger2015introduction}.
 The corresponding Dockerfile can be provided by the researcher or generated by tools such as containerit~\cite{nust2019containerit}.
 
-A specific file hierarchy (shown in Fig.~\ref{fig:filehierarchyworkflow}\subref{subfig:filehierarchy}) is used in this paper however this is optional, as the Reconciler only needs to know the directories of the main files of the \LaTeX\ and results code through its configuration file \textit{workflow.yml}.
-The Reconciler workflow fits in the researcher workflow in the following way (as also shown in Fig.~\ref{fig:filehierarchyworkflow}\subref{subfig:workflow}):
+A specific file hierarchy (shown in Fig.~\ref{fig:filehierarchyworkflow}\subref{subfig:filehierarchy}) is used in this paper however this is optional, as the template only needs to know the directories of the main files of the \LaTeX\ and results code through its configuration file \textit{workflow.yml}.
+The workflow fits in the researcher workflow in the following way (as also shown in Fig.~\ref{fig:filehierarchyworkflow}\subref{subfig:workflow}):
 \begin{enumerate}
 	\item the researcher writes or edits code,
-	\item the researcher commits and pushes the changes to the remote repository, which triggers the Reconciler workflow:
+	\item the researcher commits and pushes the changes to the remote repository, which triggers the workflow:
 		\begin{enumerate}
 			\item multiple VMs (builders) independently build and run the Dockerfile of the results code,
 			\item the results along with the \LaTeX\ code are used to compile the pdf files,
 			\item the pdf files are sent to a third VM (verifier),
-			\item the verifier VM verifies the research paper as reproducible if and only if the pdf files are the same using bit comparison.
+			\item the verifier VM verifies the research paper as reproducible if and only if the pdf files are identical.
 		\end{enumerate}
 \end{enumerate}
 
-Docker usage in the Reconciler provides portability of the environment of the research while the VM provides trust in the procedure (in contrast in executing these local, thus having low credibility in reporting reproducibility).
+Docker usage in RBs provides portability of the environment of the research while the VM provides trust in the procedure (in contrast in executing these local, thus having low credibility in reporting reproducibility).
 The reason that multiple independent builder VMs are needed is to enable comparison between different builds of the same source code and any non-deterministic stochasticity (such as not applying a specific seed to random generators) would produce different pdfs, thus making the verifier VM report the paper as non-reproducible.
 
 Additional constraints could be imposed in the VMs such as disallowing images in the code and monitoring the network connections of the code to ensure that results are generated from the code and not fetching them from an external source.
 Alternatively the code could just be open source to enable reviewers inspect the result generation procedure.
 
-Variations of the Reconciler main workflow include:
+Variations of the RBs main workflow include:
 \begin{itemize}
 	\item preprint server (such as arXiv) results reproducibility verification shown in Fig.~\ref{fig:filehierarchyworkflow}\subref{subfig:workflow}.
 		The difference with the main workflow is that one of the VMs checkouts the \LaTeX\ code and the results from the arXiv server instead of executing the results code.
 	\item one branch local verification where the last VM returns the hash of the resulted pdf enabling reviewers verifying the pdf output of their local branch.
-		Using the previous workflow the Reconciler could also be used for regression testing and debugging, to ensure that changes to the code do not alter the results.
+		Using the previous workflow RBs could also be used for regression testing and debugging, to ensure that changes to the code do not alter the results.
 \end{itemize}
 
 \subsection{Technical implementation}
-A template of the Reconciler is available using Github Actions and is applied on the arXiv version of this paper.
+A template of the RBs is available using Github Actions and is applied on the arXiv version of this paper.
 The builder VMs use different versions of Ubuntu (16.04 and 18.04) and pull a docker image for building \LaTeX\ from DockerHub.
 
-Regarding research that is computational costly or when reproducibility verification is required from the first stages of the research, the Reconciler template provides a debug flag that verifies the reproducibility of a smaller scale of the computational experiment.
+Regarding research that is computational costly or when reproducibility verification is required from the first stages of the research, the template provides a debug flag that verifies the reproducibility of a smaller scale of the computational experiment.
 E.g.\ the debug flag in the concept of neural networks could set the number of epochs and number of training samples to a low value.
-Some possible executions that the Reconciler provides are summarized in the following syntax:
+Some possible executions that RBs provide are summarized in the following syntax:
 \begin{lstlisting}[language=Bash, style=lststyle, caption={Makefile call syntax from the shell.}, captionpos=b]
 # SYNTAX
 make [docker[-gpu]] [ARGS=--full]
@@ -183,17 +184,12 @@ make clean
 
 \section{Discussion}
 Previous works in this area such as Hurlin et al.~\cite{hurlin2019reproducibility} propose an `external certification agency' for economic studies.
-The Reconciler provides a simple solution in verifying the reproducibility of a computational research paper as a whole, without having to trust a third-party.
-Future work needs to be done regarding improving the use of the Reconciler on reproducibility on the following:
-\begin{enumerate}
-	\item making scientific programming libraries reproducible,
-	\item regarding infrastructure: the use of VMs that support CUDA to enable the application of the Reconciler on deep neural network research.
-\end{enumerate}
+RBs provide a simple solution in verifying the reproducibility of a computational research paper as a whole, without having to trust a third-party.
 
 \section{Conclusion}
 Automating research reproducibility verification is becoming more important due to the increasing research output that has been observed the last few years.
 Few works were done on this area, mostly proposing trust on an external third party.
-The Reconciler verifies research reproducibility using the tools that most of the researchers already use (\LaTeX, Docker), outsourcing the procedure to VMs on the cloud.
+RBs verify research reproducibility using the tools that most of the researchers already use (\LaTeX, Docker), outsourcing the procedure to VMs on the cloud.
 
 \section{APPENDIX - Improving Computational Research Reproducibility}
 This appendix provides suggestions for improving the reproducibility of computational research papers written in \LaTeX\ with Python as the results code Programming language.
@@ -212,9 +208,9 @@ A useful \LaTeX\ package for automatically embedding code results variables in \
 
 For example the values of the following variables are not referred in the main \textit{.tex} file but they are read by an intermediate \textit{.tex} file created by the results code:
 \begin{itemize}
-	\item the learning rate is $\DTLfetch{keys_values}{key}{lr}{value}$ and
-	\item the batch size is $\DTLfetch{keys_values}{key}{batch_size}{value}$.
-	\item the validation accuracy of the best model is $\DTLfetch{keys_values}{key}{validation_accuracy_best}{value}$.
+	\item the learning rate is $\DTLfetch{keys_values}{key}{lr}{value}$,
+	\item the batch size is $\DTLfetch{keys_values}{key}{batch_size}{value}$ and
+	\item the validation accuracy of the best model is $\DTLfetch{keys_values}{key}{validation_accuracy_best}{value}\%$.
 \end{itemize}
 
 Regarding the results code for Python random seeds need to be set to a specific value such as:
