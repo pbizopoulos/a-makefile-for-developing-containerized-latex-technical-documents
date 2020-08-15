@@ -5,13 +5,13 @@
 This repository contains the code that generates the results of the paper **Reproducible Builds for Computational Research Papers**.
 
 ## Requirements
+- UNIX tools (awk, cut, grep)
 - docker
-- grep
 - make
-- nvidia-container-toolkit [required only for using cuda]
+- nvidia-container-toolkit [required only when using CUDA]
 - python3-venv
 
-## Instructions
+## Instructions for verifying the reproducibility of this paper
 1. `git clone https://github.com/pbizopoulos/reproducible-builds-for-computational-research-papers`
 2. `cd reproducible-builds-for-computational-research-papers`
 3. `sudo systemctl start docker`
