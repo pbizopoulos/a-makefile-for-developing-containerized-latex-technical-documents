@@ -1,5 +1,7 @@
-cache/
-results/
+cache/*
+results/*
+!cache/.gitkeep
+!results/.gitkeep
 
 ## Core latex/pdflatex auxiliary files:
 *.aux

@@ -49,18 +49,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--full', default=False, action='store_true')
     parser.add_argument('--use-cuda', default=False, action='store_true')
-    parser.add_argument('--cache-dir', default='cache')
-    parser.add_argument('--results-dir', default='results')
+    parser.add_argument('--cache-dir')
+    parser.add_argument('--results-dir')
     args = parser.parse_args()
     device = torch.device('cuda' if (torch.cuda.is_available() and args.use_cuda) else 'cpu')
     if args.full:
-        num_samples = 200
         num_epochs = 10
         train_range = range(40000)
         validation_range = range(40000, 50000)
         test_range = range(10000)
     else:
-        num_samples = 20
         num_epochs = 1
         train_range = range(10)
         validation_range = range(10)
