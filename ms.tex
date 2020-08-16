@@ -64,73 +64,46 @@ For the rest of the paper we will refer to:
 
 \section{Reproducible Builds}
 
-\begin{figure*}[!t]
-	\begin{minipage}{0.2\linewidth}
-		\centering
-		\subfloat[]{\begin{tikzpicture}[%
-				grow via three points={one child at (0.5,-0.7) and
-				two children at (0.5,-0.7) and (0.5,-1.4)},
-				edge from parent path={(\tikzparentnode.south) |- (\tikzchildnode.west)}]
-				\node[draw]{root}
-				child{node[draw, anchor=west]{workflow.yml}}
-				child{node[draw, anchor=west]{Makefile}}
-				child{node[draw, anchor=west, fill=blue!20]{Dockerfile}}
-				child{node[draw, anchor=west, fill=blue!20]{main.py}}
-				child{node[draw, anchor=west, fill=red!20]{ms.tex}}
-				child{node[draw, anchor=west, fill=red!20]{ms.bib}};
-		\end{tikzpicture}
-		\label{subfig:filehierarchy}}
-	\end{minipage}
-	\begin{minipage}{0.8\linewidth}
-		\centering
-		\subfloat[]{\begin{tikzpicture}[node distance=1.9cm, minimum height=1cm]
-			\node[draw, rounded corners] (localrepo) {Local Repo};
-			\node[draw, rounded corners, above of=localrepo] (remoterepo) {Remote Repo};
-			\node[draw, rounded corners, above left=1cm of remoterepo, fill=blue!20] (builddocker1) {Build Docker};
-			\node[draw, rounded corners, above of=builddocker1, fill=red!20] (compilelatex1) {Compile \LaTeX};
-			\node[draw, rounded corners, above of=remoterepo, fill=blue!20] (builddocker2) {Build Docker};
-			\node[draw, rounded corners, above of=builddocker2, fill=red!20] (compilelatex2) {Compile \LaTeX};
-			\node[draw, rounded corners, above right=1cm of remoterepo] (arxivrepo) {arXiv Repo};
-			\node[draw, rounded corners, above of=arxivrepo, fill=red!30] (compilelatex3) {Compile \LaTeX};
-			\node[draw, rounded corners, above of=compilelatex2, fill=white] (comparison) {Comparison};
-			\path[draw, ->] (localrepo) -- node[left]{push} (remoterepo);
-			\path[draw, ->] (remoterepo) -| node[left]{checkout} (builddocker1);
-			\path[draw, ->] (builddocker1) -- node[left]{\LaTeX+results}(compilelatex1);
-			\path[draw, ->] (compilelatex1) |- node[left]{pdf} (comparison);
-			\path[draw, ->] (remoterepo) -- node[right]{checkout} (builddocker2);
-			\path[draw, ->, dashed] (remoterepo) -| node[right]{checkout} (arxivrepo);
-			\path[draw, ->] (builddocker2) -- node[right]{\LaTeX+results} (compilelatex2);
-			\path[draw, ->, dashed] (arxivrepo) -- node[right]{\LaTeX+results} (compilelatex3);
-			\path[draw, ->] (compilelatex2) -- node[right]{pdf} (comparison);
-			\path[draw, ->, dashed] (compilelatex3) |- node[right]{pdf} (comparison);
+\begin{figure}[!t]
+	\centering
+	\begin{tikzpicture}[%
+			grow via three points={one child at (0.5,-0.7) and two children at (0.5,-0.7) and (0.5,-1.4)},
+			edge from parent path={(\tikzparentnode.south) |- (\tikzchildnode.west)}]
+			\node[draw](root){root}
+			child{node[draw, anchor=west](makefile){Makefile}}
+			child{node[draw, anchor=west, fill=red!20](tex){ms.tex}}
+			child{node[draw, anchor=west, fill=red!20](bib){ms.bib}}
+			child{node[draw, anchor=west, fill=blue!20](py){main.py}}
+			child{node[draw, anchor=west, fill=blue!20](venv){.venv}}
+			child{node[draw, anchor=west, fill=blue!20](dockerfile){Dockerfile}};
 			\begin{scope}[on background layer]
-				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(builddocker1) (compilelatex1) (builddocker1.west), label={[black!50]110:$VM_{OS_1}$}]{};
-				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(builddocker2) (compilelatex2) (builddocker2.west), label={[black!50]70:$VM_{OS_n}$}]{};
-				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(compilelatex3), label={[black!50]50:$VM_{arxiv}$}]{};
-				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=3pt, fit=(comparison), label={[black!50]above:$VM_{comp}$}]{};
+				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=4pt, fit=(root) (dockerfile)]{};
+				\node[draw, rounded corners, dashed, fill=gray!70, inner sep=2pt, fit=(py) (dockerfile)](code){};
+				\node[draw, rounded corners, dashed, fill=gray!70, inner sep=2pt, fit=(tex) (bib)](paper){};
 			\end{scope}
-		\end{tikzpicture}
-		\label{subfig:workflow}}
-	\end{minipage}
-	\caption{In \protect\subref{subfig:filehierarchy} the RBs template file hierarchy is depicted as a file tree directory.
-	Results and \LaTeX\ code reside in the same repository but this is optional.
-	In \protect\subref{subfig:workflow} the proposed workflow with the $n$ independent branches is depicted one for each VM and the optional branch for verifying arXiv papers, where the branch fetches the results and the \LaTeX\ code from the arXiv servers.
-	Blue denotes results code file or procedure, red denotes \LaTeX\ code file or procedure and gray background denotes that the encapsulated procedures is happening in a VM.
-	Arrows in \protect\subref{subfig:workflow} denote the data flow direction, complemented by descriptive labels, while the dashed arrows on the right denote the optional branch for the arxiv.}
+			\node[draw, right=2cm of code, fill=white] (results) {results};
+			\path[draw, ->] (code) -- node[above]{venv/docker} (results);
+			\node[draw, right=4cm of paper, fill=white] (pdf) {pdf};
+			\path[draw, ->] (results) |- (pdf);
+			\path[draw, ->] (paper) -- node[above]{docker} (pdf);
+	\end{tikzpicture}
+	\caption{In this figure the RBs template file hierarchy is depicted in the light gray background along with the flow of pdf generation.
+	Blue denotes results code file, red denotes \LaTeX\ code file and dark gray background that the encapsulated files are used for a subsequent step.
+	Arrows denote the data flow direction, complemented by descriptive labels.}
 	\label{fig:filehierarchyworkflow}
-\end{figure*}
+\end{figure}
 
-The proposed workflow can be applied on computational research papers that are written in \LaTeX~\cite{lamport1994latex} and the results code can be executed within a Docker container.
+The proposed template can be applied on computational research papers that are written in \LaTeX~\cite{lamport1994latex} and the results code can be executed within a Docker container or a virtual environment.
 \LaTeX\ is a typesetting system for publishing high quality research papers, and Docker~\cite{merkel2014docker} is a container system that allows portable execution of a codebase between different operating systems/environments and has shown great promise in reproducible science~\cite{boettiger2015introduction}.
 The corresponding Dockerfile can be provided by the researcher or generated by tools such as containerit~\cite{nust2019containerit}.
 
-A specific file hierarchy (shown in Fig.~\ref{fig:filehierarchyworkflow}\subref{subfig:filehierarchy}) is used in this paper however this is optional, as the template only needs to know the directories of the main files of the \LaTeX\ and results code through its configuration file \textit{workflow.yml}.
-The workflow fits in the researcher workflow in the following way (as also shown in Fig.~\ref{fig:filehierarchyworkflow}\subref{subfig:workflow}):
+A specific file hierarchy (shown in Fig.~\ref{fig:filehierarchyworkflow}) is used in this paper however this is optional, as the template only needs to know the directories of the main files of the \LaTeX\ and `results code' during its creation by the template.
+The template fits in the researcher workflow in the following way:
 \begin{enumerate}
 	\item the researcher writes or edits code,
 	\item the researcher commits and pushes the changes to the remote repository, which triggers the workflow:
 		\begin{enumerate}
-			\item multiple VMs (builders) independently build and run the Dockerfile of the results code,
+			\item multiple VMs (builders) independently build and run the Dockerfile of the `results code',
 			\item the results along with the \LaTeX\ code are used to compile the pdf files,
 			\item the pdf files are sent to a third VM (verifier),
 			\item the verifier VM verifies the research paper as reproducible if and only if the pdf files are identical.
@@ -145,8 +118,8 @@ Alternatively the code could just be open source to enable reviewers inspect the
 
 Variations of the RBs main workflow include:
 \begin{itemize}
-	\item preprint server (such as arXiv) results reproducibility verification shown in Fig.~\ref{fig:filehierarchyworkflow}\subref{subfig:workflow}.
-		The difference with the main workflow is that one of the VMs checkouts the \LaTeX\ code and the results from the arXiv server instead of executing the results code.
+	\item preprint server (such as arXiv) results reproducibility verification shown in Fig.~\ref{fig:filehierarchyworkflow}.
+		The difference with the main workflow is that one of the VMs checkouts the \LaTeX\ code and the results from the arXiv server instead of executing the `results code'.
 	\item one branch local verification where the last VM returns the hash of the resulted pdf enabling reviewers verifying the pdf output of their local branch.
 		Using the previous workflow RBs could also be used for regression testing and debugging, to ensure that changes to the code do not alter the results.
 \end{itemize}
@@ -190,7 +163,7 @@ Few works were done on this area, mostly proposing trust on an external third pa
 RBs verify research reproducibility using the tools that most of the researchers already use (\LaTeX, Docker), outsourcing the procedure to VMs on the cloud.
 
 \section{APPENDIX - Improving Computational Research Reproducibility}
-This appendix provides suggestions for improving the reproducibility of computational research papers written in \LaTeX\ with Python as the results code Programming language.
+This appendix provides suggestions for improving the reproducibility of computational research papers written in \LaTeX\ with Python as the `results code' Programming language.
 A common culprit of reproducibility using \LaTeX\ is the time-date metadata of pdf output which can be disabled using the following into the \textit{.tex} code after the preamble:
 \begin{lstlisting}[language=TeX, style=lststyle, caption={\LaTeX\ pdf reproducibility commands for preamble.}, captionpos=b]
 \pdfinfoomitdate=1
@@ -199,19 +172,19 @@ A common culprit of reproducibility using \LaTeX\ is the time-date metadata of p
 \end{lstlisting}
 
 A useful \LaTeX\ package for automatically embedding code results variables in \LaTeX\ code is \textit{datatool}.
-\begin{lstlisting}[language=TeX, style=lststyle, caption={\LaTeX\ datatool example of loading a file that contains pairs of keys and values (keys\_values.csv) generated by a results code and getting the value of a key named lr.}, captionpos=b]
+\begin{lstlisting}[language=TeX, style=lststyle, caption={\LaTeX\ datatool example of loading a file that contains pairs of keys and values (keys\_values.csv) generated by a `results code' and getting the value of a key named lr.}, captionpos=b]
 \DTLloaddb{keys_values}{keys_values.csv}
 \DTLfetch{keys_values}{key}{lr}{value}
 \end{lstlisting}
 
-For example the values of the following variables are not referred in the main \textit{.tex} file but they are read by an intermediate \textit{.tex} file created by the results code:
+For example the values of the following variables are not referred in the main \textit{.tex} file but they are read by an intermediate \textit{.tex} file created by the `results code':
 \begin{itemize}
 	\item the learning rate is $\DTLfetch{keys_values}{key}{lr}{value}$,
 	\item the batch size is $\DTLfetch{keys_values}{key}{batch_size}{value}$ and
 	\item the validation accuracy of the best model is $\DTLfetch{keys_values}{key}{validation_accuracy_best}{value}\%$.
 \end{itemize}
 
-Regarding the results code for Python random seeds need to be set to a specific value such as:
+Regarding the `results code' for Python random seeds need to be set to a specific value such as:
 \begin{lstlisting}[language=python, style=lststyle, caption={Python reproducibility commands for some popular libraries.}, captionpos=b]
 random.seed(0) # for build-in random module
 np.random.seed(0) # for numpy
@@ -225,7 +198,7 @@ Using the random seeds and \textit{datatool} we could have deterministic stochas
 For example Fig.~\ref{fig:image} depicts the train and validation loss:
 \begin{figure}[h]
 	\includegraphics[width=\linewidth]{results/image.pdf}
-	\caption{Image example created from results code.}
+	\caption{Image example created from `results code'.}
 	\label{fig:image}
 \end{figure}
 
@@ -240,7 +213,7 @@ df.to_latex('table.tex', float_format="%.2f")
 
 \begin{table}[h]
 	\centering
-	\caption{Table example created from results code.}
+	\caption{Table example created from `results code'.}
 	\label{table:table}
 	\setlength\tabcolsep{4.2pt}
 	\input{results/table.tex}
