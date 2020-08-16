@@ -30,27 +30,28 @@
 \maketitle
 
 \begin{abstract}
-	Previous work in reproducibility focused on providing frameworks to make research reproducible, however without taking in consideration the cost of extra work that needs to be done by the authors.
-	We propose applying the concept of `reproducible builds' (RBs) on computational research papers written in \LaTeX.
-	The reproducibility of a paper can be verified locally with the use of a Makefile and remotely through a workflow that uses Virtual Machines (VMs) in the cloud.
-	The verifier (author or reviewer) may execute the code that reproduces the figures, tables and variables (results) of the paper that are then used during the \LaTeX\ compilation, to produce corresponding pdf files.
+	Previous work in reproducibility focused on providing frameworks to help writing reproducible research papers, however without taking in consideration the cost of extra work that needs to be done by the authors.
+	We propose a template that applies the concept of `reproducible builds' (RBs) on computational research papers written in \LaTeX.
+	The template provides a Makefile that allows the verifier (author or reviewer) to execute the code that reproduces the figures, tables and variables (results) of the paper that are then used during the \LaTeX\ compilation, to produce corresponding pdf files.
 	The previous procedure is completed twice and the research paper is verified as reproducible, if and only if the resulted pdf files are identical.
 	The two builds are needed to enable comparison between different builds of the same source code such that any non-deterministic stochasticity would produce different pdf files, thus making the paper non-reproducible.
+	The reproducibility of a paper can be verified either locally on the machine of the verifier or remotely using Virtual Machines (VMs) in the cloud.
 	We release an open source template of RBs and use it to write and verify the reproducibility of this paper.
 \end{abstract}
 
 \section{Introduction}
 A research paper is considered reproducible when reviewers are able to reproduce its results, given the data and experimental procedure.
 More specifically, computational research reproducibility requires the presence of source code that produces or fetches data from external sources which then transforms into the figures, tables and variables of the paper.
-Open sourcing the code and the raw data of a computational research paper helps in increasing the credibility of the research results but this is not enough to verify its reproducibility.
-The use of a common template for verifying computational research papers will push the direction towards creating reproducible research, thus tackling the `reproducibility crisis' problem.
+Open sourcing the code and the raw data of a computational research paper helps in increasing the credibility of the research results but it is not enough to verify its reproducibility.
+The use of a template for writing and verifying computational research papers will push the direction towards creating reproducible research, thus tackling the `reproducibility crisis' problem.
 
 We propose the use of `reproducible builds' (RBs) that verify the reproducibility of computational research papers written in \LaTeX.
-The workflow consists of multiple Virtual Machines (VMs) that execute the source code that produces the figures, tables, variables (results), and later compile the \LaTeX\ to produce pdf files.
+The template consists of a Makefile that allows the verifier (author or reviewer) to execute the source code that produces the figures, tables, variables (results), and later compile the \LaTeX\ to produce pdf files.
 The previous procedure is executed twice and the research paper is verified as reproducible, if and only if the resulting pdf files are identical.
+This procedure can be executed either locally in the verifier machine or remotely in Virtual Machines (VMs) in the cloud.
 
 We provide a template\footnote{\url{https://github.com/pbizopoulos/cookiecutter-reproducible-builds-for-computational-research-papers}} for writing papers with RBs and use it to write this paper\footnote{\url{https://arxiv.org/abs/2005.12660}} and verify its reproducibility\footnote{\url{https://github.com/pbizopoulos/reproducible-builds-for-computational-research-papers}}.
-We use Python~\cite{van2007python} for producing the results, however other scientific oriented programming languages such as R~\cite{ihaka1996r} and Julia~\cite{bezanson2017julia} can be used.
+We use Python~\cite{van2007python} for producing the results, however other scientific-oriented programming languages such as R~\cite{ihaka1996r} and Julia~\cite{bezanson2017julia} can be used.
 
 For the rest of the paper we will refer to:
 \begin{itemize}
