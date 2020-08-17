@@ -32,7 +32,7 @@
 \begin{abstract}
 	Previous work in reproducibility focused on providing frameworks to help writing reproducible research papers, however without taking in consideration the cost of extra work that needs to be done by the authors.
 	We propose a template that applies the concept of `reproducible builds' (RBs) on computational research papers written in \LaTeX.
-	The template provides a Makefile that allows the verifier (author or reviewer) to execute the code that reproduces the figures, tables and variables (results) of the paper that are then used during the \LaTeX\ compilation, to produce corresponding pdf files.
+	The template provides a Makefile that allows the verifier (author or reviewer) to execute the code that reproduces the figures, tables and variables (results) of the paper that are then used during the \LaTeX\ compilation, to produce a pdf.
 	The previous procedure is completed twice and the research paper is verified as reproducible, if and only if the resulted pdf files are identical.
 	The two builds are needed to enable comparison between different builds of the same source code such that any non-deterministic stochasticity would produce different pdf files, thus making the paper non-reproducible.
 	The reproducibility of a paper can be verified either locally on the machine of the verifier or remotely using Virtual Machines (VMs) in the cloud.
@@ -42,15 +42,15 @@
 \section{Introduction}
 A research paper is considered reproducible when reviewers are able to reproduce its results, given the data and experimental procedure.
 More specifically, computational research reproducibility requires the presence of source code that produces or fetches data from external sources which then transforms into the figures, tables and variables of the paper.
-Open sourcing the code and the raw data of a computational research paper helps in increasing the credibility of the research results but it is not enough to verify its reproducibility.
+Open sourcing the code and the raw data of a computational research paper helps increasing its reproducibility confidence but it is not enough to verify it.
 The use of a template for writing and verifying computational research papers will push the direction towards creating reproducible research, thus tackling the `reproducibility crisis' problem.
 
 We propose the use of `reproducible builds' (RBs) that verify the reproducibility of computational research papers written in \LaTeX.
-The template consists of a Makefile that allows the verifier (author or reviewer) to execute the source code that produces the figures, tables, variables (results), and later compile the \LaTeX\ to produce pdf files.
+The template consists of a Makefile that allows the verifier (author or reviewer) to execute the source code that produces the figures, tables, variables (results), and later compile the \LaTeX\ to produce a pdf.
 The previous procedure is executed twice and the research paper is verified as reproducible, if and only if the resulting pdf files are identical.
 This procedure can be executed either locally in the verifier machine or remotely in Virtual Machines (VMs) in the cloud.
 
-We provide a template\footnote{\url{https://github.com/pbizopoulos/cookiecutter-reproducible-builds-for-computational-research-papers}} for writing papers with RBs and use it to write this paper\footnote{\url{https://arxiv.org/abs/2005.12660}} and verify its reproducibility\footnote{\url{https://github.com/pbizopoulos/reproducible-builds-for-computational-research-papers}}.
+We provide an open source implementation of the template\footnote{\url{https://github.com/pbizopoulos/cookiecutter-reproducible-builds-for-computational-research-papers}} for writing papers with RBs and use it to write this paper\footnote{\url{https://arxiv.org/abs/2005.12660}} and verify its reproducibility\footnote{\url{https://github.com/pbizopoulos/reproducible-builds-for-computational-research-papers}}.
 We use Python~\cite{van2007python} for producing the results, however other scientific-oriented programming languages such as R~\cite{ihaka1996r} and Julia~\cite{bezanson2017julia} can be used.
 
 For the rest of the paper we will refer to:
@@ -58,7 +58,7 @@ For the rest of the paper we will refer to:
 	\item `paper' as a computational research paper,
 	\item `results' as the figures, tables and variables that are shown in the paper,
 	\item `\LaTeX\ code' as the files containing the main text (\textit{*.tex} files) and bibliography (\textit{*.bib} files) of the research paper,
-	\item `results code' as the files containing the scientific-oriented programming language code that produces the results (\textit{*.py} files) and
+	\item `results code' as the files containing the scientific-oriented programming language code (\textit{*.py} files) that produces the results and
 	\item `code' as both the `\LaTeX\ code' and `results code'.
 \end{itemize}
 
@@ -87,13 +87,12 @@ For the rest of the paper we will refer to:
 			\path[draw, ->] (results) |- (pdf);
 			\path[draw, ->] (paper) -- node[above]{docker} (pdf);
 	\end{tikzpicture}
-	\caption{In this figure the RBs template file hierarchy is depicted in the light gray background along with the flow of pdf generation.
-	Blue denotes results code file, red denotes \LaTeX\ code file and dark gray background that the encapsulated files are used for a subsequent step.
-	Arrows denote the data flow direction, complemented by descriptive labels.}
+	\caption{In this figure the RBs template file hierarchy is depicted in the light gray background and the arrows denote the data flow direction for the pdf generation, complemented by descriptive labels.
+	Blue denotes `results code' file, red denotes `\LaTeX\ code' file and the dark gray background that the encapsulated files are used for a subsequent step.}
 	\label{fig:filehierarchyworkflow}
 \end{figure}
 
-The proposed template can be applied on computational research papers that are written in \LaTeX~\cite{lamport1994latex} and the results code can be executed within a Docker container or a virtual environment.
+The proposed template can be applied on computational research papers that are written in \LaTeX~\cite{lamport1994latex} and the `results code' can be executed within a Docker container or a virtual environment.
 \LaTeX\ is a typesetting system for publishing high quality research papers, and Docker~\cite{merkel2014docker} is a container system that allows portable execution of a codebase between different operating systems/environments and has shown great promise in reproducible science~\cite{boettiger2015introduction}.
 The corresponding Dockerfile can be provided by the researcher or generated by tools such as containerit~\cite{nust2019containerit}.
 
