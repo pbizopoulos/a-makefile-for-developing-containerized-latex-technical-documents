@@ -30,13 +30,13 @@
 \maketitle
 
 \begin{abstract}
-	Previous work in reproducibility focused on providing frameworks to help writing reproducible research papers, however without taking in consideration the cost of extra work that needs to be done by the authors.
-	We propose a template that applies the concept of `reproducible builds' (RBs) on computational research papers written in \LaTeX.
-	The template provides a Makefile that allows the verifier (author or reviewer) to execute the code that reproduces the figures, tables and variables (results) of the paper that are then used during the \LaTeX\ compilation, to produce a pdf.
+	Previous work in reproducibility focused on providing frameworks to help writing reproducible research papers, however without taking in consideration the cost of extra work by the authors to make their paper reproducible and by the reviewers to verify the paper's reproducibility.
+	We propose a simple template for writing computational research papers in \LaTeX\ that are easily verifiable in terms of their reproducibility.
+	The template provides a Makefile that allows the verifier to execute the code that reproduces the figures, tables and variables (results) of the paper, which are then used during the \LaTeX\ compilation, to produce a pdf.
 	The previous procedure is completed twice and the research paper is verified as reproducible, if and only if the resulted pdf files are identical.
 	The two builds are needed to enable comparison between different builds of the same source code such that any non-deterministic stochasticity would produce different pdf files, thus making the paper non-reproducible.
 	The reproducibility of a paper can be verified either locally on the machine of the verifier or remotely using Virtual Machines (VMs) in the cloud.
-	We release an open source template of RBs and use it to write and verify the reproducibility of this paper.
+	We release an open source template of `reproducible builds' (RBs) and use it to write and verify the reproducibility of this paper.
 \end{abstract}
 
 \section{Introduction}
@@ -45,8 +45,8 @@ More specifically, computational research reproducibility requires the presence 
 Open sourcing the code and the raw data of a computational research paper helps increasing its reproducibility confidence but it is not enough to verify it.
 The use of a template for writing and verifying computational research papers will push the direction towards creating reproducible research, thus tackling the `reproducibility crisis' problem.
 
-We propose the use of `reproducible builds' (RBs) that verify the reproducibility of computational research papers written in \LaTeX.
-The template consists of a Makefile that allows the verifier (author or reviewer) to execute the source code that produces the figures, tables, variables (results), and later compile the \LaTeX\ to produce a pdf.
+We propose a template that uses the concept of `reproducible builds' (RBs) to verify the reproducibility of computational research papers written in \LaTeX.
+The template consists of a Makefile that allows the verifier to execute the source code that produces the figures, tables, variables (results), and later compile the \LaTeX\ to produce a pdf.
 The previous procedure is executed twice and the research paper is verified as reproducible, if and only if the resulting pdf files are identical.
 This procedure can be executed either locally in the verifier machine or remotely in Virtual Machines (VMs) in the cloud.
 
@@ -62,7 +62,7 @@ For the rest of the paper we will refer to:
 	\item `code' as both the `\LaTeX\ code' and `results code'.
 \end{itemize}
 
-\section{Reproducible Builds}
+\section{Reproducible Builds Template}
 
 \begin{figure}[!t]
 	\centering
@@ -100,24 +100,24 @@ A specific file hierarchy (shown in Fig.~\ref{fig:filehierarchyworkflow}) is use
 The template fits in the researcher workflow in the following way:
 \begin{enumerate}
 	\item the researcher writes or edits code,
+	\item the researcher verifies the reproducibility of the paper locally,
 	\item the researcher commits and pushes the changes to the remote repository, which triggers the workflow:
 		\begin{enumerate}
-			\item multiple VMs (builders) independently build and run the Dockerfile of the `results code',
+			\item two VMs (builders) execute the `results code',
 			\item the results along with the \LaTeX\ code are used to compile the pdf files,
-			\item the pdf files are sent to a third VM (verifier),
-			\item the verifier VM verifies the research paper as reproducible if and only if the pdf files are identical.
+			\item the pdf files are sent to another VM (verifier), which verifies the research paper as reproducible if and only if the pdf files are identical.
 		\end{enumerate}
 \end{enumerate}
 
 Docker usage in RBs provides portability of the environment of the research while the VM provides trust in the procedure (in contrast in executing these local, thus having low credibility in reporting reproducibility).
-The reason that multiple independent builder VMs are needed is to enable comparison between different builds of the same source code and any non-deterministic stochasticity (such as not applying a specific seed to random generators) would produce different pdfs, thus making the verifier VM report the paper as non-reproducible.
+The reason that two independent builder VMs are needed is to enable comparison between different builds of the same source code and any non-deterministic stochasticity (such as not applying a specific seed to random generators) would produce different pdfs, thus making the verifier VM report the paper as non-reproducible.
 
 Additional constraints could be imposed in the VMs such as disallowing images in the code and monitoring the network connections of the code to ensure that results are generated from the code and not fetching them from an external source.
 Alternatively the code could just be open source to enable reviewers inspect the result generation procedure.
 
 Variations of the RBs main workflow include:
 \begin{itemize}
-	\item preprint server (such as arXiv) results reproducibility verification shown in Fig.~\ref{fig:filehierarchyworkflow}.
+	\item preprint server (such as arXiv) results reproducibility verification.
 		The difference with the main workflow is that one of the VMs checkouts the \LaTeX\ code and the results from the arXiv server instead of executing the `results code'.
 	\item one branch local verification where the last VM returns the hash of the resulted pdf enabling reviewers verifying the pdf output of their local branch.
 		Using the previous workflow RBs could also be used for regression testing and debugging, to ensure that changes to the code do not alter the results.
@@ -125,36 +125,34 @@ Variations of the RBs main workflow include:
 
 \subsection{Technical implementation}
 A template of the RBs is available using Github Actions and is applied on the arXiv version of this paper.
-The builder VMs use different versions of Ubuntu (16.04 and 18.04) and pull a docker image for building \LaTeX\ from DockerHub.
+The builder VMs use different versions of Ubuntu (18.04 and 20.04) and pull a docker image for building \LaTeX\ from DockerHub.
 
-Regarding research that is computational costly or when reproducibility verification is required from the first stages of the research, the template provides a debug flag that verifies the reproducibility of a smaller scale of the computational experiment.
-E.g.\ the debug flag in the concept of neural networks could set the number of epochs and number of training samples to a low value.
+Regarding research that is computational costly or when reproducibility verification is required from the first stages of the research, the template provides a debug flag that verifies the reproducibility of a computationally lighter version of the experiment.
+E.g.\ the debug flag in the field of neural networks could set the number of epochs and number of training samples to a low value.
 Some possible executions that RBs provide are summarized in the following syntax:
 \begin{lstlisting}[language=Bash, style=lststyle, caption={Makefile call syntax from the shell.}, captionpos=b]
-# SYNTAX
-make [docker[-gpu]] [ARGS=--full]
-# where [...] denotes an optional argument.
 
-# Requires local installation of texlive-full
-# and it populates the figures and tables.
-make
-# Requires local installation of texlive-full.
-# and it populates the figures and tables.
-make ARGS=--full
-# Requires local installation of docker
-# and populates the figures and tables.
-make docker
-# Requires local installation of nvidia-container-toolkit.
-make docker-gpu ARGS=--full
-# Restores <repo> in its initial state
-# by removing all figures, tables and downloaded datasets.
-make clean
+make [OPTION] [ARGS=--full] [GPU='--gpus all']
 
+OPTIONS
+# (or empty OPTION) Generate pdf with results from venv.
+ms.pdf
+# Verify venv paper reproducibility.
+venv-verify
+# Generate pdf with results from docker.
+docker
+# Verify docker paper reproducibility.
+docker-verify
+# Remove cache, results, venv directories and tex aux files.
+clean
+# Show help.
+help
 \end{lstlisting}
 
 \section{Discussion}
 Previous works in this area such as Hurlin et al.~\cite{hurlin2019reproducibility} propose an `external certification agency' for economic studies.
 RBs provide a simple solution in verifying the reproducibility of a computational research paper as a whole, without having to trust a third-party.
+Anyone can clone a repository written with RBs and locally verify its reproducibility, in case third party verifications (such as cloud VMs) cannot be trusted.
 
 \section{Conclusion}
 Automating research reproducibility verification is becoming more important due to the increasing research output that has been observed the last few years.
@@ -162,7 +160,9 @@ Few works were done on this area, mostly proposing trust on an external third pa
 RBs verify research reproducibility using the tools that most of the researchers already use (\LaTeX, Docker), outsourcing the procedure to VMs on the cloud.
 
 \section{APPENDIX - Improving Computational Research Reproducibility}
-This appendix provides suggestions for improving the reproducibility of computational research papers written in \LaTeX\ with Python as the `results code' Programming language.
+This appendix provides suggestions for improving the reproducibility of computational research papers written in \LaTeX\ with Python as the `results code' programming language.
+For demonstration purposes we train and test a simple neural network on the MNIST~\cite{lecun2010mnist} dataset with PyTorch~\cite{paszke2019pytorch}.
+
 A common culprit of reproducibility using \LaTeX\ is the time-date metadata of pdf output which can be disabled using the following into the \textit{.tex} code after the preamble:
 \begin{lstlisting}[language=TeX, style=lststyle, caption={\LaTeX\ pdf reproducibility commands for preamble.}, captionpos=b]
 \pdfinfoomitdate=1
