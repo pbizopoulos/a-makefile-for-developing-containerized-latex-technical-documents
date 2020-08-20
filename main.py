@@ -123,7 +123,7 @@ if __name__ == '__main__':
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.autoscale(enable=True, axis='x', tight=True)
-    plt.ylim([0, 3])
+    plt.ylim([0, 1])
     plt.legend(['Train', 'Validation'])
     plt.savefig(f'{args.results_dir}/image')
     plt.close()
