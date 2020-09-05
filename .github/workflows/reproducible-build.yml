@@ -10,7 +10,7 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v2
       - name: make verify
-        run: make verify ARGS=--full
+        run: make verify ARGS=--full INTERACTIVE=
       - name: Upload pdf for comparison
         uses: actions/upload-artifact@v2
         with:
