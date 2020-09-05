@@ -15,7 +15,7 @@ INTERACTIVE=-it
 ms.pdf: ms.tex ms.bib results/.completed # Generate pdf.
 	docker run --rm \
 		--user $(shell id -u):$(shell id -g) \
-		-v $(PWD)/:/home/latex \
+		-v $(PWD):/home/latex \
 		ghcr.io/pbizopoulos/texlive-full \
 		latexmk -usepretex="\pdfinfoomitdate=1\pdfsuppressptexinfo=-1\pdftrailerid{}" -gg -pdf -cd /home/latex/ms.tex
 
@@ -41,7 +41,7 @@ clean: # Remove cache, results directories and tex auxiliary files.
 	rm -rf __pycache__/ cache/* results/* results/.completed ms.bbl
 	docker run --rm \
 		--user $(shell id -u):$(shell id -g) \
-		-v $(PWD)/:/home/latex \
+		-v $(PWD):/home/latex \
 		ghcr.io/pbizopoulos/texlive-full \
 		latexmk -C -cd /home/latex/ms.tex
 
