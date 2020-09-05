@@ -9,6 +9,7 @@
 .POSIX:
 
 ARGS = 
+GPU = --gpus all
 INTERACTIVE = -it
 
 ms.pdf: ms.tex ms.bib results/.completed # Generate pdf.
@@ -27,14 +28,13 @@ results/.completed: $(shell find . -maxdepth 1 -name '*.py')
 		-w /usr/src/app \
 		-e HOME=/usr/src/app/cache \
 		-v $(PWD):/usr/src/app \
-		--gpus all \
-		reproducible-builds-for-computational-research-papers \
+		$(GPU) reproducible-builds-for-computational-research-papers \
 		python3 main.py $(ARGS) --cache-dir cache --results-dir results
 	touch results/.completed
 
 verify: # Verify paper reproducibility.
-	make clean && make ARGS=$(ARGS) INTERACTIVE=$(INTERACTIVE) && mv ms.pdf tmp.pdf
-	make clean && make ARGS=$(ARGS) INTERACTIVE=$(INTERACTIVE)
+	make clean && make ARGS=$(ARGS) GPU=$(GPU) INTERACTIVE=$(INTERACTIVE) && mv ms.pdf tmp.pdf
+	make clean && make ARGS=$(ARGS) GPU=$(GPU) INTERACTIVE=$(INTERACTIVE)
 	@diff ms.pdf tmp.pdf && (echo 'ms.pdf is reproducible with docker' && sha256sum ms.pdf) || echo 'ms.pdf is not reproducible with docker'
 	@rm tmp.pdf
 
