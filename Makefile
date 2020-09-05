@@ -22,8 +22,7 @@ ms.pdf: ms.tex ms.bib results/.completed # Generate pdf.
 results/.completed: $(shell find . -maxdepth 1 -name '*.py')
 	rm -rf results/* results/.completed
 	docker build -t reproducible-builds-for-computational-research-papers:latest .
-	docker run --rm \
-		$(INTERACTIVE) \
+	docker run --rm $(INTERACTIVE) \
 		--user $(shell id -u):$(shell id -g) \
 		-w /usr/src/app \
 		-e HOME=/usr/src/app/cache \
