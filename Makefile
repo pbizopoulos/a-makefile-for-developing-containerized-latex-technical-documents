@@ -8,17 +8,16 @@
 
 .POSIX:
 
-ARGS = 
-GPU = --gpus all
-INTERACTIVE = -it
+ARGS= 
+GPU=--gpus all
+INTERACTIVE=-it
 
 ms.pdf: ms.tex ms.bib results/.completed # Generate pdf.
 	docker run --rm \
 		--user $(shell id -u):$(shell id -g) \
 		-v $(PWD)/:/home/latex \
 		ghcr.io/pbizopoulos/texlive-full \
-		latexmk -usepretex="\pdfinfoomitdate=1\pdfsuppressptexinfo=-1\pdftrailerid{}" -gg -pdf -cd -quiet /home/latex/ms.tex
-
+		latexmk -usepretex="\pdfinfoomitdate=1\pdfsuppressptexinfo=-1\pdftrailerid{}" -gg -pdf -cd /home/latex/ms.tex
 
 results/.completed: $(shell find . -maxdepth 1 -name '*.py')
 	rm -rf results/* results/.completed
@@ -33,8 +32,8 @@ results/.completed: $(shell find . -maxdepth 1 -name '*.py')
 	touch results/.completed
 
 verify: # Verify paper reproducibility.
-	make clean && make ARGS=$(ARGS) GPU=$(GPU) INTERACTIVE=$(INTERACTIVE) && mv ms.pdf tmp.pdf
-	make clean && make ARGS=$(ARGS) GPU=$(GPU) INTERACTIVE=$(INTERACTIVE)
+	make clean && make ARGS=$(ARGS) GPU="$(GPU)" INTERACTIVE=$(INTERACTIVE) && mv ms.pdf tmp.pdf
+	make clean && make ARGS=$(ARGS) GPU="$(GPU)" INTERACTIVE=$(INTERACTIVE)
 	@diff ms.pdf tmp.pdf && (echo 'ms.pdf is reproducible with docker' && sha256sum ms.pdf) || echo 'ms.pdf is not reproducible with docker'
 	@rm tmp.pdf
 
