@@ -34,8 +34,8 @@ results/.completed: $(shell find . -maxdepth 1 -name '*.py')
 	touch results/.completed
 
 verify: # Verify paper reproducibility.
-	make clean && make $(ARGS) $(INTERACTIVE) && mv ms.pdf tmp.pdf
-	make clean && make $(ARGS) $(INTERACTIVE)
+	make clean && make ARGS=$(ARGS) INTERACTIVE=$(INTERACTIVE) && mv ms.pdf tmp.pdf
+	make clean && make ARGS=$(ARGS) INTERACTIVE=$(INTERACTIVE)
 	@diff ms.pdf tmp.pdf && (echo 'ms.pdf is reproducible with docker' && sha256sum ms.pdf) || echo 'ms.pdf is not reproducible with docker'
 	@rm tmp.pdf
 
