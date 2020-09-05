@@ -8,7 +8,7 @@
 
 .POSIX:
 
-ARGS= 
+ARGS=
 GPU=--gpus all
 INTERACTIVE=-it
 
@@ -19,22 +19,23 @@ ms.pdf: ms.tex ms.bib results/.completed # Generate pdf.
 		ghcr.io/pbizopoulos/texlive-full \
 		latexmk -usepretex="\pdfinfoomitdate=1\pdfsuppressptexinfo=-1\pdftrailerid{}" -gg -pdf -cd /home/latex/ms.tex
 
-results/.completed: $(shell find . -maxdepth 1 -name '*.py')
+
+results/.completed: Dockerfile $(shell find . -maxdepth 1 -name '*.py')
 	rm -rf results/* results/.completed
-	docker build -t reproducible-builds-for-computational-research-papers:latest .
+	docker build -t reproducible-builds-for-computational-research-papers .
 	docker run --rm $(INTERACTIVE) \
 		--user $(shell id -u):$(shell id -g) \
 		-w /usr/src/app \
 		-e HOME=/usr/src/app/cache \
 		-v $(PWD):/usr/src/app \
-		$(GPU) reproducible-builds-for-computational-research-papers \
+		 $(GPU)  reproducible-builds-for-computational-research-papers \
 		python3 main.py $(ARGS) --cache-dir cache --results-dir results
 	touch results/.completed
 
-verify: # Verify paper reproducibility.
-	make clean && make ARGS=$(ARGS) GPU="$(GPU)" INTERACTIVE=$(INTERACTIVE) && mv ms.pdf tmp.pdf
-	make clean && make ARGS=$(ARGS) GPU="$(GPU)" INTERACTIVE=$(INTERACTIVE)
-	@diff ms.pdf tmp.pdf && (echo 'ms.pdf is reproducible with docker' && sha256sum ms.pdf) || echo 'ms.pdf is not reproducible with docker'
+test: # Test whether the paper has a deterministic build.
+	make clean && make ARGS=$(ARGS) GPU="$(GPU)" INTERACTIVE= && mv ms.pdf tmp.pdf
+	make clean && make ARGS=$(ARGS) GPU="$(GPU)" INTERACTIVE= 
+	@diff ms.pdf tmp.pdf && echo 'ms.pdf has a deterministic build.' || echo 'ms.pdf has not a deterministic build.'
 	@rm tmp.pdf
 
 clean: # Remove cache, results directories and tex auxiliary files.
@@ -47,4 +48,4 @@ clean: # Remove cache, results directories and tex auxiliary files.
 
 help: # Show help.
 	@grep '^# ' Makefile | cut -b 3-
-	@grep -E '^[a-z.-]*:.*# .*$$' Makefile | awk 'BEGIN {FS = ":.*# "}; {printf "\t%-13s - %s\n", $$1, $$2}'
+	@grep -E '^[a-z.-]*:.*# .*$$' Makefile | awk 'BEGIN {FS = ":.*# "}; {printf "\t%-18s - %s\n", $$1, $$2}'
