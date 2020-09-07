@@ -66,8 +66,8 @@ if __name__ == '__main__':
     lr = 0.01
     batch_size = 64
     transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
-    train_dataset = MNIST(args.cache_dir, train=True, transform=transform, download=True)
-    validation_dataset = MNIST(args.cache_dir, train=True, transform=transform)
+    train_dataset = MNIST(cache_dir, train=True, transform=transform, download=True)
+    validation_dataset = MNIST(cache_dir, train=True, transform=transform)
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(train_range))
     validation_dataloader = DataLoader(validation_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(validation_range))
     model = CustomModel()
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     train_loss_array = np.zeros((num_epochs))
     validation_loss_array = np.zeros((num_epochs))
     validation_loss_best = float('inf')
-    model_path = f'{args.results_dir}/model_best.pt'
+    model_path = f'{results_dir}/model_best.pt'
     for index_epoch, epoch in enumerate(range(num_epochs)):
         train_loss_sum = 0
         model.train()
@@ -124,7 +124,7 @@ if __name__ == '__main__':
     plt.autoscale(enable=True, axis='x', tight=True)
     plt.ylim([0, 1])
     plt.legend(['Train', 'Validation'])
-    plt.savefig(f'{args.results_dir}/image')
+    plt.savefig(f'{results_dir}/image')
     plt.close()
 
     # Create tables.
@@ -133,8 +133,8 @@ if __name__ == '__main__':
     columns = ['MNIST']
     df = pd.DataFrame(table, index=index, columns=columns)
     df.index.names = ['Metric']
-    df.to_latex(f'{args.results_dir}/table.tex', float_format="%.2f", bold_rows=True)
+    df.to_latex(f'{results_dir}/table.tex', float_format="%.2f", bold_rows=True)
 
     # Create variables.
     df = pd.DataFrame({'key': ['lr', 'batch_size', 'validation_accuracy_best'], 'value': [lr, str(int(batch_size)), validation_accuracy_best]})
-    df.to_csv(f'{args.results_dir}/keys-values.csv', index=False, float_format='%.2f')
+    df.to_csv(f'{results_dir}/keys-values.csv', index=False, float_format='%.2f')
