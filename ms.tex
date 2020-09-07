@@ -30,7 +30,7 @@
 \maketitle
 
 \begin{abstract}
-	Previous works in research reproducibility provided frameworks for writing reproducible research papers, however without considering the cost of extra work that needs to be done by the author to make his paper reproducible and by the reviewer to verify the paper's reproducibility.
+	Previous works in research reproducibility provided frameworks for writing reproducible research papers, however without considering the cost of extra work that needs to be done by the author to make the paper reproducible and by the reviewer to verify the paper's reproducibility.
 	We propose a simple template for writing computational research papers in \LaTeX\ that are easily verifiable in terms of their reproducibility.
 	The template contains a Makefile that allows the reviewer to execute the code that reproduces the figures, tables and variables (results) of the paper, which are then used during the \LaTeX\ compilation, to produce a pdf.
 	The previous procedure is completed twice and the paper is verified as reproducible, if and only if the pdf files are identical.
@@ -42,19 +42,19 @@
 \section{Introduction}
 A research paper is considered reproducible when any reviewer is able to reproduce its results, given the data and experimental procedure.
 More specifically, computational research reproducibility requires the presence of source code that produces or fetches data from external sources which then transforms into the figures, tables and variables of the paper.
-Open sourcing the code and the raw data of a computational research paper increases its reproducibility confidence but it is not enough to verify it.
-Using a template for writing and verifying computational research papers will push the direction towards creating reproducible research, thus tackling the `reproducibility crisis' problem.
+Open sourcing the code and the raw data of a computational research paper increases the confidence in its reproducibility but it is not enough to verify it.
+Using a template both for writing and verifying computational research papers will push the direction towards creating reproducible research, thus tackling the `reproducibility crisis' problem.
 
-We propose a template that uses the concept of \textit{reproducible builds} (RBs) to verify the reproducibility of computational research papers written in \LaTeX in a local or remote computational environment.
-We provide an open source implementation of the template\footnote{\url{https://github.com/pbizopoulos/cookiecutter-reproducible-builds-for-computational-research-papers}} for writing papers with RBs and use it to write this paper\footnote{\url{https://arxiv.org/abs/2005.12660}} and verify its reproducibility\footnote{\url{https://github.com/pbizopoulos/reproducible-builds-for-computational-research-papers}}.
+We propose a template for writing computational research papers with \LaTeX and verifying the its reproducibility using the concept of \textit{reproducible builds} (RBs) in a local or remote computational environment.
+We provide an open source implementation of the template\footnote{\url{https://github.com/pbizopoulos/cookiecutter-reproducible-builds-for-computational-research-papers}} and use it to write this paper\footnote{\url{https://arxiv.org/abs/2005.12660}} and verify its reproducibility\footnote{\url{https://github.com/pbizopoulos/reproducible-builds-for-computational-research-papers}}.
 We use Python~\cite{van2007python} for producing the results, however other scientific-oriented programming languages can be used.
 
 For the rest of the paper we will refer to:
 \begin{itemize}
 	\item \textit{paper} as a computational research paper,
 	\item \textit{results} as the figures, tables and variables that are shown in the \textit{paper},
-	\item \textit{\LaTeX\ code} as the files containing the main text (\textit{*.tex} files) and bibliography (\textit{*.bib} files) of the \textit{paper},
-	\item \textit{results code} as the files containing the scientific-oriented programming language code (\textit{*.py} files) that produces the \textit{results},
+	\item \textit{\LaTeX\ code} as the files containing the main text (\textit{*.tex}) and bibliography (\textit{*.bib}) of the \textit{paper},
+	\item \textit{results code} as the files containing the scientific-oriented programming language code (\textit{*.py}) that produces the \textit{results},
 	\item \textit{code} as both the \textit{\LaTeX\ code} and \textit{results code},
 	\item \textit{author} as the author(s) of the \textit{paper} and
 	\item \textit{reviewer} as the reviewer(s) of the \textit{paper} or anyone in interest of verifying the \textit{paper} (author(s), journal editors, other researchers).
@@ -72,15 +72,14 @@ For the rest of the paper we will refer to:
 			child{node[draw, anchor=west, fill=red!20](tex){ms.tex}}
 			child{node[draw, anchor=west, fill=red!20](bib){ms.bib}}
 			child{node[draw, anchor=west, fill=blue!20](py){main.py}}
-			child{node[draw, anchor=west, fill=blue!20](venv){.venv}}
 			child{node[draw, anchor=west, fill=blue!20](dockerfile){Dockerfile}};
 			\begin{scope}[on background layer]
-				\node[draw, rounded corners, dashed, fill=gray!30, inner sep=4pt, fit=(root) (dockerfile)]{};
-				\node[draw, rounded corners, dashed, fill=gray!70, inner sep=2pt, fit=(py) (dockerfile)](code){};
-				\node[draw, rounded corners, dashed, fill=gray!70, inner sep=2pt, fit=(tex) (bib)](paper){};
+				\node[draw, rounded corners, dashed, fill=gray!20, inner sep=4pt, fit=(root) (dockerfile)]{};
+				\node[draw, rounded corners, dashed, fill=gray!80, inner sep=2pt, fit=(py) (dockerfile)](code){};
+				\node[draw, rounded corners, dashed, fill=gray!80, inner sep=2pt, fit=(tex) (bib)](paper){};
 			\end{scope}
 			\node[draw, right=2cm of code, fill=white] (results) {results};
-			\path[draw, ->] (code) -- node[above]{venv/docker} (results);
+			\path[draw, ->] (code) -- node[above]{docker} (results);
 			\node[draw, right=4cm of paper, fill=white] (pdf) {pdf};
 			\path[draw, ->] (results) |- (pdf);
 			\path[draw, ->] (paper) -- node[above]{docker} (pdf);
@@ -90,7 +89,7 @@ For the rest of the paper we will refer to:
 	\label{fig:filehierarchyworkflow}
 \end{figure}
 
-The proposed template can be applied on \textit{papers} written in \LaTeX~\cite{lamport1994latex} and the \textit{results code} can be executed within a Docker container or a virtual environment.
+The proposed template can be applied on \textit{papers} written in \LaTeX~\cite{lamport1994latex} and the \textit{results code} are executed within a Docker container.
 \LaTeX\ is a typesetting system for publishing high quality research papers, and Docker~\cite{merkel2014docker} is a container system that allows portable execution of a codebase between different operating systems/environments and has shown great promise in reproducible research~\cite{boettiger2015introduction}.
 The corresponding Dockerfile can be provided by the \textit{author} or generated by tools such as containerit~\cite{nust2019containerit}.
 
@@ -145,21 +144,15 @@ These can be disabled using the following into the \textit{\LaTeX\ code} after t
 Executing RBs can be done using the following:
 \begin{lstlisting}[language=Bash, style=lststyle, caption={Makefile call syntax from the shell.}, captionpos=b]
 
-make [OPTION] [ARGS=--full] [GPU='--gpus all']
+SYNTAX
+make [OPTION] [ARGS=--full]
 
 OPTIONS
-# (or empty OPTION) Generate pdf with results from venv.
-ms.pdf
-# Verify venv paper reproducibility.
-venv-verify
-# Generate pdf with results from docker.
-docker
-# Verify docker paper reproducibility.
-docker-verify
-# Remove cache, results, venv directories and tex aux files.
-clean
-# Show help.
-help
+ms.pdf - Generate pdf.
+test   - Test whether the paper has a reproducible build.
+clean  - Remove cache, results directories and tex aux files.
+help   - Show help.
+
 \end{lstlisting}
 
 The RB template takes advantage of the automatic generation of intermediate files of the `make' program.
@@ -223,6 +216,7 @@ df.to_latex('table.tex', float_format="%.2f")
 \end{table}
 
 \section{Discussion}
+RBs are based on plain text and are independent of any specific git and docker registry providor thus preventing `vendor lock-in' situations.
 Previous works in this area such as Hurlin et al.~\cite{hurlin2019reproducibility} propose an `external certification agency' for economic studies.
 RBs provide a simple solution for writing and verifying the reproducibility of a \textit{paper} as a whole, without having to trust a third-party.
 Anyone can clone a repository written with RBs and locally verify its reproducibility, in case third party verifications (such as cloud VMs) cannot be trusted.
