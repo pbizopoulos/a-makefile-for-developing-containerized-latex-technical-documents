@@ -70,7 +70,7 @@ if __name__ == '__main__':
     validation_dataset = MNIST(cache_dir, train=True, transform=transform)
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(train_range))
     validation_dataloader = DataLoader(validation_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(validation_range))
-    model = CustomModel()
+    model = CustomModel().to(device)
     optimizer = optim.SGD(model.parameters(), lr=lr)
     criterion = nn.CrossEntropyLoss()
     train_loss_array = np.zeros((num_epochs))
