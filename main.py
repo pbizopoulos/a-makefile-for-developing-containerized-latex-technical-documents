@@ -82,7 +82,7 @@ if __name__ == '__main__':
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if args.full:
-        num_epochs = 50
+        num_epochs = 20
     else:
         num_epochs = 1
         train_range_list = [train_range[:10] for train_range in train_range_list]
