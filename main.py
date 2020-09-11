@@ -4,44 +4,73 @@ import pandas as pd
 import torch
 
 from matplotlib import pyplot as plt
+from matplotlib.ticker import MaxNLocator
 from torch import nn
 from torch import optim
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision import transforms
-from torchvision.datasets import MNIST
+from torchvision.datasets import MNIST, FashionMNIST, KMNIST, QMNIST
+from torchvision.models import vgg11_bn
 
 plt.rcParams['font.size'] = 12
 plt.rcParams['savefig.format'] = 'pdf'
 
+dataset_list = [MNIST, FashionMNIST, KMNIST, QMNIST]
+dataset_name_list = [dataset.__name__ for dataset in dataset_list]
+num_fc_list = [9216, 9216, 9216, 9216, 9216, 12544, 12544, 135424, 12544]
 
-class CustomModel(nn.Module):
-    def __init__(self):
-        super(CustomModel, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5, 1)
-        self.conv2 = nn.Conv2d(20, 50, 5, 1)
-        self.fc1 = nn.Linear(4*4*50, 500)
-        self.fc2 = nn.Linear(500, 10)
+mean_std_list = [
+        ((0.1307,), (0.3081,)),
+        ((0.1307,), (0.3081,)),
+        ((0.1307,), (0.3081,)),
+        ((0.1307,), (0.3081,)),
+        ]
 
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        x = F.max_pool2d(x, 2, 2)
-        x = F.relu(self.conv2(x))
-        x = F.max_pool2d(x, 2, 2)
-        x = torch.flatten(x, 1)
-        x = F.relu(self.fc1(x))
-        x = self.fc2(x)
-        return x
+train_range_list = [
+        range(50000), 
+        range(50000),
+        range(50000),
+        range(50000),
+        ]
+
+validation_range_list = [
+        range(50000, 60000),
+        range(50000, 60000),
+        range(50000, 60000),
+        range(50000, 60000),
+        ]
+
+test_range_list = [
+        range(10000),
+        range(10000),
+        range(10000),
+        range(10000),
+        ]
+
+def save_loss(train_loss, validation_loss, dataset_name, results_dir):
+    fig, ax = plt.subplots()
+    plt.grid(True)
+    plt.autoscale(enable=True, axis='x', tight=True)
+    plt.ylim([0, 1])
+    plt.xlabel('Epochs', fontsize=15)
+    plt.ylabel('Loss', fontsize=15)
+    plt.plot(train_loss)
+    plt.plot(validation_loss)
+    ax.tick_params(axis='both', which='major', labelsize='large')
+    ax.tick_params(axis='both', which='minor', labelsize='large')
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    plt.savefig(f'{results_dir}/{dataset_name}-loss', bbox_inches='tight')
+    plt.close()
 
 
 if __name__ == '__main__':
     # DO NOT EDIT BLOCK
     np.random.seed(0)
-    torch.manual_seed(0)
-    torch.cuda.manual_seed_all(0)
-    torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+    torch.manual_seed(0)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--full', default=False, action='store_true')
@@ -53,88 +82,102 @@ if __name__ == '__main__':
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if args.full:
-        num_epochs = 10
-        train_range = range(40000)
-        validation_range = range(40000, 50000)
-        test_range = range(10000)
+        num_epochs = 50
     else:
         num_epochs = 1
-        train_range = range(10)
-        validation_range = range(10)
-        test_range = range(10)
-
+        train_range_list = [train_range[:10] for train_range in train_range_list]
+        validation_range_list = [validation_range[:10] for validation_range in validation_range_list]
+        test_range_list = [test_range[:10] for test_range in test_range_list]
     lr = 0.01
     batch_size = 64
-    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
-    train_dataset = MNIST(cache_dir, train=True, transform=transform, download=True)
-    validation_dataset = MNIST(cache_dir, train=True, transform=transform)
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(train_range))
-    validation_dataloader = DataLoader(validation_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(validation_range))
-    model = CustomModel().to(device)
-    optimizer = optim.SGD(model.parameters(), lr=lr)
+    train_loss_array = np.zeros((len(dataset_list), num_epochs))
+    validation_loss_array = np.zeros((len(dataset_list), num_epochs))
+    test_accuracy_array = np.zeros((len(dataset_list)))
+    test_batch_size = 1000
     criterion = nn.CrossEntropyLoss()
-    train_loss_array = np.zeros((num_epochs))
-    validation_loss_array = np.zeros((num_epochs))
-    validation_loss_best = float('inf')
-    model_path = f'{results_dir}/model_best.pt'
-    for index_epoch, epoch in enumerate(range(num_epochs)):
-        train_loss_sum = 0
-        model.train()
-        for data, target in train_dataloader:
-            data = data.to(device)
-            target = target.to(device)
-            optimizer.zero_grad()
-            output = model(data)
-            loss = criterion(output, target)
-            loss.backward()
-            optimizer.step()
-            train_loss_sum += loss.item()
-        train_loss = train_loss_sum / len(train_dataloader)
-        train_loss_array[index_epoch] = train_loss
+    for index_dataset, (dataset, dataset_name, train_range, validation_range, test_range, mean_std, num_fc) in enumerate(zip(dataset_list, dataset_name_list, train_range_list, validation_range_list, test_range_list, mean_std_list, num_fc_list)):
+        transform = transforms.Compose([
+            transforms.Resize((32, 32)),
+            transforms.ToTensor(),
+            transforms.Lambda(lambda x: torch.cat([x, x, x], 0)),
+            transforms.Normalize(mean_std[0], mean_std[1])
+            ])
+        train_dataset = dataset(cache_dir, train=True, transform=transform, download=True)
+        validation_dataset = dataset(cache_dir, train=True, transform=transform)
+        test_dataset = dataset(cache_dir, train=False, transform=transform, download=True)
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(train_range))
+        validation_dataloader = DataLoader(validation_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(validation_range))
+        test_dataloader = DataLoader(test_dataset, batch_size=test_batch_size, sampler=SubsetRandomSampler(test_range))
+        num_classes = len(train_dataset.classes)
+        model = vgg11_bn().to(device)
+        optimizer = optim.SGD(model.parameters(), lr=lr)
+        validation_loss_best = float('inf')
+        model_path = f'{results_dir}/{dataset.__name__}.pt'
+        for index_epoch, epoch in enumerate(range(num_epochs)):
+            train_loss_sum = 0
+            model.train()
+            for data, target in train_dataloader:
+                data = data.to(device)
+                target = target.to(device)
+                optimizer.zero_grad()
+                output = model(data)
+                loss = criterion(output, target)
+                loss.backward()
+                optimizer.step()
+                train_loss_sum += loss.item()
+            train_loss = train_loss_sum / len(train_dataloader)
+            train_loss_array[index_dataset, index_epoch] = train_loss
+            model.eval()
+            validation_loss_sum = 0
+            correct = 0
+            total = 0
+            with torch.no_grad():
+                for data, target in validation_dataloader:
+                    data = data.to(device)
+                    target = target.to(device)
+                    output = model(data)
+                    validation_loss_sum += criterion(output, target).item()
+                    prediction = output.argmax(dim=1, keepdim=True)
+                    correct += prediction.eq(target.view_as(prediction)).sum().item()
+                    total += output.shape[0]
+            validation_loss = validation_loss_sum / len(validation_dataloader)
+            validation_loss_array[index_dataset, index_epoch] = validation_loss
+            accuracy = 100. * correct / total
+            print(f'{dataset_name}, Epoch: {epoch}, Validation average loss: {validation_loss:.4f}, Validation accuracy: {accuracy:.2f}%')
+            if validation_loss < validation_loss_best:
+                validation_loss_best = validation_loss
+                torch.save(model.state_dict(), model_path)
+                print('saving as best model')
+        model = vgg11_bn().to(device)
+        model.load_state_dict(torch.load(model_path))
         model.eval()
-        validation_loss_sum = 0
         correct = 0
         total = 0
         with torch.no_grad():
-            for data, target in validation_dataloader:
+            for data, target in test_dataloader:
                 data = data.to(device)
                 target = target.to(device)
                 output = model(data)
-                validation_loss_sum += criterion(output, target).item()
                 prediction = output.argmax(dim=1, keepdim=True)
                 correct += prediction.eq(target.view_as(prediction)).sum().item()
                 total += output.shape[0]
-        validation_loss = validation_loss_sum / len(validation_dataloader)
-        validation_loss_array[index_epoch] = validation_loss
-        validation_accuracy = 100. * correct / total
-        print(f'Epoch: {epoch}, Validation average loss: {validation_loss:.4f}, Validation accuracy: {validation_accuracy:.2f}%')
-        if validation_loss < validation_loss_best:
-            validation_loss_best = validation_loss
-            validation_accuracy_best = validation_accuracy
-            torch.save(model.state_dict(), model_path)
-            print('saving as best model')
+            accuracy = 100. * correct / total
+            test_accuracy_array[index_dataset] = accuracy
+            print(f'{dataset_name}, Test accuracy: {accuracy:.2f}%')
 
-    # Create pdf images.
-    plt.figure(constrained_layout=True, figsize=(6, 2))
-    plt.plot(train_loss_array)
-    plt.plot(validation_loss_array)
-    plt.grid(True)
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.autoscale(enable=True, axis='x', tight=True)
-    plt.ylim([0, 1])
-    plt.legend(['Train', 'Validation'])
-    plt.savefig(f'{results_dir}/image')
-    plt.close()
+    df_keys_values = pd.DataFrame({'key': [
+        'num_epochs',
+        'batch_size',
+        'lr'],
+        'value': [
+            str(int(num_epochs)),
+            str(int(batch_size)),
+            lr]})
+    df_keys_values.to_csv(f'{results_dir}/keys-values.csv')
 
-    # Create tables.
-    table = [train_loss_array[-1], validation_loss_array[-1], validation_accuracy_best]
-    index = ['Train Loss', 'Val Loss', 'Val Acc(%)']
-    columns = ['MNIST']
-    df = pd.DataFrame(table, index=index, columns=columns)
-    df.index.names = ['Metric']
-    df.to_latex(f'{results_dir}/table.tex', float_format="%.2f", bold_rows=True)
+    for index_dataset_name, (dataset_name, train_loss, validation_loss) in enumerate(zip(dataset_name_list, train_loss_array, validation_loss_array)):
+        save_loss(train_loss, validation_loss, dataset_name, results_dir)
 
-    # Create variables.
-    df = pd.DataFrame({'key': ['lr', 'batch_size', 'validation_accuracy_best'], 'value': [lr, str(int(batch_size)), validation_accuracy_best]})
-    df.to_csv(f'{results_dir}/keys-values.csv', index=False, float_format='%.2f')
+    max_per_column_list = test_accuracy_array.max(0)
+    df = pd.DataFrame(test_accuracy_array)
+    df.to_latex(f'{results_dir}/metrics.tex', bold_rows=True, column_format='r|r', multirow=True, escape=False)

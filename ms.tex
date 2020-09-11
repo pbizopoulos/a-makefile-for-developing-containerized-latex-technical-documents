@@ -2,6 +2,7 @@
 \usepackage[caption=false,font=footnotesize]{subfig}
 \usepackage{booktabs}
 \usepackage{datatool}
+\usepackage{diagbox}
 \usepackage{listings}
 \usepackage{makecell}
 \usepackage{tikz}
@@ -13,8 +14,8 @@
 \usepackage{hyperref}
 
 \lstdefinestyle{lststyle}{
-	aboveskip=20pt,
-	belowskip=20pt,
+	aboveskip=10pt,
+	belowskip=10pt,
 	frame=single,
 	basicstyle=\tt\scriptsize,
 	commentstyle=\color{gray}}
@@ -32,7 +33,7 @@
 \begin{abstract}
 	Previous works in research reproducibility provided frameworks for writing reproducible research papers, however without considering the cost of extra work that needs to be done by the author to make the paper reproducible and by the reviewer to verify the paper's reproducibility.
 	We propose a simple template for writing computational research papers in \LaTeX\ that are easily verifiable in terms of their reproducibility.
-	The template contains a Makefile that allows the reviewer to execute the code that reproduces the figures, tables and variables (results) of the paper, which are then used during the \LaTeX\ compilation, to produce a pdf.
+	The template contains a Makefile that allows the author/reviewer to execute the code that reproduces the figures, tables and variables (results) of the paper, which are then used during the \LaTeX\ compilation, to produce a pdf.
 	The previous procedure is completed twice and the paper is verified as reproducible, if and only if the pdf files are identical.
 	The two builds are needed to enable comparison between different builds of the same source code such that any non-deterministic stochasticity would produce different pdf files, thus making the paper non-reproducible.
 	The reproducibility of a paper can be verified either locally on the machine of the reviewer or remotely using Virtual Machines (VMs) in the cloud.
@@ -97,17 +98,13 @@ A specific file hierarchy (shown in Fig.~\ref{fig:filehierarchyworkflow}) is use
 The template fits in the research writing and reproducibility verification in the following way:
 \begin{enumerate}
 	\item the \textit{author} edits the \textit{code} in the local repository,
-	\item the \textit{author} may verify the reproducibility of the \textit{paper} locally:
+	\item the \textit{author} may execute \textit{make} during development and experimentation,
+	\item the \textit{author} may verify the reproducibility of the \textit{paper} locally by executing \textit{make test} (or remotely by commiting with a message which contains \textit{[make test]}) which triggers the following:
 		\begin{enumerate}
-			\item the \textit{results code} is executed twice in the local machine,
-			\item the \textit{results} along with the \textit{\LaTeX\ code} are used to compile the pdf files,
-			\item the \textit{paper} is verifed as locally reproducible if and only if the pdf files are identical.
-		\end{enumerate}
-	\item the \textit{author} may push the change to the remote repository, which optionally triggers the remote reproducibility verification:
-		\begin{enumerate}
-			\item the \textit{results code} is executed twice in two cloud VMs (builders),
-			\item the \textit{results} along with the \textit{\LaTeX\ code} are used to compile the pdf files,
-			\item the \textit{paper} is verified as remotely reproducible if and only if the pdf files are identical.
+			\item the \textit{results code} is executed,
+			\item the \textit{results} along with the \textit{\LaTeX\ code} are used to compile a pdf file,
+			\item the previous is executed twice,
+			\item the \textit{paper} is verifed as reproducible if and only if the pdf files are identical.
 		\end{enumerate}
 	\item the \textit{reviewer} may verify the reproducibility of the paper on a local or remote machine.
 \end{enumerate}
@@ -126,12 +123,12 @@ Other potential uses of the RBs template include:
 
 \subsection{Technical implementation}
 An open source implementation of the RBs template is available in which the remote reproducibility verification is done using Github Actions.
-The builder VMs use different versions of Ubuntu (18.04 and 20.04) and pull a docker image for building \LaTeX\ from DockerHub.
+The builder VMs use the latest version of Ubuntu and pull a docker image for building \LaTeX\ from the Github Container Registry.
 We demonstrate its use by writing and verifying the reproducibility of this paper and its arXiv version.
 
-Regarding research that is computational costly, the template provides a debug flag that verifies the reproducibility of a computationally lighter version of the \textit{paper}.
-This flag also helps in faster iterations during research writing and experimentation.
-An example of the debug flag in the field of neural networks is setting the number of epochs and number of training samples to a low value.
+Regarding research that is computational costly, the template by default allows the execution and reproducibility verification of a computationally lighter version of the \textit{paper} and provides an argument for executing the whole experiment.
+This also helps in faster iterations during research writing and experimentation.
+An example of a computationally lighter version in the field of neural networks is setting the number of epochs and number of training samples to a low value.
 
 A common culprit against reproducibility in \LaTeX\ is the time-date metadata of pdf output.
 These can be disabled using the following into the \textit{\LaTeX\ code} after the preamble or as extra arguments during \LaTeX\ compilation (as done in the RB Makefile):
@@ -143,7 +140,6 @@ These can be disabled using the following into the \textit{\LaTeX\ code} after t
 
 Executing RBs can be done using the following:
 \begin{lstlisting}[language=Bash, style=lststyle, caption={Makefile call syntax from the shell.}, captionpos=b]
-
 SYNTAX
 make [OPTION] [ARGS=--full]
 
@@ -155,12 +151,32 @@ help   - Show help.
 
 \end{lstlisting}
 
+\begin{table}[]
+	\centering
+	\caption{Makefile usage table.}
+	\label{table:usagetable}
+	\begin{tabular}{l|ll}
+		\toprule
+		\diagbox{\textbf{OPTION}}{\textbf{ARGS}} & \textbf{(empty)}              & \textbf{-{}-full}                    \\
+		\midrule
+		\textbf{(ms.pdf or empty)}          & debug/development    & release paper             \\
+		\textbf{test}                       & test reproducibility & test reproducibility full \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
 The RB template takes advantage of the automatic generation of intermediate files of the `make' program.
-The \textit{author} only needs to edit (or use the `touch' program to force) a file from \textit{results code} or \textit{\LaTeX\ code} and the corresponding compilation is automatically triggered.
+The \textit{author} only needs to edit (or use the `touch' UNIX utility to force) a file from \textit{results code} or \textit{\LaTeX\ code} and the corresponding compilation is automatically triggered.
 
 \section{Example Use Case of RBs}
-This sections provides a use case of RBs and also serves as a manual for creating reproducibility of \textit{papers} written in \LaTeX\ with Python as the \textit{results code} programming language.
-For demonstration purposes we train and test a simple neural network on the MNIST~\cite{lecun2010mnist} dataset with PyTorch~\cite{paszke2019pytorch}.
+This sections provides a use case of RBs and also serves as a manual for creating reproducible \textit{papers} written in \LaTeX\ with Python as the \textit{results code} programming language.
+For demonstration purposes we train and test a VGG11 neural network~\cite{simonyan2014very} with batch normalization with PyTorch~\cite{paszke2019pytorch}, on the following datasets:
+\begin{itemize}
+	\item MNIST~\cite{lecun2010mnist}
+	\item FashionMNIST~\cite{xiao2017fashion}
+	\item KMNIST~\cite{clanuwat2018deep}
+	\item QMNIST~\cite{yadav2019cold}
+\end{itemize}
 
 A useful \LaTeX\ package for automatically embedding variables from \textit{results} in \textit{\LaTeX\ code} is \textit{datatool} with the following example use:
 \begin{lstlisting}[language=TeX, style=lststyle, caption={\LaTeX\ datatool example of loading a file that contains pairs of keys and values (keys\_values.csv) generated by a \textit{results code} and getting the value of a key named lr.}, captionpos=b]
@@ -172,7 +188,6 @@ For example the values of the following variables are not referred in the main \
 \begin{itemize}
 	\item the learning rate is $\DTLfetch{keys_values}{key}{lr}{value}$,
 	\item the batch size is $\DTLfetch{keys_values}{key}{batch_size}{value}$ and
-	\item the validation accuracy of the best model is $\DTLfetch{keys_values}{key}{validation_accuracy_best}{value}\%$.
 \end{itemize}
 
 Regarding the \textit{results code} for Python, random seeds need to be set to a specific value such as:
@@ -192,11 +207,15 @@ tf.random.set_seed(0)
 
 Using the random seeds and \textit{datatool} we could have deterministic stochasticity that reproduces figures, tables and variables.
 For example Fig.~\ref{fig:image} depicts the train and validation loss:
-\begin{figure}[h]
-	\includegraphics[width=\linewidth]{results/image.pdf}
-	\caption{Image example created from \textit{results code}.}
+\begin{figure*}[!t]
+	\subfloat{\includegraphics[width=0.25\textwidth]{results/MNIST-loss}}
+	\subfloat{\includegraphics[width=0.25\textwidth]{results/FashionMNIST-loss}}
+	\subfloat{\includegraphics[width=0.25\textwidth]{results/KMNIST-loss}}
+	\subfloat{\includegraphics[width=0.25\textwidth]{results/QMNIST-loss}}
+	\caption{Train validation lossses.
+	Image example created from \textit{results code}.}
 	\label{fig:image}
-\end{figure}
+\end{figure*}
 
 Another useful function for Python is \textit{pandas.DataFrame.to\_latex} which automatically converts a dataframe table to a \LaTeX\ table (as shown in Table~\ref{table:table}.
 
@@ -204,7 +223,7 @@ Another useful function for Python is \textit{pandas.DataFrame.to\_latex} which 
 num_columns = 11
 table = np.random.random((7, num_columns))
 df = pd.DataFrame(table)
-df.to_latex('table.tex', float_format="%.2f")
+df.to_latex('metrics.tex', float_format="%.2f")
 \end{lstlisting}
 
 \begin{table}[h]
@@ -212,16 +231,16 @@ df.to_latex('table.tex', float_format="%.2f")
 	\caption{Table example created from results code.}
 	\label{table:table}
 	\setlength\tabcolsep{4.2pt}
-	\input{results/table.tex}
+	\input{results/metrics.tex}
 \end{table}
 
 \section{Discussion}
 RBs are based on plain text and are independent of any specific git and docker registry providor thus preventing `vendor lock-in' situations.
 Previous works in this area such as Hurlin et al.~\cite{hurlin2019reproducibility} propose an `external certification agency' for economic studies.
-RBs provide a simple solution for writing and verifying the reproducibility of a \textit{paper} as a whole, without having to trust a third-party.
+RBs provide a simple solution for writing and verifying the reproducibility of a `\textit{paper} as a whole', without having to trust a third-party.
 Anyone can clone a repository written with RBs and locally verify its reproducibility, in case third party verifications (such as cloud VMs) cannot be trusted.
 Similar to RBs is ReDoc~\cite{schwab2000making} which however focuses on separate result file reproducibility and requires the author to write each rule in the Makefile for each result file.
-RBs on the other hand focus on `~\textit{paper} as a whole' reproducibility with an automatically generated Makefile.
+RBs on the other hand provides a Makefile that is automatically generated by the template.
 
 \section{Conclusion}
 Automating research reproducibility verification is becoming more important due to the increasing research output that has been observed in the last few years.
