@@ -23,8 +23,9 @@
 
 .POSIX:
 
-ARGS= 
+ARGS=
 DEBUG_ARGS=--interactive --tty
+DOCKER_GHCR=
 MAKEFILE_DIR=$(dir $(realpath Makefile))
 DOCKER_GPU_ARGS=--gpus all
 
@@ -36,9 +37,11 @@ ms.pdf: ms.tex ms.bib results/.completed # Generate pdf.
 		ghcr.io/pbizopoulos/texlive-full \
 		latexmk -usepretex="\pdfinfoomitdate=1\pdfsuppressptexinfo=-1\pdftrailerid{}" -gg -pdf -cd /home/latex/ms.tex
 
+ifdef DOCKER_GHCR
+
 results/.completed: Dockerfile $(shell find . -maxdepth 1 -name '*.py')
 	rm -rf results/* results/.completed
-	docker image build --tag reproducible-builds-for-computational-research-papers .
+	docker image pull reproducible-builds-for-computational-research-papers
 	docker container run \
 		$(DEBUG_ARGS) \
 		--rm \
@@ -47,6 +50,22 @@ results/.completed: Dockerfile $(shell find . -maxdepth 1 -name '*.py')
 		$(DOCKER_GPU_ARGS) reproducible-builds-for-computational-research-papers \
 		python main.py $(ARGS)
 	touch results/.completed
+
+else
+
+results/.completed: Dockerfile $(shell find . -maxdepth 1 -name '*.py')
+	rm -rf results/* results/.completed
+	docker image build --tag reproducible-builds-for-computational-research-papers-dev .
+	docker container run \
+		$(DEBUG_ARGS) \
+		--rm \
+		--user $(shell id -u):$(shell id -g) \
+		--volume $(MAKEFILE_DIR):/usr/src/app \
+		$(DOCKER_GPU_ARGS) reproducible-builds-for-computational-research-papers-dev \
+		python main.py $(ARGS)
+	touch results/.completed
+
+endif
 
 test: # Test whether the paper has a reproducible build.
 	make clean && make ARGS=$(ARGS) DEBUG_ARGS= DOCKER_GPU_ARGS="$(DOCKER_GPU_ARGS)" && mv ms.pdf tmp.pdf
