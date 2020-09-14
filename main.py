@@ -82,7 +82,7 @@ if __name__ == '__main__':
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if args.full:
-        num_epochs = 20
+        num_epochs = 10
     else:
         num_epochs = 1
         train_range_list = [train_range[:10] for train_range in train_range_list]
@@ -92,7 +92,7 @@ if __name__ == '__main__':
     batch_size = 64
     train_loss_array = np.zeros((len(dataset_list), num_epochs))
     validation_loss_array = np.zeros((len(dataset_list), num_epochs))
-    test_accuracy_array = np.zeros((len(dataset_list)))
+    test_accuracy_array = np.zeros((len(dataset_list), 1))
     test_batch_size = 1000
     criterion = nn.CrossEntropyLoss()
     for index_dataset, (dataset, dataset_name, train_range, validation_range, test_range, mean_std, num_fc) in enumerate(zip(dataset_list, dataset_name_list, train_range_list, validation_range_list, test_range_list, mean_std_list, num_fc_list)):
@@ -178,6 +178,6 @@ if __name__ == '__main__':
     for index_dataset_name, (dataset_name, train_loss, validation_loss) in enumerate(zip(dataset_name_list, train_loss_array, validation_loss_array)):
         save_loss(train_loss, validation_loss, dataset_name, results_dir)
 
-    max_per_column_list = test_accuracy_array.max(0)
-    df = pd.DataFrame(test_accuracy_array)
-    df.to_latex(f'{results_dir}/metrics.tex', bold_rows=True, column_format='r|r', multirow=True, escape=False)
+    test_accuracy_array = test_accuracy_array.T
+    df = pd.DataFrame(test_accuracy_array, index=['Accuracy'], columns=dataset_name_list)
+    df.to_latex(f'{results_dir}/metrics.tex', bold_rows=True, column_format='r|rrrr', multirow=True, escape=False)
