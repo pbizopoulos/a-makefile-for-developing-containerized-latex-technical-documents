@@ -7,17 +7,7 @@ jobs:
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v2
-      - name: Build, Test and Deploy docker image
-        if: contains(github.event.head_commit.message, '{release}')
-        run: |
-          docker build -t reproducible-builds-for-computational-research-papers .
-          TAG="ghcr.io/pbizopoulos/reproducible-builds-for-computational-research-papers"
-          docker tag reproducible-builds-for-computational-research-papers ${TAG}:latest
-          echo ${{ secrets.CR_PAT }} | docker login ghcr.io --username pbizopoulos --password-stdin
-          docker push $TAG
-          $(echo ${{ github.event.head_commit.message }} | awk -F'[][]' '{print $2}') DEBUG_ARGS= DOCKER_GPU_ARGS= DOCKER_GHCR=True
       - name: Test whether the paper has a reproducible build
-        if: "!contains(github.event.head_commit.message, '{release}')"
         run: $(echo ${{ github.event.head_commit.message }} | awk -F'[][]' '{print $2}') DEBUG_ARGS= DOCKER_GPU_ARGS= 
       - name: Upload pdf
         if: contains(github.event.head_commit.message, '{release}')
