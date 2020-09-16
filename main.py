@@ -49,21 +49,6 @@ test_range_list = [
         range(10000),
         ]
 
-def save_loss(train_loss, validation_loss, dataset_name, results_dir):
-    fig, ax = plt.subplots()
-    plt.grid(True)
-    plt.autoscale(enable=True, axis='x', tight=True)
-    plt.ylim([0, 1])
-    plt.xlabel('Epochs', fontsize=15)
-    plt.ylabel('Loss', fontsize=15)
-    plt.plot(train_loss)
-    plt.plot(validation_loss)
-    ax.tick_params(axis='both', which='major', labelsize='large')
-    ax.tick_params(axis='both', which='minor', labelsize='large')
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    plt.savefig(f'{results_dir}/{dataset_name}-loss', bbox_inches='tight')
-    plt.close()
-
 
 if __name__ == '__main__':
     # DO NOT EDIT BLOCK
@@ -90,7 +75,6 @@ if __name__ == '__main__':
         test_range_list = [test_range[:10] for test_range in test_range_list]
     lr = 0.01
     batch_size = 64
-    train_loss_array = np.zeros((len(dataset_list), num_epochs))
     validation_loss_array = np.zeros((len(dataset_list), num_epochs))
     test_accuracy_array = np.zeros((len(dataset_list), 1))
     test_batch_size = 1000
@@ -114,7 +98,6 @@ if __name__ == '__main__':
         validation_loss_best = float('inf')
         model_path = f'{results_dir}/{dataset.__name__}.pt'
         for index_epoch, epoch in enumerate(range(num_epochs)):
-            train_loss_sum = 0
             model.train()
             for data, target in train_dataloader:
                 data = data.to(device)
@@ -124,9 +107,6 @@ if __name__ == '__main__':
                 loss = criterion(output, target)
                 loss.backward()
                 optimizer.step()
-                train_loss_sum += loss.item()
-            train_loss = train_loss_sum / len(train_dataloader)
-            train_loss_array[index_dataset, index_epoch] = train_loss
             model.eval()
             validation_loss_sum = 0
             correct = 0
@@ -175,8 +155,20 @@ if __name__ == '__main__':
             lr]})
     df_keys_values.to_csv(f'{results_dir}/keys-values.csv')
 
-    for index_dataset_name, (dataset_name, train_loss, validation_loss) in enumerate(zip(dataset_name_list, train_loss_array, validation_loss_array)):
-        save_loss(train_loss, validation_loss, dataset_name, results_dir)
+    fig, ax = plt.subplots()
+    plt.grid(True)
+    plt.autoscale(enable=True, axis='x', tight=True)
+    plt.ylim([0, 0.5])
+    plt.xlabel('Epochs', fontsize=15)
+    plt.ylabel('Validation Loss', fontsize=15)
+    for dataset_name, validation_loss in zip(dataset_name_list, validation_loss_array):
+        plt.plot(validation_loss, label=dataset_name)
+    ax.tick_params(axis='both', which='major', labelsize='large')
+    ax.tick_params(axis='both', which='minor', labelsize='large')
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.legend()
+    plt.savefig(f'{results_dir}/validation-loss', bbox_inches='tight')
+    plt.close()
 
     test_accuracy_array = test_accuracy_array.T
     df = pd.DataFrame(test_accuracy_array, index=['Accuracy'], columns=dataset_name_list)
