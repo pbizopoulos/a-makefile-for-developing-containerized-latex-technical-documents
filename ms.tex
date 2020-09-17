@@ -200,9 +200,9 @@ torch.manual_seed(0)
 Using the random seeds and \textit{datatool} we could have deterministic stochasticity that reproduces figures, tables and variables.
 For example Fig.~\ref{fig:image} depicts the train and validation loss for all datasets.
 \begin{figure}[!t]
-	\subfloat{\includegraphics[width=0.5\textwidth]{results/validation-loss}}
-	\caption{Validation losses.
-	Image example created from \textit{results code}.}
+	\subfloat{\includegraphics[width=0.25\textwidth]{results/MNIST-loss}}
+	\subfloat{\includegraphics[width=0.25\textwidth]{results/FashionMNIST-loss}}
+	\caption{Train validation losses}
 	\label{fig:image}
 \end{figure}
 
@@ -220,7 +220,7 @@ df.to_latex('metrics.tex', float_format="%.2f")
 	\caption{Table example created from results code.}
 	\label{table:table}
 	\setlength\tabcolsep{4.2pt}
-	\input{results/metrics.tex}
+	\scalebox{0.64}{\input{results/metrics.tex}}
 \end{table}
 
 \section{Discussion}
