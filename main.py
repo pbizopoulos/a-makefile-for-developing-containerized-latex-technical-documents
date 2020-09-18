@@ -11,13 +11,13 @@ from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision import transforms
-from torchvision.datasets import MNIST, FashionMNIST, KMNIST, QMNIST, EMNIST, CIFAR10, CIFAR100, STL10, SVHN
+from torchvision.datasets import MNIST, FashionMNIST, KMNIST, QMNIST, EMNIST, CIFAR10, CIFAR100, SVHN
 from torchvision.models import vgg11_bn
 
 plt.rcParams['font.size'] = 12
 plt.rcParams['savefig.format'] = 'pdf'
 
-dataset_list = [MNIST, FashionMNIST, KMNIST, QMNIST, EMNIST, CIFAR10, CIFAR100, STL10, SVHN]
+dataset_list = [MNIST, FashionMNIST, KMNIST, QMNIST, EMNIST, CIFAR10, CIFAR100, SVHN]
 dataset_name_list = [dataset.__name__ for dataset in dataset_list]
 num_fc_list = [9216, 9216, 9216, 9216, 9216, 12544, 12544, 135424, 12544]
 activation_function_list = ['ReLU', 'SELU']
@@ -141,7 +141,7 @@ if __name__ == '__main__':
                 transforms.ToTensor(),
                 transforms.Normalize(mean_std[0], mean_std[1])
                 ])
-        if dataset_name in ['STL10', 'SVHN']:
+        if dataset_name == 'SVHN':
             train_dataset = dataset(cache_dir, split='train', transform=transform, download=True)
             validation_dataset = dataset(cache_dir, split='train', transform=transform)
             test_dataset = dataset(cache_dir, split='test', transform=transform, download=True)
