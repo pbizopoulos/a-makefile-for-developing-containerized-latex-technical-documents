@@ -19,7 +19,6 @@ plt.rcParams['savefig.format'] = 'pdf'
 
 dataset_list = [MNIST, FashionMNIST, KMNIST, QMNIST, EMNIST, CIFAR10, CIFAR100, SVHN]
 dataset_name_list = [dataset.__name__ for dataset in dataset_list]
-num_fc_list = [9216, 9216, 9216, 9216, 9216, 12544, 12544, 135424, 12544]
 activation_function_list = ['ReLU', 'SELU']
 
 mean_std_list = [
@@ -79,8 +78,9 @@ def save_loss(train_loss, validation_loss, dataset_name, activation_function_lis
     if dataset_name == 'MNIST':
         plt.ylabel('loss', fontsize=15)
     for train_loss_, validation_loss_, activation_function, color in zip(train_loss, validation_loss, activation_function_list, ['b', 'orange']):
-        plt.plot(train_loss_, label=activation_function, color=color)
-        plt.plot(validation_loss_, label=activation_function, color=color)
+        plt.plot(train_loss_, label=f'Train {activation_function}', color=color)
+        plt.plot(validation_loss_, label=f'Validation {activation_function}', linestyle='--', color=color)
+    plt.title(dataset_name)
     ax.tick_params(axis='both', which='major', labelsize='large')
     ax.tick_params(axis='both', which='minor', labelsize='large')
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -113,9 +113,9 @@ if __name__ == '__main__':
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if args.full:
-        num_epochs = 10
+        num_epochs = 20
     else:
-        num_epochs = 1
+        num_epochs = 2
         train_range_list = [train_range[:10] for train_range in train_range_list]
         validation_range_list = [validation_range[:10] for validation_range in validation_range_list]
         test_range_list = [test_range[:10] for test_range in test_range_list]
@@ -127,7 +127,7 @@ if __name__ == '__main__':
     test_batch_size = 1000
     num_parameters = np.zeros((len(activation_function_list)))
     criterion = nn.CrossEntropyLoss()
-    for index_dataset, (dataset, dataset_name, train_range, validation_range, test_range, mean_std, num_fc) in enumerate(zip(dataset_list, dataset_name_list, train_range_list, validation_range_list, test_range_list, mean_std_list, num_fc_list)):
+    for index_dataset, (dataset, dataset_name, train_range, validation_range, test_range, mean_std) in enumerate(zip(dataset_list, dataset_name_list, train_range_list, validation_range_list, test_range_list, mean_std_list)):
         if dataset_name in ['MNIST', 'FashionMNIST', 'KMNIST', 'QMNIST', 'EMNIST']:
             transform = transforms.Compose([
                 transforms.Resize((32, 32)),
