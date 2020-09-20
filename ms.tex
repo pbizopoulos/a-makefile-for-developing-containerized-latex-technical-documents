@@ -157,7 +157,7 @@ An example of computationally lighter versions in the field of neural networks i
 The execution of the full experiment is done by providing an additional argument.
 
 The RB template takes advantage of the automatic generation of intermediate files of the `make' program.
-The \textit{author} only needs to edit (or use the `touch' UNIX utility to force) a file from \textit{results code} or \textit{\LaTeX\ code} and the corresponding compilation is automatically triggered with `make'.
+The \textit{author} only needs to edit (or use the `touch' UNIX utility to update the modification time) a file from \textit{results code} or \textit{\LaTeX\ code} and the corresponding compilation is automatically triggered with `make'.
 
 In this implementation of RBs the remote reproducibility verification is done using Github Actions, the builder VM uses the latest version of Ubuntu and pulls a docker image for building \LaTeX\ from the Github Container Registry.
 
@@ -175,6 +175,8 @@ For demonstration purposes we train and test a VGG11 neural network~\cite{simony
 	\item SVHN~\cite{netzer2011reading}.
 \end{itemize}
 
+We split to train, validation and test datasets and compare the use of ReLU and SELU activation functions in a VGG11 model.
+The images from the MNIST variants are resized to $32\times 32$ to comply with the dimensions of VGG11.
 Regarding \LaTeX\ a common culprit against reproducibility is the time-date metadata embedded in the pdf output.
 These can be disabled using the following commands into the \textit{\LaTeX\ code} or as extra arguments during \LaTeX\ compilation (as done in the RB Makefile):
 \begin{lstlisting}[language=TeX, style=lststyle, caption={\LaTeX\ pdf reproducibility commands.}, captionpos=b]
