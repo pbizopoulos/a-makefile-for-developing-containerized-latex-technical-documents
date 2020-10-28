@@ -11,19 +11,17 @@ from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision import transforms
-from torchvision.datasets import MNIST, FashionMNIST, KMNIST, QMNIST, EMNIST, CIFAR10, CIFAR100, SVHN
+from torchvision.datasets import MNIST, FashionMNIST, KMNIST, CIFAR10, CIFAR100, SVHN
 from torchvision.models import vgg11_bn
 
 plt.rcParams['font.size'] = 12
 plt.rcParams['savefig.format'] = 'pdf'
 
-dataset_list = [MNIST, FashionMNIST, KMNIST, QMNIST, EMNIST, CIFAR10, CIFAR100, SVHN]
+dataset_list = [MNIST, FashionMNIST, KMNIST, CIFAR10, CIFAR100, SVHN]
 dataset_name_list = [dataset.__name__ for dataset in dataset_list]
 activation_function_list = ['ReLU', 'SELU']
 
 mean_std_list = [
-        ((0.1307,), (0.3081,)),
-        ((0.1307,), (0.3081,)),
         ((0.1307,), (0.3081,)),
         ((0.1307,), (0.3081,)),
         ((0.1307,), (0.3081,)),
@@ -37,8 +35,6 @@ train_range_list = [
         range(50000), 
         range(50000),
         range(50000),
-        range(50000),
-        range(600000),
         range(40000),
         range(40000),
         range(4000),
@@ -49,8 +45,6 @@ validation_range_list = [
         range(50000, 60000),
         range(50000, 60000),
         range(50000, 60000),
-        range(50000, 60000),
-        range(600000, 697932),
         range(40000, 50000),
         range(40000, 50000),
         range(4000, 5000),
@@ -61,8 +55,6 @@ test_range_list = [
         range(10000),
         range(10000),
         range(10000),
-        range(10000),
-        range(116323),
         range(10000),
         range(10000),
         range(8000),
@@ -128,7 +120,7 @@ if __name__ == '__main__':
     num_parameters = np.zeros((len(activation_function_list)))
     criterion = nn.CrossEntropyLoss()
     for index_dataset, (dataset, dataset_name, train_range, validation_range, test_range, mean_std) in enumerate(zip(dataset_list, dataset_name_list, train_range_list, validation_range_list, test_range_list, mean_std_list)):
-        if dataset_name in ['MNIST', 'FashionMNIST', 'KMNIST', 'QMNIST', 'EMNIST']:
+        if dataset_name in ['MNIST', 'FashionMNIST', 'KMNIST']:
             transform = transforms.Compose([
                 transforms.Resize((32, 32)),
                 transforms.ToTensor(),
@@ -145,10 +137,6 @@ if __name__ == '__main__':
             train_dataset = dataset(cache_dir, split='train', transform=transform, download=True)
             validation_dataset = dataset(cache_dir, split='train', transform=transform)
             test_dataset = dataset(cache_dir, split='test', transform=transform, download=True)
-        elif dataset_name == 'EMNIST':
-            train_dataset = dataset(cache_dir, split='byclass', train=True, transform=transform, download=True)
-            validation_dataset = dataset(cache_dir, split='byclass', train=True, transform=transform)
-            test_dataset = dataset(cache_dir, split='byclass', train=False, transform=transform, download=True)
         else:
             train_dataset = dataset(cache_dir, train=True, transform=transform, download=True)
             validation_dataset = dataset(cache_dir, train=True, transform=transform)
