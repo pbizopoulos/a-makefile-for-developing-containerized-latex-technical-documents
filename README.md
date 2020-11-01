@@ -5,13 +5,16 @@
 This repository contains the code that generates the results of the paper **Reproducible Builds for Computational Research Papers**.
 
 ## Requirements
-- UNIX tools (awk, cut, grep)
+- UNIX utilities (diff, echo, mv, rm, touch)
 - docker
 - make
 - nvidia-container-toolkit [required only when using CUDA]
 
-## Instructions
+## Instructions [more info on this template](https://github.com/pbizopoulos/cookiecutter-reproducible-builds-for-computational-research-papers)
 1. `git clone https://github.com/pbizopoulos/reproducible-builds-for-computational-research-papers`
 2. `cd reproducible-builds-for-computational-research-papers`
 3. `sudo systemctl start docker`
-4. `make help`
+4. `make [OPTION] [ARGS=--full]`
+    * `make`       # Generate pdf.
+    * `make test`  # Test whether the paper has a reproducible build.
+    * `make clean` # Remove cache, results directories and tex auxiliary files.
