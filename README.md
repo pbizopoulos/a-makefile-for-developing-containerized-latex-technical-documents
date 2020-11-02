@@ -14,7 +14,7 @@ This repository contains the code that generates the results of the paper **Repr
 1. `git clone https://github.com/pbizopoulos/reproducible-builds-for-computational-research-papers`
 2. `cd reproducible-builds-for-computational-research-papers`
 3. `sudo systemctl start docker`
-4. `make [OPTION] [ARGS=--full]`
-    * `make`       # Generate pdf.
-    * `make test`  # Test whether the paper has a reproducible build.
-    * `make clean` # Remove cache, results directories and tex auxiliary files.
+4. make options
+    * `make`             # Generate pdf.
+    * `make ARGS=--full` # Generate full pdf.
+    * `make clean`       # Remove cache, results directories and tex auxiliary files.
