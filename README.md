@@ -5,7 +5,7 @@
 This repository contains the code that generates the results of the paper **Reproducible Builds for Computational Research Papers**.
 
 ## Requirements
-- UNIX utilities (diff, echo, mv, rm, touch)
+- UNIX utilities (cmp, cp, echo, rm, touch)
 - docker
 - make
 - nvidia-container-toolkit [required only when using CUDA]
