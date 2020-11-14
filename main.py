@@ -100,7 +100,6 @@ if __name__ == '__main__':
     parser.add_argument('results_dir')
     parser.add_argument('--full', default=False, action='store_true')
     args = parser.parse_args()
-
     # END OF DO NOT EDIT BLOCK
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
