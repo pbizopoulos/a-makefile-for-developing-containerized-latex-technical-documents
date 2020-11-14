@@ -96,11 +96,11 @@ if __name__ == '__main__':
     torch.manual_seed(0)
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('cache_dir')
+    parser.add_argument('results_dir')
     parser.add_argument('--full', default=False, action='store_true')
     args = parser.parse_args()
 
-    cache_dir = 'cache'
-    results_dir = 'results'
     # END OF DO NOT EDIT BLOCK
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -134,13 +134,13 @@ if __name__ == '__main__':
                 transforms.Normalize(mean_std[0], mean_std[1])
                 ])
         if dataset_name == 'SVHN':
-            train_dataset = dataset(cache_dir, split='train', transform=transform, download=True)
-            validation_dataset = dataset(cache_dir, split='train', transform=transform)
-            test_dataset = dataset(cache_dir, split='test', transform=transform, download=True)
+            train_dataset = dataset(args.cache_dir, split='train', transform=transform, download=True)
+            validation_dataset = dataset(args.cache_dir, split='train', transform=transform)
+            test_dataset = dataset(args.cache_dir, split='test', transform=transform, download=True)
         else:
-            train_dataset = dataset(cache_dir, train=True, transform=transform, download=True)
-            validation_dataset = dataset(cache_dir, train=True, transform=transform)
-            test_dataset = dataset(cache_dir, train=False, transform=transform, download=True)
+            train_dataset = dataset(args.cache_dir, train=True, transform=transform, download=True)
+            validation_dataset = dataset(args.cache_dir, train=True, transform=transform)
+            test_dataset = dataset(args.cache_dir, train=False, transform=transform, download=True)
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(train_range))
         validation_dataloader = DataLoader(validation_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(validation_range))
         test_dataloader = DataLoader(test_dataset, batch_size=test_batch_size, sampler=SubsetRandomSampler(test_range))
@@ -155,7 +155,7 @@ if __name__ == '__main__':
             num_parameters[index_activation_function] = sum(p.numel() for p in model.parameters() if p.requires_grad)
             optimizer = optim.SGD(model.parameters(), lr=lr)
             validation_loss_best = float('inf')
-            model_path = f'{results_dir}/{dataset.__name__}-{activation_function}.pt'
+            model_path = f'{args.results_dir}/{dataset.__name__}-{activation_function}.pt'
             for index_epoch, epoch in enumerate(range(num_epochs)):
                 train_loss_sum = 0
                 model.train()
@@ -218,13 +218,13 @@ if __name__ == '__main__':
             str(int(num_epochs)),
             str(int(batch_size)),
             lr]})
-    df_keys_values.to_csv(f'{results_dir}/keys-values.csv')
+    df_keys_values.to_csv(f'{args.results_dir}/keys-values.csv')
 
     for index_dataset_name, (dataset_name, train_loss, validation_loss) in enumerate(zip(dataset_name_list, train_loss_array, validation_loss_array)):
-        save_loss(train_loss, validation_loss, dataset_name, activation_function_list, results_dir)
+        save_loss(train_loss, validation_loss, dataset_name, activation_function_list, args.results_dir)
 
     test_accuracy_array = test_accuracy_array.T
     max_per_column_list = test_accuracy_array.max(0)
     formatters = [lambda x,max_per_column=max_per_column: fr'\bf{{{x:.2f}}}' if (x == max_per_column) else f'{x:.2f}' for max_per_column in max_per_column_list]
     df = pd.DataFrame(test_accuracy_array, index=activation_function_list, columns=dataset_name_list)
-    df.to_latex(f'{results_dir}/metrics.tex', formatters=formatters, bold_rows=True, column_format='r|rrrrrrrrr', multirow=True, escape=False)
+    df.to_latex(f'{args.results_dir}/metrics.tex', formatters=formatters, bold_rows=True, column_format='r|rrrrrrrrr', multirow=True, escape=False)
