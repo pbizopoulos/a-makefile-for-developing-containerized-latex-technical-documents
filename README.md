@@ -4,7 +4,7 @@
 [![test-reproducible-build](https://github.com/pbizopoulos/reproducible-builds-for-computational-research-papers/workflows/test-reproducible-build/badge.svg)](https://github.com/pbizopoulos/reproducible-builds-for-computational-research-papers/actions?query=workflow%3Atest-reproducible-build)
 
 # Reproducible Builds for Computational Research Papers
-This repository contains the code that generates the results of the paper **Reproducible Builds for Computational Research Papers**.
+This repository contains the code that generates the paper **Reproducible Builds for Computational Research Papers**.
 
 ## Requirements
 - UNIX utilities (cmp, cp, echo, rm, touch)
@@ -19,4 +19,4 @@ This repository contains the code that generates the results of the paper **Repr
 4. make options
     * `make`             # Generate pdf.
     * `make ARGS=--full` # Generate full pdf.
-    * `make clean`       # Remove cache, results directories and tex auxiliary files.
+    * `make clean`       # Remove build and cache directories.
