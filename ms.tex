@@ -23,7 +23,7 @@
 \begin{document}
 \DTLloaddb{keys_values}{results/keys-values.csv}
 
-\title{Docker as a Development Environment for Research Papers}
+\title{Docker as a Development Environment for Documenting Results}
 
 \author{Paschalis~Bizopoulos and Dimitris~Bizopoulos
 \thanks{P. Bizopoulos and D. Bizopoulos are Independent Researchers, Thessaloniki, Greece e-mail: pbizopoulos@protonmail.com, dimitrisbizopoulos@gmail.com}}
@@ -47,7 +47,7 @@ Open sourcing the code and the raw data of a computational research paper incre
 Using a template both for writing and verifying computational research papers will push the direction towards creating reproducible research, thus tackling the `reproducibility crisis' problem.
 
 We propose a template for writing computational research papers with \LaTeX\ and verifying  its reproducibility using the concept of \textit{reproducible builds} (RBs) in a local or remote computational environment.
-We provide an open source implementation of the template\footnote{\url{https://github.com/pbizopoulos/docker-as-a-development-environment-for-research-papers-template}}, which we use to write this paper\footnote{\url{https://arxiv.org/abs/2005.12660}} and verify its reproducibility\footnote{\url{https://github.com/pbizopoulos/docker-as-a-development-environment-for-research-papers}}.
+We provide an open source implementation of the template\footnote{\url{https://github.com/pbizopoulos/docker-as-a-development-environment-for-documenting-results-template}}, which we use to write this paper\footnote{\url{https://arxiv.org/abs/2005.12660}} and verify its reproducibility\footnote{\url{https://github.com/pbizopoulos/docker-as-a-development-environment-for-documenting-results}}.
 We use Python~\cite{van2007python} for producing the results, however other scientific-oriented programming languages can be used.
 
 For the rest of the paper we will refer to:
@@ -251,6 +251,6 @@ Few works were done on this area, mostly proposing trust on an external third pa
 RBs help in writing and verifying reproducible research using the tools that most of the researchers already use (\LaTeX, Docker).
 
 \bibliographystyle{IEEEtran}
-\bibliography{ms}
+\bibliography{ms.bib}
 
 \end{document}
