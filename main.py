@@ -19,7 +19,7 @@ plt.rcParams['savefig.format'] = 'pdf'
 
 dataset_list = [MNIST, FashionMNIST, KMNIST, CIFAR10, CIFAR100, SVHN]
 dataset_name_list = [dataset.__name__ for dataset in dataset_list]
-activation_function_list = ['ReLU', 'SELU']
+activation_function_list = ['ReLU', 'SiLU']
 
 mean_std_list = [
         ((0.1307,), (0.3081,)),
@@ -83,7 +83,7 @@ def save_loss(train_loss, validation_loss, dataset_name, activation_function_lis
 def change_relu_to_selu(model):
     for child_name, child in model.named_children():
         if isinstance(child, nn.ReLU):
-            setattr(model, child_name, nn.SELU())
+            setattr(model, child_name, nn.SiLU())
         else:
             change_relu_to_selu(child)
 
@@ -91,8 +91,8 @@ def change_relu_to_selu(model):
 if __name__ == '__main__':
     # DO NOT EDIT BLOCK - Required by the Makefile
     parser = argparse.ArgumentParser()
-    parser.add_argument('cache_dir')
     parser.add_argument('results_dir')
+    parser.add_argument('tmp_dir')
     parser.add_argument('--full', default=False, action='store_true')
     args = parser.parse_args()
     # END OF DO NOT EDIT BLOCK
@@ -134,13 +134,13 @@ if __name__ == '__main__':
                 transforms.Normalize(mean_std[0], mean_std[1])
                 ])
         if dataset_name == 'SVHN':
-            train_dataset = dataset(args.cache_dir, split='train', transform=transform, download=True)
-            validation_dataset = dataset(args.cache_dir, split='train', transform=transform)
-            test_dataset = dataset(args.cache_dir, split='test', transform=transform, download=True)
+            train_dataset = dataset(args.tmp_dir, split='train', transform=transform, download=True)
+            validation_dataset = dataset(args.tmp_dir, split='train', transform=transform)
+            test_dataset = dataset(args.tmp_dir, split='test', transform=transform, download=True)
         else:
-            train_dataset = dataset(args.cache_dir, train=True, transform=transform, download=True)
-            validation_dataset = dataset(args.cache_dir, train=True, transform=transform)
-            test_dataset = dataset(args.cache_dir, train=False, transform=transform, download=True)
+            train_dataset = dataset(args.tmp_dir, train=True, transform=transform, download=True)
+            validation_dataset = dataset(args.tmp_dir, train=True, transform=transform)
+            test_dataset = dataset(args.tmp_dir, train=False, transform=transform, download=True)
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(train_range))
         validation_dataloader = DataLoader(validation_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(validation_range))
         test_dataloader = DataLoader(test_dataset, batch_size=test_batch_size, sampler=SubsetRandomSampler(test_range))
@@ -150,12 +150,12 @@ if __name__ == '__main__':
             num_classes = len(train_dataset.classes)
         for index_activation_function, activation_function in enumerate(activation_function_list):
             model = vgg11_bn().to(device)
-            if activation_function == 'SELU':
+            if activation_function == 'SiLU':
                 change_relu_to_selu(model)
             num_parameters[index_activation_function] = sum(p.numel() for p in model.parameters() if p.requires_grad)
             optimizer = optim.SGD(model.parameters(), lr=lr)
             validation_loss_best = float('inf')
-            model_path = f'{args.results_dir}/{dataset.__name__}-{activation_function}.pt'
+            model_path = f'{args.tmp_dir}/{dataset.__name__}-{activation_function}.pt'
             for index_epoch, epoch in enumerate(range(num_epochs)):
                 train_loss_sum = 0
                 model.train()
@@ -192,7 +192,7 @@ if __name__ == '__main__':
                     torch.save(model.state_dict(), model_path)
                     print('saving as best model')
             model = vgg11_bn().to(device)
-            if activation_function == 'SELU':
+            if activation_function == 'SiLU':
                 change_relu_to_selu(model)
             model.load_state_dict(torch.load(model_path))
             model.eval()
