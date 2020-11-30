@@ -21,7 +21,7 @@
 	commentstyle=\color{gray}}
 
 \begin{document}
-\DTLloaddb{keys_values}{results/keys-values.csv}
+\DTLloaddb{keys_values}{tmp/keys-values.csv}
 
 \title{Documenting Results Generation using \LaTeX\ and Docker}
 
@@ -190,8 +190,8 @@ torch.manual_seed(0)
 Using the random seeds and \textit{datatool} we could have deterministic stochasticity that reproduces figures, tables and variables.
 For example Fig.~\ref{fig:image} depicts the train and validation loss for all datasets.
 \begin{figure}[!t]
-	\subfloat{\includegraphics[width=0.25\textwidth]{results/MNIST-loss}}
-	\subfloat{\includegraphics[width=0.25\textwidth]{results/FashionMNIST-loss}}
+	\subfloat{\includegraphics[width=0.25\textwidth]{tmp/MNIST-loss}}
+	\subfloat{\includegraphics[width=0.25\textwidth]{tmp/FashionMNIST-loss}}
 	\caption{Train and validation losses for MNIST and FashionMNIST.}
 	\label{fig:image}
 \end{figure}
@@ -210,7 +210,7 @@ df.to_latex('metrics.tex', float_format="%.2f")
 	\caption{Table example created from results code.}
 	\label{table:table}
 	\setlength\tabcolsep{4.2pt}
-	\scalebox{0.72}{\input{results/metrics.tex}}
+	\scalebox{0.72}{\input{tmp/metrics.tex}}
 \end{table}
 
 \section{Discussion}
