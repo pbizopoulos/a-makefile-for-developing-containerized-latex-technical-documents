@@ -2,9 +2,8 @@
 \usepackage[caption=false,font=footnotesize]{subfig}
 \usepackage{booktabs}
 \usepackage{datatool}
-\usepackage{diagbox}
+\usepackage{flushend}
 \usepackage{listings}
-\usepackage{makecell}
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \usetikzlibrary{trees}
@@ -13,17 +12,12 @@
 \usepackage[hyphens]{url}
 \usepackage{hyperref}
 
-\lstdefinestyle{lststyle}{
-	aboveskip=10pt,
-	belowskip=10pt,
-	frame=single,
-	basicstyle=\tt\scriptsize,
-	commentstyle=\color{gray}}
+\lstdefinestyle{lststyle}{basicstyle=\tt\footnotesize, captionpos=b, frame=single}
 
 \begin{document}
 \DTLloaddb{keys_values}{tmp/keys-values.csv}
 
-\title{Documenting Results Generation using \LaTeX\ and Docker}
+\title{\LaTeX\ Technical Documents with Docker and Make}
 
 \author{Paschalis~Bizopoulos and Dimitris~Bizopoulos
 \thanks{P. Bizopoulos and D. Bizopoulos are Independent Researchers, Thessaloniki, Greece e-mail: pbizopoulos@protonmail.com, dimitrisbizopoulos@gmail.com}}
@@ -31,149 +25,110 @@
 \maketitle
 
 \begin{abstract}
-	Documenting computational results should be done in an as much as possible automatic way to ease the work of coauthors to write the document and the reviewing process.
-	We propose a simple template for documenting computational results using Docker and \LaTeX\ that can be used for generating reports and research papers.
-	The template contains a Makefile that allows the author/reviewer to execute the code that reproduces the figures, tables and variables (results) of the document, which are then used during the \LaTeX\ compilation, to produce the document.
+	We propose a template for writing portable \LaTeX\ technical documents with Docker and \textit{Make} in POSIX-oriented operating systems.
+	The template provides a Makefile that allows the author to execute the code that generates the figures, tables and variables (results), which are then used during the \LaTeX\ compilation, to produce the fast/draft and slow/final versions of the document.
 	We release an open source repository of the template and use it to write this paper.
 \end{abstract}
 
 \section{Introduction}
-A document is considered reproducible when any reviewer is able to reproduce its results, given the data and experimental procedure.
-More specifically, computational research reproducibility requires the presence of source code that produces or fetches data from external sources which then transforms into the figures, tables and variables of the paper.
-Open sourcing the code and the raw data of a computational research paper increases the confidence in its reproducibility but it is not enough to verify it.
-Using a template both for writing and verifying computational research papers will push the direction towards creating reproducible research, thus tackling the `reproducibility crisis' problem.
+There are multiple ways for writing technical documents that present both computationally generated results (figures, tables and variables) and natural text.
+One programming paradigm that tries to solve this task is \textit{literate programming}~\cite{knuth1984literate} in which the author inserts snippets of code and its executed output alongside natural text.
+Some applications of \textit{literate programming} include Jupyter~\cite{kluyver2016jupyter} which allows publishing code, results and explanations in a executable format, PythonTeX~\cite{poore2015pythontex} which allows Python to be executed in \LaTeX\ and ActivePapers~\cite{hinsen2014activepapers} in which code can be executed using the Java Virtual Machine.
 
-We propose a template for writing computational research papers with \LaTeX\ and verifying  its reproducibility using the concept of \textit{reproducible builds} (RBs) in a local or remote computational environment.
-We provide an open source implementation of the template\footnote{\url{https://github.com/pbizopoulos/documenting-results-generation-using-latex-and-docker-template}}, which we use to write this paper\footnote{\url{https://arxiv.org/abs/2005.12660}} and verify its reproducibility\footnote{\url{https://github.com/pbizopoulos/documenting-results-generation-using-latex-and-docker}}.
-We use Python~\cite{van2007python} for producing the results, however other scientific-oriented programming languages can be used.
+Although \textit{literate programming} provides many advantages for demonstrative projects and easy visual feedback during experimentation, its `dual nature' makes it difficult to debug and constrains authors in using specific text editors and programming languages thus leading to `app/vendor lock-in` situations.
+
+We propose a template for writing portable \LaTeX\ technical documents with Docker and \textit{Make} in POSIX-oriented operating systems and provide an open source implementation\footnote{\url{https://github.com/pbizopoulos/latex-technical-documents-with-docker-and-make-template}}.
+We write this paper\footnote{\url{https://arxiv.org/abs/2005.12660}}\footnote{\url{https://github.com/pbizopoulos/latex-technical-documents-with-docker-and-make}} using this template and choose the Python programming language~\cite{van2007python} for generating the results.
 
 For the rest of the paper we will refer to:
 \begin{itemize}
-	\item \textit{document} as a document embedded with computational results,
-	\item \textit{results} as the figures, tables and variables that are shown in the \textit{document},
-	\item \textit{\LaTeX\ code} as the files containing the main text (\textit{*.tex}) and bibliography (\textit{*.bib}) of the \textit{document},
-	\item \textit{results code} as the files containing the scientific-oriented programming language code (\textit{*.py}) that produces the \textit{results},
+	\item \textit{results} as the figures, tables and variables that are generated from a computation,
+	\item \textit{results code} as the scientific-oriented programming language code (\textit{main.py}) that produces the \textit{results},
+	\item \textit{\LaTeX\ code} as the natural text (\textit{ms.tex}) and bibliography (\textit{ms.bib}),
 	\item \textit{code} as both the \textit{\LaTeX\ code} and \textit{results code},
-	\item \textit{author} as the author(s) of the \textit{document} and
-	\item \textit{reviewer} as the reviewer(s) of the \textit{document} or anyone interested in verifying the \textit{document} (author(s), journal editors, other researchers).
+	\item \textit{document} as the technical document that contains the rendered natural text and \textit{results} and
+	\item \textit{author} as the author of the \textit{document} that writes and develops the \textit{code}.
 \end{itemize}
 
-\section{Reproducible Builds Template}
+\section{Template}
 
 \begin{figure}[!t]
 	\centering
 	\begin{tikzpicture}[%
 			grow via three points={one child at (0.5,-0.7) and two children at (0.5,-0.7) and (0.5,-1.4)},
 			edge from parent path={(\tikzparentnode.south) |- (\tikzchildnode.west)}]
-			\node[draw](root){root}
+			\node[draw](document){document/}
 			child{node[draw, anchor=west](makefile){Makefile}}
+			child{node[draw, anchor=west](tmp){tmp/}}
 			child{node[draw, anchor=west, fill=red!20](tex){ms.tex}}
 			child{node[draw, anchor=west, fill=red!20](bib){ms.bib}}
 			child{node[draw, anchor=west, fill=blue!20](py){main.py}}
-			child{node[draw, anchor=west, fill=blue!20](dockerfile){Dockerfile}};
+			child{node[draw, anchor=west, fill=blue!20](dockerfile){Dockerfile}}
+			child{node[draw, anchor=west, fill=blue!20](requirements){requirements.txt}};
 			\begin{scope}[on background layer]
-				\node[draw, rounded corners, dashed, fill=gray!20, inner sep=4pt, fit=(root) (dockerfile)]{};
-				\node[draw, rounded corners, dashed, fill=gray!80, inner sep=2pt, fit=(py) (dockerfile)](code){};
+				\node[draw, rounded corners, dashed, fill=gray!20, inner sep=4pt, fit=(document) (requirements)]{};
+				\node[draw, rounded corners, dashed, fill=gray!80, inner sep=2pt, fit=(py) (requirements)](code){};
 				\node[draw, rounded corners, dashed, fill=gray!80, inner sep=2pt, fit=(tex) (bib)](document){};
 			\end{scope}
-			\node[draw, right=2cm of code, fill=white] (results) {results};
+			\node[draw, right=1.5cm of code, fill=white] (results) {tmp/results};
 			\path[draw, ->] (code) -- node[above]{docker} (results);
-			\node[draw, right=4cm of document, fill=white] (pdf) {pdf};
+			\node[draw, right=4cm of document, fill=white] (pdf) {tmp/ms.pdf};
 			\path[draw, ->] (results) |- (pdf);
 			\path[draw, ->] (document) -- node[above]{docker} (pdf);
 	\end{tikzpicture}
-	\caption{The RBs template file hierarchy is depicted in the light gray background and the arrows denote the data flow towards generating the pdf.
-	Blue indicates a \textit{results code} file, red a \textit{\LaTeX\ code} file and within the dark gray background, files that are used for a subsequent step.}
+	\caption{The file hierarchy of the template is depicted in the light gray background and the arrows denote the data flow towards generating the \textit{document}.
+	Blue indicates a \textit{results code} file, red a \textit{\LaTeX\ code} file and within the dark gray background, files that are developed by the \textit{author}.}
 	\label{fig:filehierarchyworkflow}
 \end{figure}
 
-The proposed template can be used for writing \textit{papers} with \LaTeX~\cite{lamport1994latex} and the \textit{results code} that can be executed within a Docker container.
-\LaTeX\ is a typesetting system for publishing high quality research papers, and Docker~\cite{merkel2014docker} is a container system that allows portable execution of a codebase between different operating systems/environments and has shown great promise in reproducible research~\cite{boettiger2015introduction}.
+\LaTeX~\cite{lamport1994latex} is a typesetting system for publishing high quality research documents, and Docker~\cite{merkel2014docker} is a container system that allows portable execution of a codebase between different operating systems/environments.
 
-A specific file hierarchy is shown in Fig.~\ref{fig:filehierarchyworkflow} however this is optional, as the template only needs to know the directories of the main files of the \LaTeX\ and \textit{results code} during its creation.
-The Makefile and Dockerfile are automatically generated by the template after user prompts.
-For more complicated setups the Dockerfile can be provided by the \textit{author} or generated by tools such as repo2docker~\cite{forde2018reproducible}.
+The proposed template can be used for writing \LaTeX\ \textit{documents} that present \textit{results} generated from \textit{results code} executed within a Docker container.
+The file hierarchy of the template is shown in Fig.\ref{fig:filehierarchyworkflow}.
 
-The template fits in research writing and reproducibility verification in the following way:
+The \textit{author} may use the template for writing \textit{documents} in the following way:
 \begin{enumerate}
-	\item the \textit{author} edits the \textit{code} in the local repository,
-	\item the \textit{author} may execute \textit{make} during development and experimentation,
-	\item the \textit{author} may verify the reproducibility of the \textit{document} locally by executing \textit{make test} (or remotely by commiting the code change with a message which contains \textit{\{make test\}}) which triggers the following:
+	\item clones the template,
+	\item specifies the name of the \textit{document} in the Makefile,
+	\item develops the Dockerfile,
+	\item develops the \textit{code} in the local repository,
 		\begin{enumerate}
-			\item the \textit{results code} is executed,
-			\item the \textit{results} along with the \textit{\LaTeX\ code} are used to compile a pdf file,
-			\item the previous is executed twice,
-			\item the \textit{document} is verifed as reproducible if and only if the pdf files are identical.
+			\item develops the fast/draft and slow/final version \textit{document} in \textit{code},
+			\item develops the saving/loading of \textit{results} in/from the \textit{tmp} directory,
 		\end{enumerate}
-	\item the \textit{reviewer} may verify the reproducibility of the document locally (by cloning the repo and executing \textit{make test}) or remotely (by inspecting the result of \textit{\{make test\}}).
+	\item executes \textit{make} for generating the fast/draft version \textit{document} used during development and experimentation,
+	\item executes \textit{make ARG=-{}-full} for generating the slow/final version \textit{document} used for distribution.
+	\item executes \textit{make clean} to restore to a clean state by removing the \textit{tmp} directory,
 \end{enumerate}
 
-The reason that two local/remote compilations are needed is to enable comparison between different builds of the same source code and any non-deterministic stochasticity (such as not applying a specific seed to random generators) would produce different pdfs, thus making the \textit{document} non-reproducible.
-Moreover Docker usage in RBs provides portability of the environment of the research while third-party VMs are used when the verification needs to be shared (in contrast with verifying locally, thus having low credibility in reporting reproducibility).
+The fast/draft version \textit{document} helps in faster iterations during writing and experimentation.
+An example of creating a fast/draft version in the field of neural networks is setting the number of epochs and number of training samples to a low value.
 
-Additional constraints could be imposed in the VMs such as disallowing image files in the \textit{code} and monitoring the network connections of the \textit{code} to help the \textit{reviewer} check whether the \textit{results} are generated from the \textit{code} and are not fetched from an external source.
+The template makes use of the automatic generation of intermediate files of the \textit{Make} program.
+The \textit{author} only needs to edit (or use the \textit{touch} Unix utility to update the modification time) a file from \textit{results code} or \textit{\LaTeX\ code} and the corresponding compilation is automatically triggered with \textit{Make}.
 
-Potential uses of the RBs template include:
-\begin{itemize}
-	\item preprint server (e.g.\ arXiv) \textit{document} reproducibility verification and
-	\item regression testing and debugging, to ensure that changes to \textit{code} do not alter the results.
-\end{itemize}
-
-\subsection{Technical implementation}
-Executing RBs can be done using the following:
-\begin{lstlisting}[language=Bash, style=lststyle, caption={Makefile call syntax from the shell.}, captionpos=b]
-make             # Generate pdf.
-make ARGS=--full # Generate full pdf.
-make clean       # Remove results and tmp directories.
+A useful \LaTeX\ package for automatically presenting variables from \textit{results} in \textit{\LaTeX\ code} is \textit{datatool} with the following example use:
+\begin{lstlisting}[language=TeX, style=lststyle, caption={\LaTeX\ datatool example of loading a file that contains pairs of keys and values (tmp/keys\_values.csv) generated by a \textit{results code} and getting the value of a key named lr.}]
+\DTLloaddb{keys_values}{tmp/keys_values.csv}
+\DTLfetch{keys_values}{key}{lr}{value}
 \end{lstlisting}
 
-Regarding research that is computational costly, the template allows the execution and reproducibility verification of a computationally lighter version of the \textit{document} by default.
-This also helps in faster iterations during research writing and experimentation.
-An example of computationally lighter versions in the field of neural networks is setting the number of epochs and number of training samples to a low value.
-The execution of the full experiment is done by providing an additional argument.
+Another useful function for Python is \textit{pandas.DataFrame.to\_latex} which automatically converts a dataframe table to a \LaTeX\ table (as shown in Table~\ref{table:table}).
+\begin{lstlisting}[language=python, style=lststyle, caption={Convert Pandas DataFrame to \LaTeX\ table.}]
+df = pd.DataFrame(table)
+df.to_latex("tmp/metrics.tex", float_format="%.2f")
+\end{lstlisting}
 
-The RB template takes advantage of the automatic generation of intermediate files of the `make' program.
-The \textit{author} only needs to edit (or use the `touch' UNIX utility to update the modification time) a file from \textit{results code} or \textit{\LaTeX\ code} and the corresponding compilation is automatically triggered with `make'.
-
-In this implementation of RBs the remote reproducibility verification is done using Github Actions, the builder VM uses the latest version of Ubuntu and pulls a docker image for building \LaTeX\ from the Github Container Registry.
-
-\section{Example Use Case of RBs}
-This sections provides a use case of RBs and also serves as a manual for creating reproducible \textit{papers} written in \LaTeX\ with Python as the \textit{results code} programming language.
-For demonstration purposes we train and test a VGG11 neural network~\cite{simonyan2014very} with batch normalization in PyTorch~\cite{paszke2019pytorch}, on the following datasets:
-\begin{itemize}
-	\item MNIST~\cite{lecun2010mnist},
-	\item FashionMNIST~\cite{xiao2017fashion},
-	\item KMNIST~\cite{clanuwat2018deep},
-	\item CIFAR10~\cite{krizhevsky2009learning},
-	\item CIFAR100~\cite{krizhevsky2009learning} and
-	\item SVHN~\cite{netzer2011reading}.
-\end{itemize}
-
-We split to train, validation and test datasets and compare the use of ReLU and SELU activation functions in a VGG11 model.
-The images from the MNIST variants are resized to $32\times 32$ to comply with the dimensions of VGG11.
-Regarding \LaTeX\ a common culprit against reproducibility is the time-date metadata embedded in the pdf output.
-These can be disabled using the following commands into the \textit{\LaTeX\ code} or as extra arguments during \LaTeX\ compilation (as done in the RB Makefile):
-\begin{lstlisting}[language=TeX, style=lststyle, caption={\LaTeX\ pdf reproducibility commands.}, captionpos=b]
+Regarding \LaTeX\ a culprit against reproducibility is the time-date metadata embedded in the pdf output.
+These can be disabled using the following commands into the \textit{\LaTeX\ code} or as extra arguments during \LaTeX\ compilation (as done in the template Makefile):
+\begin{lstlisting}[language=TeX, style=lststyle, caption={\LaTeX\ pdf reproducibility commands.}]
 \pdfinfoomitdate=1
 \pdfsuppressptexinfo=-1
 \pdftrailerid{}
 \end{lstlisting}
 
-A useful \LaTeX\ package for automatically embedding variables from \textit{results} in \textit{\LaTeX\ code} is \textit{datatool} with the following example use:
-\begin{lstlisting}[language=TeX, style=lststyle, caption={\LaTeX\ datatool example of loading a file that contains pairs of keys and values (keys\_values.csv) generated by a \textit{results code} and getting the value of a key named lr.}, captionpos=b]
-\DTLloaddb{keys_values}{keys_values.csv}
-\DTLfetch{keys_values}{key}{lr}{value}
-\end{lstlisting}
-
-For example the values of the following variables are not referred in the main \textit{.tex} file but they are read by an intermediate \textit{.tex} file created by the \textit{results code}:
-\begin{itemize}
-	\item the number of epochs is $\DTLfetch{keys_values}{key}{num_epochs}{value}$,
-	\item the batch size is $\DTLfetch{keys_values}{key}{batch_size}{value}$ and
-	\item the learning rate for SGD is $\DTLfetch{keys_values}{key}{lr}{value}$.
-\end{itemize}
-
 Regarding the \textit{results code} for Python, random seeds need to be set to a specific value such as:
-\begin{lstlisting}[language=python, style=lststyle, caption={Python reproducibility commands for some popular libraries.}, captionpos=b]
+\begin{lstlisting}[language=python, style=lststyle, caption={Python reproducibility commands for some popular libraries.}]
 # for build-in random module
 random.seed(0)
 # for numpy
@@ -187,44 +142,62 @@ torch.cuda.manual_seed_all(0)
 torch.manual_seed(0)
 \end{lstlisting}
 
-Using the random seeds and \textit{datatool} we could have deterministic stochasticity that reproduces figures, tables and variables.
-For example Fig.~\ref{fig:image} depicts the train and validation loss for all datasets.
+Setting the random seeds and the previously mentioned \LaTeX\ packages we could have deterministic stochasticity that generates figures, tables and variables.
+
+Potential uses of the template include:
+\begin{itemize}
+	\item regression testing and debugging, to ensure that changes to \textit{code} do not alter the results.
+	\item common environment across multiple \textit{authors},
+	\item reviewer, coauthor(s), journal editors or other researchers can easily reproduce the \textit{document} with minimal requirements.
+\end{itemize}
+
+In cases where reproducibility is required, the potential differences in the resulting \textit{document} binary can be identified using tools such as diffoscope\footnote{\url{https://diffoscope.org/}} and the cache files saved at the tmp directory after execution.
+
+\section{Example use case of the template}
+This sections provides a use case of the template and also serves as a manual for writing \LaTeX\ \textit{documents} with Python as the \textit{results code} programming language.
+We train and test a VGG11 neural network~\cite{simonyan2014very} with batch normalization in PyTorch~\cite{paszke2019pytorch}, on the following datasets:
+\begin{itemize}
+	\item MNIST~\cite{lecun2010mnist},
+	\item FashionMNIST~\cite{xiao2017fashion},
+	\item KMNIST~\cite{clanuwat2018deep},
+	\item CIFAR10~\cite{krizhevsky2009learning},
+	\item CIFAR100~\cite{krizhevsky2009learning} and
+	\item SVHN~\cite{netzer2011reading}.
+\end{itemize}
+
+We use the default train, validation and test datasets and compare the use of ReLU\cite{dahl2013improving} and SiLU\cite{elfwing2018sigmoid} activation functions in a VGG11 model.
+The images from the MNIST variants are resized to $32\times 32$ to comply with the dimensions of VGG11.
+
+Making use of the \textit{datatool} package the values of the following variables are not referred in the main \textit{.tex} file but they are read by an intermediate \textit{.tex} file created by the \textit{results code}:
+\begin{itemize}
+	\item the number of epochs is $\DTLfetch{keys_values}{key}{num_epochs}{value}$,
+	\item the batch size is $\DTLfetch{keys_values}{key}{batch_size}{value}$ and
+	\item the learning rate for SGD is $\DTLfetch{keys_values}{key}{lr}{value}$.
+\end{itemize}
+
+Making use of setting the random seeds we consistenly get the same figures as shown in Fig.\ref{fig:image} which depicts the train and validation loss for all datasets.
 \begin{figure}[!t]
-	\subfloat{\includegraphics[width=0.25\textwidth]{tmp/MNIST-loss}}
-	\subfloat{\includegraphics[width=0.25\textwidth]{tmp/FashionMNIST-loss}}
+	\subfloat{\includegraphics[width=0.25\textwidth]{tmp/MNIST-loss.pdf}}
+	\subfloat{\includegraphics[width=0.25\textwidth]{tmp/FashionMNIST-loss.pdf}}
 	\caption{Train and validation losses for MNIST and FashionMNIST.}
 	\label{fig:image}
 \end{figure}
-
-Another useful function for Python is \textit{pandas.DataFrame.to\_latex} which automatically converts a dataframe table to a \LaTeX\ table (as shown in Table~\ref{table:table}).
-
-\begin{lstlisting}[language=python, style=lststyle, caption={Convert Pandas DataFrame to \LaTeX\ table.}, captionpos=b]
-num_columns = 11
-table = np.random.random((7, num_columns))
-df = pd.DataFrame(table)
-df.to_latex('metrics.tex', float_format="%.2f")
-\end{lstlisting}
 
 \begin{table}[h]
 	\centering
 	\caption{Table example created from results code.}
 	\label{table:table}
-	\setlength\tabcolsep{4.2pt}
-	\scalebox{0.72}{\input{tmp/metrics.tex}}
+	\setlength\tabcolsep{2pt}
+	\input{tmp/metrics.tex}
 \end{table}
 
 \section{Discussion}
-RBs are based on plain text files and are independent of any specific version control and docker registry providor thus preventing `vendor lock-in' situations.
-Previous works in this area such as Hurlin et al.~\cite{hurlin2019reproducibility} propose an `external certification agency' for economic studies.
-RBs provide a simple solution for writing and verifying the reproducibility of a `\textit{document} as a whole', without having to trust a third-party.
-Anyone can clone a repository written with RBs and locally verify its reproducibility, in case third party VMs cannot be trusted.
-Similar to RBs is ReDoc~\cite{schwab2000making} which however focuses on separate result file reproducibility and requires the author to write each rule in the Makefile for each result file.
-RBs on the other hand provides a Makefile that is automatically generated by the template.
+The proposed template is based on plain text files and can be used with any POSIX-oriented operating that supports Docker and \textit{Make}.
+Moreover it can be combined with any version control system, docker container registry providor and text editor thus preventing `app/vendor lock-in' situations.
 
 \section{Conclusion}
-Automating research reproducibility verification is becoming more important due to the increasing research output that has been observed in the last few years.
-Few works were done on this area, mostly proposing trust on an external third party.
-RBs help in writing and verifying reproducible research using the tools that most of the researchers already use (\LaTeX, Docker).
+Creation, usage and publication of technical documents are one of the top challenges for reproducible technical documents~\cite{barba2019praxis}.
+The proposed template aids to this purpose in writing reproducible technical documents using the tools that most of academics already use (\LaTeX, Docker).
 
 \bibliographystyle{IEEEtran}
 \bibliography{ms.bib}
