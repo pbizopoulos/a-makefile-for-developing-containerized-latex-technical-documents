@@ -3,8 +3,8 @@
 [![template](http://img.shields.io/badge/template-EEE0B1.svg)](https://github.com/pbizopoulos/latex-technical-documents-with-docker-and-make-template)
 [![test-local-reproducibility](https://github.com/pbizopoulos/documenting-results-generation-using-latex-and-docker/workflows/test-local-reproducibility/badge.svg)](https://github.com/pbizopoulos/latex-technical-documents-with-docker-and-make/actions?query=workflow%3Atest-local-reproducibility)
 
-# Writing LaTeX Technical Documents with Docker and Make
-This repository contains the code that generates **Writing LaTeX Technical Documents with Docker and Make**.
+# LaTeX Technical Documents with Docker and Make
+This repository contains the code that generates **LaTeX Technical Documents with Docker and Make**.
 
 ## Requirements
 - [POSIX-oriented operating system](https://en.wikipedia.org/wiki/POSIX#POSIX-oriented_operating_systems)

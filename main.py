@@ -96,7 +96,7 @@ if __name__ == '__main__':
     # END OF DO NOT EDIT BLOCK
 
     # Set random seeds for reproducibility.
-    #np.random.seed(0)
+    np.random.seed(0)
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
     torch.manual_seed(0)
