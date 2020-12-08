@@ -67,7 +67,7 @@ def save_loss(train_loss, validation_loss, dataset_name, activation_function_lis
     plt.autoscale(enable=True, axis='x', tight=True)
     plt.ylim([0, 1])
     plt.xlabel('Epochs', fontsize=15)
-    if dataset_name == 'MNIST':
+    if dataset_name in ['MNIST', 'KMNIST', 'CIFAR100']:
         plt.ylabel('loss', fontsize=15)
     for train_loss_, validation_loss_, activation_function, color in zip(train_loss, validation_loss, activation_function_list, ['b', 'orange']):
         plt.plot(train_loss_, label=f'Train {activation_function}', color=color)
