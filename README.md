@@ -1,7 +1,7 @@
 [![arXiv](http://img.shields.io/badge/cs.SE-arXiv%3A2005.12660-B31B1B.svg)](https://arxiv.org/abs/2005.12660)
 [![citation](http://img.shields.io/badge/citation-0091FF.svg)](https://scholar.google.com/scholar?q=Reconciler%3A%20A%20Workflow%20for%20Certifying%20Computational%20Research%20Reproducibility.%20arXiv%202020)
 [![template](http://img.shields.io/badge/template-EEE0B1.svg)](https://github.com/pbizopoulos/latex-technical-documents-with-docker-and-make-template)
-[![test-local-reproducibility](https://github.com/pbizopoulos/documenting-results-generation-using-latex-and-docker/workflows/test-local-reproducibility/badge.svg)](https://github.com/pbizopoulos/latex-technical-documents-with-docker-and-make/actions?query=workflow%3Atest-local-reproducibility)
+[![test-fast-draft-reproducibility](https://github.com/pbizopoulos/documenting-results-generation-using-latex-and-docker/workflows/test-fast-draft-reproducibility/badge.svg)](https://github.com/pbizopoulos/latex-technical-documents-with-docker-and-make/actions?query=workflow%3Atest-fast-draft-reproducibility)
 
 # LaTeX Technical Documents with Docker and Make
 This repository contains the code that generates **LaTeX Technical Documents with Docker and Make**.

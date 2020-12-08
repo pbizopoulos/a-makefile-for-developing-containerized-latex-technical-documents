@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision import transforms
 from torchvision.datasets import MNIST, FashionMNIST, KMNIST, CIFAR10, CIFAR100, SVHN
-from torchvision.models import vgg11_bn
+from torchvision.models import mobilenet_v2
 
 plt.rcParams['font.size'] = 12
 plt.rcParams['savefig.format'] = 'pdf'
@@ -80,12 +80,12 @@ def save_loss(train_loss, validation_loss, dataset_name, activation_function_lis
     plt.savefig(f'tmp/{dataset_name}-loss', bbox_inches='tight')
     plt.close()
 
-def change_relu_to_selu(model):
+def change_module(model, module_old, module_new):
     for child_name, child in model.named_children():
-        if isinstance(child, nn.ReLU):
-            setattr(model, child_name, nn.SiLU())
+        if isinstance(child, module_old):
+            setattr(model, child_name, module_new())
         else:
-            change_relu_to_selu(child)
+            change_module(child, module_old, module_new)
 
 
 if __name__ == '__main__':
@@ -147,9 +147,9 @@ if __name__ == '__main__':
         else:
             num_classes = len(train_dataset.classes)
         for index_activation_function, activation_function in enumerate(activation_function_list):
-            model = vgg11_bn().to(device)
+            model = mobilenet_v2().to(device)
             if activation_function == 'SiLU':
-                change_relu_to_selu(model)
+                change_module(model, nn.ReLU6, nn.SiLU)
             num_parameters[index_activation_function] = sum(p.numel() for p in model.parameters() if p.requires_grad)
             optimizer = optim.SGD(model.parameters(), lr=lr)
             validation_loss_best = float('inf')
@@ -189,9 +189,9 @@ if __name__ == '__main__':
                     validation_loss_best = validation_loss
                     torch.save(model.state_dict(), model_path)
                     print('saving as best model')
-            model = vgg11_bn().to(device)
+            model = mobilenet_v2().to(device)
             if activation_function == 'SiLU':
-                change_relu_to_selu(model)
+                change_module(model, nn.ReLU6, nn.SiLU)
             model.load_state_dict(torch.load(model_path))
             model.eval()
             correct = 0
