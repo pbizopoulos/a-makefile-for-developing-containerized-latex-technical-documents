@@ -13,13 +13,14 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision import transforms
 from torchvision.datasets import MNIST, FashionMNIST, KMNIST, CIFAR10, CIFAR100, SVHN
 from torchvision.models import mobilenet_v2
+from torchvision.utils import save_image
 
-plt.rcParams['font.size'] = 12
+plt.rcParams['font.size'] = 18
 plt.rcParams['savefig.format'] = 'pdf'
 
 dataset_list = [MNIST, FashionMNIST, KMNIST, CIFAR10, CIFAR100, SVHN]
 dataset_name_list = [dataset.__name__ for dataset in dataset_list]
-activation_function_list = ['ReLU', 'SiLU']
+activation_function_list = ['ReLU', 'ReLU6', 'SiLU']
 
 mean_std_list = [
         ((0.1307,), (0.3081,)),
@@ -66,9 +67,9 @@ def save_loss(train_loss, validation_loss, dataset_name, activation_function_lis
     plt.grid(True)
     plt.autoscale(enable=True, axis='x', tight=True)
     plt.ylim([0, 1])
-    plt.xlabel('Epochs', fontsize=15)
-    if dataset_name in ['MNIST', 'KMNIST', 'CIFAR100']:
-        plt.ylabel('loss', fontsize=15)
+    plt.xlabel('Epochs', fontsize=18)
+    if dataset_name == 'MNIST':
+        plt.ylabel('loss', fontsize=18)
     for train_loss_, validation_loss_, activation_function, color in zip(train_loss, validation_loss, activation_function_list, ['b', 'orange']):
         plt.plot(train_loss_, label=f'Train {activation_function}', color=color)
         plt.plot(validation_loss_, label=f'Validation {activation_function}', linestyle='--', color=color)
@@ -86,6 +87,12 @@ def change_module(model, module_old, module_new):
             setattr(model, child_name, module_new())
         else:
             change_module(child, module_old, module_new)
+
+activations = {}
+def get_activations(name):
+    def hook(model, input, output):
+        activations[name] = output.detach()
+    return hook
 
 
 if __name__ == '__main__':
@@ -120,14 +127,12 @@ if __name__ == '__main__':
     for index_dataset, (dataset, dataset_name, train_range, validation_range, test_range, mean_std) in enumerate(zip(dataset_list, dataset_name_list, train_range_list, validation_range_list, test_range_list, mean_std_list)):
         if dataset_name in ['MNIST', 'FashionMNIST', 'KMNIST']:
             transform = transforms.Compose([
-                transforms.Resize((32, 32)),
                 transforms.ToTensor(),
                 transforms.Lambda(lambda x: torch.cat([x, x, x], 0)),
                 transforms.Normalize(mean_std[0], mean_std[1])
                 ])
         else:
             transform = transforms.Compose([
-                transforms.Resize((32, 32)),
                 transforms.ToTensor(),
                 transforms.Normalize(mean_std[0], mean_std[1])
                 ])
@@ -150,10 +155,13 @@ if __name__ == '__main__':
             model = mobilenet_v2().to(device)
             if activation_function == 'SiLU':
                 change_module(model, nn.ReLU6, nn.SiLU)
+            elif activation_function == 'ReLU':
+                change_module(model, nn.ReLU6, nn.ReLU)
             num_parameters[index_activation_function] = sum(p.numel() for p in model.parameters() if p.requires_grad)
             optimizer = optim.SGD(model.parameters(), lr=lr)
             validation_loss_best = float('inf')
-            model_path = f'tmp/{dataset.__name__}-{activation_function}.pt'
+            filename = f'{dataset.__name__}-{activation_function}'
+            model_path = f'tmp/{filename}.pt'
             for index_epoch, epoch in enumerate(range(num_epochs)):
                 train_loss_sum = 0
                 model.train()
@@ -192,8 +200,13 @@ if __name__ == '__main__':
             model = mobilenet_v2().to(device)
             if activation_function == 'SiLU':
                 change_module(model, nn.ReLU6, nn.SiLU)
+            elif activation_function == 'ReLU':
+                change_module(model, nn.ReLU6, nn.ReLU)
             model.load_state_dict(torch.load(model_path))
             model.eval()
+            model.features[0][0].register_forward_hook(get_activations(filename))
+            kernels = model.features[0][0].weight.detach().clone()
+            save_image(kernels[:16], f'tmp/{filename}-kernels.pdf', padding=1, nrow=4, normalize=True)
             correct = 0
             total = 0
             with torch.no_grad():
@@ -208,6 +221,8 @@ if __name__ == '__main__':
                 test_accuracy_array[index_dataset, index_activation_function] = accuracy
                 print(f'{dataset_name}, {activation_function}, Test accuracy: {accuracy:.2f}%')
 
+    for key, value in activations.items():
+        save_image(value[:9, :3], f'tmp/{key}-feature-maps.pdf', padding=1, nrow=3, normalize=True)
     df_keys_values = pd.DataFrame({'key': [
         'num_epochs',
         'batch_size',
