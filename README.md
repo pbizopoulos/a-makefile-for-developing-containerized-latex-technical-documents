@@ -18,5 +18,5 @@ This repository contains the code that generates **LaTeX Technical Documents wit
 3. `sudo systemctl start docker`
 4. make options
     * `make`             # Generate the draft (fast) version document.
-    * `make ARG=--full`  # Generate the full (slow) version document.
+    * `make VER=--full`  # Generate the full (slow) version document.
     * `make clean`       # Remove the tmp/ directory.

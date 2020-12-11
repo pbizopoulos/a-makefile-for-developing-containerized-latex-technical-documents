@@ -11,14 +11,14 @@ from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision import transforms
-from torchvision.datasets import MNIST, FashionMNIST, KMNIST, CIFAR10, CIFAR100, SVHN
+from torchvision.datasets import MNIST, FashionMNIST, KMNIST, CIFAR10, CIFAR100
 from torchvision.models import mobilenet_v2
 from torchvision.utils import save_image
 
 plt.rcParams['font.size'] = 18
 plt.rcParams['savefig.format'] = 'pdf'
 
-dataset_list = [MNIST, FashionMNIST, KMNIST, CIFAR10, CIFAR100, SVHN]
+dataset_list = [MNIST, FashionMNIST, KMNIST, CIFAR10, CIFAR100]
 dataset_name_list = [dataset.__name__ for dataset in dataset_list]
 activation_function_list = ['ReLU', 'ReLU6', 'SiLU']
 
@@ -28,8 +28,6 @@ mean_std_list = [
         ((0.1307,), (0.3081,)),
         ((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
         ((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
-        ((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-        ((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
         ]
 
 train_range_list = [
@@ -38,8 +36,6 @@ train_range_list = [
         range(50000),
         range(40000),
         range(40000),
-        range(4000),
-        range(50000),
         ]
 
 validation_range_list = [
@@ -48,8 +44,6 @@ validation_range_list = [
         range(50000, 60000),
         range(40000, 50000),
         range(40000, 50000),
-        range(4000, 5000),
-        range(50000, 60000),
         ]
 
 test_range_list = [
@@ -57,8 +51,6 @@ test_range_list = [
         range(10000),
         range(10000),
         range(10000),
-        range(10000),
-        range(8000),
         range(10000),
         ]
 
@@ -87,12 +79,6 @@ def change_module(model, module_old, module_new):
             setattr(model, child_name, module_new())
         else:
             change_module(child, module_old, module_new)
-
-activations = {}
-def get_activations(name):
-    def hook(model, input, output):
-        activations[name] = output.detach()
-    return hook
 
 
 if __name__ == '__main__':
@@ -136,21 +122,12 @@ if __name__ == '__main__':
                 transforms.ToTensor(),
                 transforms.Normalize(mean_std[0], mean_std[1])
                 ])
-        if dataset_name == 'SVHN':
-            train_dataset = dataset('tmp', split='train', transform=transform, download=True)
-            validation_dataset = dataset('tmp', split='train', transform=transform)
-            test_dataset = dataset('tmp', split='test', transform=transform, download=True)
-        else:
-            train_dataset = dataset('tmp', train=True, transform=transform, download=True)
-            validation_dataset = dataset('tmp', train=True, transform=transform)
-            test_dataset = dataset('tmp', train=False, transform=transform, download=True)
+        train_dataset = dataset('tmp', train=True, transform=transform, download=True)
+        test_dataset = dataset('tmp', train=False, transform=transform, download=True)
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(train_range))
-        validation_dataloader = DataLoader(validation_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(validation_range))
+        validation_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(validation_range))
         test_dataloader = DataLoader(test_dataset, batch_size=test_batch_size, sampler=SubsetRandomSampler(test_range))
-        if dataset_name == 'SVHN':
-            num_classes = len(np.unique(train_dataset.labels))
-        else:
-            num_classes = len(train_dataset.classes)
+        num_classes = len(train_dataset.classes)
         for index_activation_function, activation_function in enumerate(activation_function_list):
             model = mobilenet_v2().to(device)
             if activation_function == 'SiLU':
@@ -204,7 +181,6 @@ if __name__ == '__main__':
                 change_module(model, nn.ReLU6, nn.ReLU)
             model.load_state_dict(torch.load(model_path))
             model.eval()
-            model.features[0][0].register_forward_hook(get_activations(filename))
             kernels = model.features[0][0].weight.detach().clone()
             save_image(kernels[:16], f'tmp/{filename}-kernels.pdf', padding=1, nrow=4, normalize=True)
             correct = 0
@@ -221,8 +197,6 @@ if __name__ == '__main__':
                 test_accuracy_array[index_dataset, index_activation_function] = accuracy
                 print(f'{dataset_name}, {activation_function}, Test accuracy: {accuracy:.2f}%')
 
-    for key, value in activations.items():
-        save_image(value[:9, :3], f'tmp/{key}-feature-maps.pdf', padding=1, nrow=3, normalize=True)
     df_keys_values = pd.DataFrame({'key': [
         'num_epochs',
         'batch_size',
@@ -240,4 +214,4 @@ if __name__ == '__main__':
     max_per_column_list = test_accuracy_array.max(0)
     formatters = [lambda x,max_per_column=max_per_column: fr'\bf{{{x:.2f}}}' if (x == max_per_column) else f'{x:.2f}' for max_per_column in max_per_column_list]
     df = pd.DataFrame(test_accuracy_array, index=activation_function_list, columns=dataset_name_list)
-    df.to_latex('tmp/metrics.tex', formatters=formatters, bold_rows=True, column_format='r|rrrrrrrrr', multirow=True, escape=False)
+    df.to_latex('tmp/metrics.tex', formatters=formatters, bold_rows=True, column_format='r|' + len(dataset_list)*'r', multirow=True, escape=False)
