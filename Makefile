@@ -1,6 +1,6 @@
 .POSIX:
 
-document_title=a-makefile-for-developing-latex-technical-documents
+document_title=a-makefile-for-developing-containerized-latex-technical-documents
 
 ifeq (1, $(shell [ -t 0 ] && echo 1))
 	debug_args=--interactive --tty
