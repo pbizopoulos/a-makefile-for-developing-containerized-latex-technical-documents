@@ -33,14 +33,14 @@
 \section{Introduction}
 Developing technical documents that present both computationally generated results (variables, tables and figures) and natural text, is a central aspect of computational research.
 One programming paradigm that was proposed as a solution is \textit{literate programming}~\cite{knuth1984literate}, in which the author inserts snippets of code and the output of its execution, alongside natural text.
-Some applications of \textit{literate programming} include Jupyter~\cite{kluyver2016jupyter} which allows publishing code, results and explanations in a executable format, PythonTeX~\cite{poore2015pythontex} which allows Python to be executed in \LaTeX\ and ActivePapers~\cite{hinsen2014activepapers} in which code can be executed using the Java Virtual Machine.
+Applications of \textit{literate programming} include Jupyter~\cite{kluyver2016jupyter} which allows publishing code, results and explanations in a executable format, PythonTeX~\cite{poore2015pythontex} which allows Python to be executed in \LaTeX\ and ActivePapers~\cite{hinsen2014activepapers} in which code can be executed using the Java Virtual Machine.
 
 Although \textit{literate programming} provides many advantages for demonstrative projects and immediate visual feedback during experimentation, its `dual nature' constrains authors in using specifically designed text editors and/or source code formats thus leading to `app/vendor lock-in` situations.
 Moreover, the overlap between natural text and results code makes \textit{literate programming} difficult to debug and version control.
 
 We propose a Makefile for developing containerized \LaTeX\ technical documents in POSIX-oriented operating systems.
 By using portable technologies that withstood the test of time, we ensure the stability and portability of the proposed Makefile.
-We write this paper\footnote{\url{https://github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents}}\footnote{\url{https://arxiv.org/abs/2005.12660}} using a template consisting the Makefile\footnote{\url{https://github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents-template}} and choose Docker as the container technology and the Python programming language~\cite{van2007python} for generating the results.
+We write this paper\footnote{\url{https://github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents}}\footnote{\url{https://arxiv.org/abs/2005.12660}} using a template that consists of the Makefile\footnote{\url{https://github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents-template}} and choose Docker as the container technology and the Python programming language~\cite{van2007python} for generating the results.
 
 For the rest of the paper we will refer to:
 \begin{itemize}
@@ -65,7 +65,7 @@ For the rest of the paper we will refer to:
 			child{node[draw, anchor=west, fill=red!20](tex){ms.tex}}
 			child{node[draw, anchor=west, fill=red!20](bib){ms.bib}}
 			child{node[draw, anchor=west, fill=blue!20](py){main.py}}
-			child{node[draw, anchor=west, fill=blue!20](dockerfile){Dockerfile}}
+			child{node[draw, anchor=west, fill=blue!20](containerfile){Containerfile}}
 			child{node[draw, anchor=west, fill=blue!20](requirements){requirements.txt}};
 			\begin{scope}[on background layer]
 				\node[draw, rounded corners, dashed, fill=gray!20, inner sep=4pt, fit=(document) (requirements)]{};
@@ -78,12 +78,13 @@ For the rest of the paper we will refer to:
 			\path[draw, ->] (results) |- (pdf);
 			\path[draw, ->] (document) -- (pdf);
 	\end{tikzpicture}
-	\caption{The files of a Docker container template that uses the Makefile is depicted in the light gray background and the arrows denote the containerized data flow towards generating the \textit{document}.
-	Green indicates temporary cache/generated files, red \textit{\LaTeX\ code} files, blue \textit{results code} files and within the dark gray background, files that are developed by the \textit{author}.}
+	\caption{The files of a template that uses the Makefile is depicted in the light gray background and the arrows denote the containerized data flow towards generating the \textit{document}.
+	Green indicates temporary cache or generated files, red \textit{\LaTeX\ code} files, blue \textit{results code} files and within the dark gray background, files that are developed by the \textit{author}.}
 	\label{fig:templatefiles}
 \end{figure}
 
-The three tools that are used by the Makefile are the Make program\footnote{\url{https://www.gnu.org/software/make/}} which is a build automation tool, \LaTeX~\cite{lamport1994latex} which is a typesetting system for publishing high quality research documents, and the container technology (such as Docker) which allows portable execution of \textit{code} between different hardware, operating systems(OSs) and environments.
+The proposed Makefile can be used for developing \textit{documents} that consist of \textit{results} generated from \textit{results code} executed within a container.
+The three tools that are used by the Makefile are the Make program\footnote{\url{https://www.gnu.org/software/make/}} which is a build automation tool, \LaTeX~\cite{lamport1994latex} which is a typesetting system for publishing high quality research documents, and the container technology (such as Docker) which allows portable execution of \textit{code} between different hardware, operating systems and environments.
 
 The pseudoalgorithm of the Makefile is as follows:
 \begin{lstlisting}[language=bash, style=lststyle, caption={Pseudoalgorithm of the Makefile.}]
@@ -92,7 +93,7 @@ tmp/$(document_pdf): $(latex_code) tmp/$(results)
 
 tmp/$(results): $(results_code)
 	build image $(results_image)
-	run container $(results_image)
+	run container $(results_image) $(VER)
 
 clean:
 	rm -rf tmp/
@@ -102,7 +103,7 @@ The default target runs the container for the \LaTeX\ compilation while the \tex
 When the \textit{author} edits a file from \textit{results code} or \textit{\LaTeX\ code}, only the required compilation is automatically triggered with Make.
 Forced compilations without change could be done using the \textit{touch} POSIX utility that updates the modification time of a file.
 
-The proposed Makefile can be used for developing \LaTeX\ \textit{documents} that consist of \textit{results} generated from \textit{results code} executed within a container with a consistent (across different hardware, OS and programming language), minimal user interface as follows:
+The Makefile consists of the following minimal user interface:
 \begin{lstlisting}[language=bash, style=lststyle, caption={Template make options.}]
 make             # Generate the draft (fast) version.
 make VER=--full  # Generate the full (slow) version.
@@ -149,33 +150,33 @@ These can be disabled using the following commands into the \textit{\LaTeX\ code
 
 Regarding the \textit{results code} for Python, we can achieve deterministic stochasticity by setting the random seeds to a specific value such as:
 \begin{lstlisting}[language=python, style=lststyle, caption={Python reproducibility commands for popular libraries.}]
-# for build-in random module
+# build-in random module
 random.seed(0)
-# for numpy
+# numpy
 np.random.seed(0)
-# for tensorflow
+# tensorflow
 tf.random.set_seed(0)
-# for pytorch
+# pytorch
 torch.backends.cudnn.benchmark = False
 torch.backends.cudnn.deterministic = True
 torch.cuda.manual_seed_all(0)
 torch.manual_seed(0)
 \end{lstlisting}
 
-Additionally an \textit{author} can use the POSIX utility \textit{cmp} to compare \textit{documents} (generated in a different session, OS or underlying hardware) byte by byte, and diffoscope\footnote{\url{https://diffoscope.org/}} for identifying sources of non-determinism as follows:
+Additionally an \textit{author} can use the POSIX utility \textit{cmp} to compare \textit{documents} (generated in a different session, operating system or underlying hardware) byte by byte, and diffoscope\footnote{\url{https://diffoscope.org/}} for identifying sources of non-determinism as follows:
 \begin{lstlisting}[language=bash, style=lststyle, caption={Test draft document version reproducibility. This can also be used as a test script when pushing or pull requesting to a remote repository.}]
-# Generate the first draft document version
+# Generate the first draft document version.
 make
-# Backup the first resulting pdf
+# Backup the first resulting pdf.
 cp tmp/ms.pdf tmp/ms-previous.pdf
-# Update the modification timestamp of main.py
+# Update the modification timestamp of main.py.
 touch main.py
-# Generate the second draft document version
+# Generate the second draft document version.
 make
-# Compare draft document versions byte by byte
+# Compare draft document versions byte by byte.
 cmp tmp/ms.pdf tmp/ms-previous.pdf
 # Compare draft document versions
-# in a human readable form
+# in a human readable form.
 diffoscope tmp/ms.pdf tmp/ms-previous.pdf
 \end{lstlisting}
 
@@ -191,14 +192,14 @@ We also use the \textit{pandas.DataFrame.to\_latex} command which automatically 
 \begin{figure}[!t]
 	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/MNIST-loss.pdf}}
 	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/FashionMNIST-loss.pdf}}
-	\caption{Comparison of MobilenetV2 with ReLU, ReLU6 and SiLU train and validation losses for MNIST and FashionMNIST.}
+	\caption{Comparison of the train and validation loss of MobilenetV2 with ReLU, ReLU6 and SiLU for MNIST and FashionMNIST.}
 	\label{fig:loss}
 \end{figure}
 
 \begin{figure}[!t]
 	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/CIFAR10-ReLU-kernels.pdf}}
 	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/CIFAR100-ReLU-kernels.pdf}}
-	\caption{The first 16 kernels of the first convolutional layer of MobilenetV2 with ReLU for CIFAR10 and CIFAR100.}
+	\caption{The first 16 kernels of the first convolutional layer of MobilenetV2 with ReLU for CIFAR10 (left) and CIFAR100 (right).}
 	\label{fig:kernels}
 \end{figure}
 
@@ -212,8 +213,8 @@ We also use the \textit{pandas.DataFrame.to\_latex} command which automatically 
 
 \section{Discussion}
 The proposed Makefile is based on plain text file editing and can be used with any POSIX-oriented operating system that supports containers and Make.
-POSIX and Make have existed for decades and have passed the test of time, while the container technology was standardized with the Open Container Initiative\footnote{\url{https://opencontainers.org/}} and there exist alternatives that could be used as drop-in replacements for Docker.
-Moreover this Makefile can be combined with any version control system, container registry provider and text editor thus preventing `app/vendor lock-in' situations.
+POSIX and Make have existed for decades and have passed the test of time, while the container technology was standardized with the Open Container Initiative\footnote{\url{https://opencontainers.org/}} and there exist alternatives\footnote{\url{https://podman.io/}} that could be used as drop-in replacements for Docker.
+Moreover the Makefile can be combined with any version control system, container registry provider and text editor thus preventing `app/vendor lock-in' situations.
 
 Use cases of the Makefile include:
 \begin{itemize}
