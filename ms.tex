@@ -103,8 +103,8 @@ The default target runs the container for the \LaTeX\ compilation while the \tex
 When the \textit{author} edits a file from \textit{results code} or \textit{\LaTeX\ code}, only the required compilation is automatically triggered with Make.
 Forced compilations without change could be done using the \textit{touch} POSIX utility that updates the modification time of a file.
 
-The Makefile consists of the following minimal user interface:
-\begin{lstlisting}[language=bash, style=lststyle, caption={Template make options.}]
+The Makefile can be called with the following options:
+\begin{lstlisting}[language=bash, style=lststyle, caption={Makefile options.}]
 make             # Generate the draft (fast) version.
 make VER=--full  # Generate the full (slow) version.
 make clean       # Remove the tmp/ directory.
@@ -121,7 +121,7 @@ The \textit{author} may use the Makefile for developing \textit{documents} in th
 	\item executes \textit{make clean} to restore to a clean state.
 \end{enumerate}
 
-The only requirements that the Makefile imposes on \textit{code} is the presence of \textit{results code} that generates the draft and full versions of the \textit{document} and \textit{results code} and \textit{\LaTeX\ code} for saving/loading the \textit{results} to/from \textit{tmp/} respectively.
+The only requirements that the Makefile imposes on \textit{code} is the presence of \textit{results code} that generates the draft and full versions of the \textit{document} and the presence of \textit{results code} and \textit{\LaTeX\ code} for saving/loading the \textit{results} to/from \textit{tmp/} respectively.
 An example of a \textit{results code} that generates the draft version \textit{document} in the field of neural networks would be a conditional that sets the number of epochs and training/validation/test samples to a low value.
 
 \section{The Makefile utilities}
@@ -163,7 +163,7 @@ torch.cuda.manual_seed_all(0)
 torch.manual_seed(0)
 \end{lstlisting}
 
-Additionally an \textit{author} can use the POSIX utility \textit{cmp} to compare \textit{documents} (generated in a different session, operating system or underlying hardware) byte by byte, and diffoscope\footnote{\url{https://diffoscope.org/}} for identifying sources of non-determinism as follows:
+Additionally, an \textit{author} can use the POSIX utility \textit{cmp} to compare \textit{documents} (generated in a different session, operating system or underlying hardware) byte by byte, and diffoscope\footnote{\url{https://diffoscope.org/}} for identifying sources of non-determinism as follows:
 \begin{lstlisting}[language=bash, style=lststyle, caption={Test draft document version reproducibility. This can also be used as a test script when pushing or pull requesting to a remote repository.}]
 # Generate the first draft document version.
 make
