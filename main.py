@@ -11,14 +11,14 @@ from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision import transforms
-from torchvision.datasets import MNIST, FashionMNIST, KMNIST, CIFAR10, CIFAR100
+from torchvision.datasets import MNIST, FashionMNIST, KMNIST, QMNIST
 from torchvision.models import mobilenet_v2
 from torchvision.utils import save_image
 
 plt.rcParams['font.size'] = 18
 plt.rcParams['savefig.format'] = 'pdf'
 
-dataset_list = [MNIST, FashionMNIST, KMNIST, CIFAR10, CIFAR100]
+dataset_list = [MNIST, FashionMNIST, KMNIST, QMNIST]
 dataset_name_list = [dataset.__name__ for dataset in dataset_list]
 activation_function_list = ['ReLU', 'ReLU6', 'SiLU']
 
@@ -26,28 +26,24 @@ mean_std_list = [
         ((0.1307,), (0.3081,)),
         ((0.1307,), (0.3081,)),
         ((0.1307,), (0.3081,)),
-        ((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        ((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
+        ((0.1307,), (0.3081,)),
         ]
 
 train_range_list = [
         range(50000), 
         range(50000),
         range(50000),
-        range(40000),
-        range(40000),
+        range(50000),
         ]
 
 validation_range_list = [
         range(50000, 60000),
         range(50000, 60000),
         range(50000, 60000),
-        range(40000, 50000),
-        range(40000, 50000),
+        range(50000, 60000),
         ]
 
 test_range_list = [
-        range(10000),
         range(10000),
         range(10000),
         range(10000),
@@ -111,17 +107,11 @@ if __name__ == '__main__':
     num_parameters = np.zeros((len(activation_function_list)))
     criterion = nn.CrossEntropyLoss()
     for index_dataset, (dataset, dataset_name, train_range, validation_range, test_range, mean_std) in enumerate(zip(dataset_list, dataset_name_list, train_range_list, validation_range_list, test_range_list, mean_std_list)):
-        if dataset_name in ['MNIST', 'FashionMNIST', 'KMNIST']:
-            transform = transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Lambda(lambda x: torch.cat([x, x, x], 0)),
-                transforms.Normalize(mean_std[0], mean_std[1])
-                ])
-        else:
-            transform = transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize(mean_std[0], mean_std[1])
-                ])
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Lambda(lambda x: torch.cat([x, x, x], 0)),
+            transforms.Normalize(mean_std[0], mean_std[1])
+            ])
         train_dataset = dataset('tmp', train=True, transform=transform, download=True)
         test_dataset = dataset('tmp', train=False, transform=transform, download=True)
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(train_range))
@@ -182,7 +172,7 @@ if __name__ == '__main__':
             model.load_state_dict(torch.load(model_path))
             model.eval()
             kernels = model.features[0][0].weight.detach().clone()
-            save_image(kernels[:16], f'tmp/{filename}-kernels.pdf', padding=1, nrow=4, normalize=True)
+            save_image(kernels[:25], f'tmp/{filename}-kernels.pdf', padding=1, nrow=5, normalize=True)
             correct = 0
             total = 0
             with torch.no_grad():

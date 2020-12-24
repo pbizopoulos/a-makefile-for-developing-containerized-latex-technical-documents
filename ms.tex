@@ -40,7 +40,7 @@ Moreover, the overlap between natural text and results code makes \textit{litera
 
 We propose a Makefile for developing containerized \LaTeX\ technical documents in POSIX-oriented operating systems.
 By using portable technologies that withstood the test of time, we ensure the stability and portability of the proposed Makefile.
-We write this paper\footnote{\url{https://github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents}}\footnote{\url{https://arxiv.org/abs/2005.12660}} using a template that consists of the Makefile\footnote{\url{https://github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents-template}} and choose Docker as the container technology and the Python programming language~\cite{van2007python} for generating the results.
+We write this paper using a template that consists of the Makefile and choose Docker as the container technology and the Python programming language for generating the results.
 
 For the rest of the paper we will refer to:
 \begin{itemize}
@@ -84,7 +84,7 @@ For the rest of the paper we will refer to:
 \end{figure}
 
 The proposed Makefile can be used for developing \textit{documents} that consist of \textit{results} generated from \textit{results code} executed within a container.
-The three tools that are used by the Makefile are the Make program\footnote{\url{https://www.gnu.org/software/make/}} which is a build automation tool, \LaTeX~\cite{lamport1994latex} which is a typesetting system for publishing high quality research documents, and the container technology (such as Docker) which allows portable execution of \textit{code} between different hardware, operating systems and environments.
+The three tools that are used by the Makefile are the Make program which is a build automation tool, \LaTeX\ which is a typesetting system for publishing high quality research documents, and the container technology (such as Docker) which allows portable execution of \textit{code} between different hardware, operating systems and environments.
 
 The pseudoalgorithm of the Makefile is as follows:
 \begin{lstlisting}[language=bash, style=lststyle, caption={Pseudoalgorithm of the Makefile.}]
@@ -163,7 +163,7 @@ torch.cuda.manual_seed_all(0)
 torch.manual_seed(0)
 \end{lstlisting}
 
-Additionally, an \textit{author} can use the POSIX utility \textit{cmp} to compare \textit{documents} (generated in a different session, operating system or underlying hardware) byte by byte, and diffoscope\footnote{\url{https://diffoscope.org/}} for identifying sources of non-determinism as follows:
+Additionally, an \textit{author} can use the POSIX utility \textit{cmp} to compare \textit{documents} (generated in a different session, operating system or underlying hardware) byte by byte, and diffoscope for identifying sources of non-determinism as follows:
 \begin{lstlisting}[language=bash, style=lststyle, caption={Test draft document version reproducibility. This can also be used as a test script when pushing or pull requesting to a remote repository.}]
 # Generate the first draft document version.
 make
@@ -182,7 +182,7 @@ diffoscope tmp/ms.pdf tmp/ms-previous.pdf
 
 \section{Example use case of the Makefile}
 This section provides a use case of the Makefile and also serves as a manual for developing \LaTeX\ \textit{documents} with Python as the \textit{results code} programming language.
-We train, validate and test MobilenetV2 neural networks~\cite{sandler2018mobilenetv2} in PyTorch~\cite{paszke2019pytorch}, on MNIST~\cite{lecun2010mnist}, FashionMNIST~\cite{xiao2017fashion}, KMNIST~\cite{clanuwat2018deep}, CIFAR10~\cite{krizhevsky2009learning} and CIFAR100~\cite{krizhevsky2009learning}.
+We train, validate and test MobilenetV2 neural networks~\cite{sandler2018mobilenetv2} in PyTorch, on MNIST~\cite{lecun2010mnist}, FashionMNIST~\cite{xiao2017fashion}, KMNIST~\cite{clanuwat2018deep} and QMNIST~\cite{yadav2019cold}.
 We use the default train, validation and test datasets and compare the use of ReLU, ReLU6\cite{dahl2013improving} and SiLU\cite{elfwing2018sigmoid} activation functions in the MobilenetV2 model.
 
 Making use of the \textit{datatool} package the values of the following variables are not directly referred in the main \textit{.tex} file but they are instead read by an intermediate \textit{.tex} file created by the \textit{results code}: the number of epochs is $\DTLfetch{keys_values}{key}{num_epochs}{value}$, the batch size is $\DTLfetch{keys_values}{key}{batch_size}{value}$ and the learning rate for SGD is $\DTLfetch{keys_values}{key}{lr}{value}$.
@@ -192,14 +192,20 @@ We also use the \textit{pandas.DataFrame.to\_latex} command which automatically 
 \begin{figure}[!t]
 	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/MNIST-loss.pdf}}
 	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/FashionMNIST-loss.pdf}}
-	\caption{Comparison of the train and validation loss of MobilenetV2 with ReLU, ReLU6 and SiLU for MNIST and FashionMNIST.}
+	\\
+	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/KMNIST-loss.pdf}}
+	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/QMNIST-loss.pdf}}
+	\caption{Comparison of the train and validation loss of MobilenetV2 with ReLU, ReLU6 and SiLU for all datasets.}
 	\label{fig:loss}
 \end{figure}
 
 \begin{figure}[!t]
-	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/CIFAR10-ReLU-kernels.pdf}}
-	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/CIFAR100-ReLU-kernels.pdf}}
-	\caption{The first 16 kernels of the first convolutional layer of MobilenetV2 with ReLU for CIFAR10 (left) and CIFAR100 (right).}
+	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/MNIST-ReLU-kernels.pdf}}
+	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/FashionMNIST-ReLU-kernels.pdf}}
+	\\
+	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/KMNIST-ReLU-kernels.pdf}}
+	\subfloat{\includegraphics[width=0.5\columnwidth]{tmp/QMNIST-ReLU-kernels.pdf}}
+	\caption{The first 25 kernels of the first convolutional layer of MobilenetV2 with ReLU for MNIST (upper-left), FashionMNIST (upper-right), KMNIST (lower-left) and QMNIST (lower-right).}
 	\label{fig:kernels}
 \end{figure}
 
@@ -213,7 +219,7 @@ We also use the \textit{pandas.DataFrame.to\_latex} command which automatically 
 
 \section{Discussion}
 The proposed Makefile is based on plain text file editing and can be used with any POSIX-oriented operating system that supports containers and Make.
-POSIX and Make have existed for decades and have passed the test of time, while the container technology was standardized with the Open Container Initiative\footnote{\url{https://opencontainers.org/}} and there exist alternatives\footnote{\url{https://podman.io/}} that could be used as drop-in replacements for Docker.
+POSIX and Make have existed for decades and have passed the test of time, while the container technology was standardized with the Open Container Initiative and there exist alternatives such as Podman that could be used as drop-in replacements for Docker.
 Moreover the Makefile can be combined with any version control system, container registry provider and text editor thus preventing `app/vendor lock-in' situations.
 
 Use cases of the Makefile include:
