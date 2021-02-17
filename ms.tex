@@ -92,7 +92,7 @@ tmp/$(document_pdf): $(latex_code) tmp/$(results)
 
 tmp/$(results): $(results_code)
 	build image $(results_image)
-	run container $(results_image) $(VER)
+	run container $(results_image) $(VERSION)
 
 clean:
 	rm -rf tmp/
@@ -104,9 +104,9 @@ Forced compilations without change could be done using the \textit{touch} POSIX 
 
 The Makefile can be called with the following options:
 \begin{lstlisting}[language=bash, style=lststyle, caption={Makefile options.}]
-make             # Generate the draft (fast) version.
-make VER=--full  # Generate the full (slow) version.
-make clean       # Remove the tmp/ directory.
+make                # Generate the draft (fast) version.
+make VERSION=--full # Generate the full (slow) version.
+make clean          # Remove the tmp/ directory.
 \end{lstlisting}
 
 The \textit{author} may use the Makefile for developing \textit{documents} in the following way:
@@ -115,7 +115,7 @@ The \textit{author} may use the Makefile for developing \textit{documents} in th
 	\item creates and develops the \textit{results code}.
 	\item creates and develops the \textit{\LaTeX\ code}.
 	\item executes \textit{make} for fast development iterations and experimentation,
-	\item executes \textit{make VER=-{}-full} for distribution or publication and
+	\item executes \textit{make VERSION=-{}-full} for distribution or publication and
 	\item executes \textit{make clean} to restore to a clean state.
 \end{enumerate}
 
