@@ -78,11 +78,17 @@ def change_module(model, module_old, module_new):
 
 
 if __name__ == '__main__':
-    # DO NOT EDIT BLOCK - Required by the Makefile
+    # Set appropriate variables (e.g. num_samples) to a lower value to reduce the computational cost of the draft (fast) version document.
     parser = argparse.ArgumentParser()
     parser.add_argument('--full', default=False, action='store_true')
     args = parser.parse_args()
-    # END OF DO NOT EDIT BLOCK
+    if args.full:
+        num_epochs = 20
+    else:
+        num_epochs = 2
+        train_range_list = [train_range[:10] for train_range in train_range_list]
+        validation_range_list = [validation_range[:10] for validation_range in validation_range_list]
+        test_range_list = [test_range[:10] for test_range in test_range_list]
 
     # Set random seeds for reproducibility.
     np.random.seed(0)
@@ -91,13 +97,6 @@ if __name__ == '__main__':
     torch.manual_seed(0)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    if args.full:
-        num_epochs = 20
-    else:
-        num_epochs = 2
-        train_range_list = [train_range[:10] for train_range in train_range_list]
-        validation_range_list = [validation_range[:10] for validation_range in validation_range_list]
-        test_range_list = [test_range[:10] for test_range in test_range_list]
     lr = 0.01
     batch_size = 64
     train_loss_array = np.zeros((len(dataset_list), len(activation_function_list), num_epochs))
