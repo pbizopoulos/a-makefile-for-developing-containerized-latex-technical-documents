@@ -1,0 +1,6 @@
+@article{bizopoulos2020makefile,
+	title={A Makefile for Developing Containerized LaTeX Technical Documents},
+	author={Bizopoulos, Paschalis},
+	journal={arXiv preprint arXiv:2005.12660},
+	year={2020}
+}
