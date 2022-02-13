@@ -13,8 +13,8 @@ git clone https://github.com/pbizopoulos/a-makefile-for-developing-containerized
 cd a-makefile-for-developing-containerized-latex-technical-documents/
 sudo systemctl start docker
 
-Basic usage:
+Basic commands:
 make		# Generate draft (fast) results.
 make FULL=1	# Generate full (slow) results.
 make clean 	# Remove tmp/ directory.
-make help	# Show help.
+make help	# Show basic/advanced commands.
