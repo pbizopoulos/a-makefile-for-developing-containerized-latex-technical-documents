@@ -154,11 +154,10 @@ def main():
     df_keys_values.to_csv(f'{tmpdir}/keys-values.csv')
     for dataset_name, train_loss, validation_loss in zip(dataset_name_list, train_loss_array, validation_loss_array):
         save_loss(train_loss, validation_loss, dataset_name, activation_function_list)
-    test_accuracy_array = test_accuracy_array.T
-    max_per_column_list = test_accuracy_array.max(0)
-    formatters = [lambda x, max_per_column=max_per_column: fr'\textbf{{{x:.2f}}}' if (x == max_per_column) else f'{x:.2f}' for max_per_column in max_per_column_list]
-    df_metrics = pd.DataFrame(test_accuracy_array, index=activation_function_list, columns=dataset_name_list)
-    df_metrics.to_latex(f'{tmpdir}/metrics.tex', formatters=formatters, bold_rows=True, multirow=True, escape=False)
+    styler = pd.DataFrame(test_accuracy_array.T, index=activation_function_list, columns=dataset_name_list).style
+    styler.format(precision=2)
+    styler.highlight_max(props='bfseries: ;')
+    styler.to_latex(f'{tmpdir}/metrics.tex', hrules=True)
 
 
 if __name__ == '__main__':
