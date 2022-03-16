@@ -15,7 +15,6 @@ from torchvision.utils import save_image
 
 tmpdir = os.getenv('TMPDIR')
 full = os.getenv('FULL')
-
 plt.rcParams['font.size'] = 18
 plt.rcParams['savefig.format'] = 'pdf'
 
