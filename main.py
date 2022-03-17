@@ -72,7 +72,7 @@ def main():
     validation_loss_array = np.zeros((len(dataset_list), len(activation_function_list), num_epochs))
     test_accuracy_array = np.zeros((len(dataset_list), len(activation_function_list)))
     test_batch_size = 1000
-    num_parameters = np.zeros((len(activation_function_list)))
+    num_parameters = np.zeros(len(activation_function_list))
     criterion = nn.CrossEntropyLoss()
     for index_dataset, (dataset, dataset_name, train_range, validation_range, test_range, mean_std) in enumerate(zip(dataset_list, dataset_name_list, train_range_list, validation_range_list, test_range_list, mean_std_list)):
         transform = transforms.Compose([transforms.ToTensor(), transforms.Lambda(lambda x: torch.cat([x, x, x], 0)), transforms.Normalize(mean_std[0], mean_std[1])])
