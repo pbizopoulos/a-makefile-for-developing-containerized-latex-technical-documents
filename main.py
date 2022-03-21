@@ -1,4 +1,5 @@
 import os
+from os.path import join
 
 import numpy as np
 import pandas as pd
@@ -13,30 +14,10 @@ from torchvision.datasets import KMNIST, MNIST, QMNIST, FashionMNIST
 from torchvision.models import mobilenet_v2
 from torchvision.utils import save_image
 
-tmpdir = os.getenv('TMPDIR')
+artifacts_dir = os.getenv('ARTIFACTSDIR')
 full = os.getenv('FULL')
 plt.rcParams['font.size'] = 18
 plt.rcParams['savefig.format'] = 'pdf'
-
-
-def save_loss(train_loss, validation_loss, dataset_name, activation_function_list):
-    _, ax = plt.subplots()
-    plt.grid(True)
-    plt.autoscale(enable=True, axis='x', tight=True)
-    plt.ylim([0, 1])
-    plt.xlabel('Epochs', fontsize=18)
-    if dataset_name == 'MNIST':
-        plt.ylabel('loss', fontsize=18)
-    for train_loss_, validation_loss_, activation_function, color in zip(train_loss, validation_loss, activation_function_list, ['b', 'orange']):
-        plt.plot(train_loss_, label=f'Train {activation_function}', color=color)
-        plt.plot(validation_loss_, label=f'Validation {activation_function}', linestyle='--', color=color)
-    plt.title(dataset_name)
-    ax.tick_params(axis='both', which='major', labelsize='large')
-    ax.tick_params(axis='both', which='minor', labelsize='large')
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    ax.legend()
-    plt.savefig(f'{tmpdir}/{dataset_name}-loss', bbox_inches='tight')
-    plt.close()
 
 
 def change_module(model, module_old, module_new):
@@ -76,8 +57,8 @@ def main():
     criterion = nn.CrossEntropyLoss()
     for index_dataset, (dataset, dataset_name, train_range, validation_range, test_range, mean_std) in enumerate(zip(dataset_list, dataset_name_list, train_range_list, validation_range_list, test_range_list, mean_std_list)):
         transform = transforms.Compose([transforms.ToTensor(), transforms.Lambda(lambda x: torch.cat([x, x, x], 0)), transforms.Normalize(mean_std[0], mean_std[1])])
-        train_dataset = dataset(tmpdir, train=True, transform=transform, download=True)
-        test_dataset = dataset(tmpdir, train=False, transform=transform, download=True)
+        train_dataset = dataset(artifacts_dir, transform=transform, download=True)
+        test_dataset = dataset(artifacts_dir, train=False, transform=transform, download=True)
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(train_range))
         validation_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(validation_range))
         test_dataloader = DataLoader(test_dataset, batch_size=test_batch_size, sampler=SubsetRandomSampler(test_range))
@@ -91,7 +72,7 @@ def main():
             optimizer = optim.SGD(model.parameters(), lr=lr)
             validation_loss_best = float('inf')
             filename = f'{dataset.__name__}-{activation_function}'
-            model_path = f'{tmpdir}/{filename}.pt'
+            model_path = join(artifacts_dir, f'{filename}.pt')
             for index_epoch, epoch in enumerate(range(num_epochs)):
                 train_loss_sum = 0
                 model.train()
@@ -135,7 +116,7 @@ def main():
             model.load_state_dict(torch.load(model_path))
             model.eval()
             kernels = model.features[0][0].weight.detach().clone()
-            save_image(kernels[:25], f'{tmpdir}/{filename}-kernels.pdf', padding=1, nrow=5, normalize=True)
+            save_image(kernels[:25], join(artifacts_dir, f'{filename}-kernels.pdf'), padding=1, nrow=5, normalize=True)
             correct = 0
             total = 0
             with torch.no_grad():
@@ -150,13 +131,29 @@ def main():
                 test_accuracy_array[index_dataset, index_activation_function] = accuracy
                 print(f'{dataset_name}, {activation_function}, Test accuracy: {accuracy:.2f}%')
     df_keys_values = pd.DataFrame({'key': ['num-epochs', 'batch-size', 'lr'], 'value': [str(int(num_epochs)), str(int(batch_size)), lr]})
-    df_keys_values.to_csv(f'{tmpdir}/keys-values.csv')
+    df_keys_values.to_csv(join(artifacts_dir, 'keys-values.csv'))
     for dataset_name, train_loss, validation_loss in zip(dataset_name_list, train_loss_array, validation_loss_array):
-        save_loss(train_loss, validation_loss, dataset_name, activation_function_list)
+        _, ax = plt.subplots()
+        plt.grid(True)
+        plt.autoscale(enable=True, axis='x', tight=True)
+        plt.ylim([0, 1])
+        plt.xlabel('Epochs', fontsize=18)
+        if dataset_name == 'MNIST':
+            plt.ylabel('loss', fontsize=18)
+        for train_loss_, validation_loss_, activation_function, color in zip(train_loss, validation_loss, activation_function_list, ['b', 'orange']):
+            plt.plot(train_loss_, label=f'Train {activation_function}', color=color)
+            plt.plot(validation_loss_, label=f'Validation {activation_function}', linestyle='--', color=color)
+        plt.title(dataset_name)
+        ax.tick_params(axis='both', which='major', labelsize='large')
+        ax.tick_params(axis='both', which='minor', labelsize='large')
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.legend()
+        plt.savefig(join(artifacts_dir, f'{dataset_name}-loss'), bbox_inches='tight')
+        plt.close()
     styler = pd.DataFrame(test_accuracy_array.T, index=activation_function_list, columns=dataset_name_list).style
     styler.format(precision=2)
     styler.highlight_max(props='bfseries: ;')
-    styler.to_latex(f'{tmpdir}/metrics.tex', hrules=True)
+    styler.to_latex(join(artifacts_dir, 'metrics.tex'), hrules=True)
 
 
 if __name__ == '__main__':
