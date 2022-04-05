@@ -103,7 +103,7 @@ def main():
                 validation_loss = validation_loss_sum / len(validation_dataloader)
                 validation_loss_array[index_dataset, index_activation_function, epoch] = validation_loss
                 accuracy = 100.0 * correct / total
-                print(f'{dataset_name}, {activation_function}, Epoch: {epoch}, Validation average loss: {validation_loss:.4f}, Validation accuracy: {accuracy:.2f}%')
+                print(f'{dataset_name = }, {activation_function = }, {epoch = }, {validation_loss = :.4f}, {accuracy = :.2f}%')
                 if validation_loss < validation_loss_best:
                     validation_loss_best = validation_loss
                     torch.save(model.state_dict(), model_path)
@@ -129,7 +129,7 @@ def main():
                     total += output.shape[0]
                 accuracy = 100.0 * correct / total
                 test_accuracy_array[index_dataset, index_activation_function] = accuracy
-                print(f'{dataset_name}, {activation_function}, Test accuracy: {accuracy:.2f}%')
+                print(f'{dataset_name = }, {activation_function = }, {accuracy = :.2f}%')
     df_keys_values = pd.DataFrame({'key': ['num-epochs', 'batch-size', 'lr'], 'value': [str(int(num_epochs)), str(int(batch_size)), lr]})
     df_keys_values.to_csv(join(artifacts_dir, 'keys-values.csv'))
     for dataset_name, training_loss, validation_loss in zip(dataset_name_list, training_loss_array, validation_loss_array):
