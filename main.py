@@ -14,14 +14,9 @@ from torchvision.datasets import KMNIST, MNIST, QMNIST, FashionMNIST
 from torchvision.models import mobilenet_v2
 from torchvision.utils import save_image
 
-artifacts_dir = os.getenv('ARTIFACTSDIR')
-full = os.getenv('FULL')
-plt.rcParams['font.size'] = 18
-plt.rcParams['savefig.format'] = 'pdf'
-
 
 def change_module(model, module_old, module_new):
-    for child_name, child in model.named_children():
+    for (child_name, child) in model.named_children():
         if isinstance(child, module_old):
             setattr(model, child_name, module_new())
         else:
@@ -29,6 +24,10 @@ def change_module(model, module_old, module_new):
 
 
 def main():
+    artifacts_dir = os.getenv('ARTIFACTSDIR')
+    full = os.getenv('FULL')
+    plt.rcParams['font.size'] = 18
+    plt.rcParams['savefig.format'] = 'pdf'
     dataset_list = [MNIST, FashionMNIST, KMNIST, QMNIST]
     dataset_name_list = [dataset.__name__ for dataset in dataset_list]
     activation_function_list = ['ReLU', 'ReLU6', 'SiLU']
@@ -55,14 +54,14 @@ def main():
     test_batch_size = 1000
     num_parameters = np.zeros(len(activation_function_list))
     criterion = nn.CrossEntropyLoss()
-    for index_dataset, (dataset, dataset_name, training_range, validation_range, test_range, mean_std) in enumerate(zip(dataset_list, dataset_name_list, training_range_list, validation_range_list, test_range_list, mean_std_list)):
+    for (index_dataset, (dataset, dataset_name, training_range, validation_range, test_range, mean_std)) in enumerate(zip(dataset_list, dataset_name_list, training_range_list, validation_range_list, test_range_list, mean_std_list)):
         transform = transforms.Compose([transforms.ToTensor(), transforms.Lambda(lambda x: torch.cat([x, x, x], 0)), transforms.Normalize(mean_std[0], mean_std[1])])
         training_dataset = dataset(artifacts_dir, transform=transform, download=True)
         test_dataset = dataset(artifacts_dir, train=False, transform=transform, download=True)
         training_dataloader = DataLoader(training_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(training_range))
         validation_dataloader = DataLoader(training_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(validation_range))
         test_dataloader = DataLoader(test_dataset, batch_size=test_batch_size, sampler=SubsetRandomSampler(test_range))
-        for index_activation_function, activation_function in enumerate(activation_function_list):
+        for (index_activation_function, activation_function) in enumerate(activation_function_list):
             model = mobilenet_v2().to(device)
             if activation_function == 'SiLU':
                 change_module(model, nn.ReLU6, nn.SiLU)
@@ -76,7 +75,7 @@ def main():
             for epoch in range(num_epochs):
                 training_loss_sum = 0
                 model.train()
-                for data, target in training_dataloader:
+                for (data, target) in training_dataloader:
                     data = data.to(device)
                     target = target.to(device)
                     optimizer.zero_grad()
@@ -92,7 +91,7 @@ def main():
                 correct = 0
                 total = 0
                 with torch.no_grad():
-                    for data, target in validation_dataloader:
+                    for (data, target) in validation_dataloader:
                         data = data.to(device)
                         target = target.to(device)
                         output = model(data)
@@ -120,7 +119,7 @@ def main():
             correct = 0
             total = 0
             with torch.no_grad():
-                for data, target in test_dataloader:
+                for (data, target) in test_dataloader:
                     data = data.to(device)
                     target = target.to(device)
                     output = model(data)
@@ -132,15 +131,15 @@ def main():
                 print(f'{dataset_name = }, {activation_function = }, {accuracy = :.2f}%')
     df_keys_values = pd.DataFrame({'key': ['num-epochs', 'batch-size', 'lr'], 'value': [str(int(num_epochs)), str(int(batch_size)), lr]})
     df_keys_values.to_csv(join(artifacts_dir, 'keys-values.csv'))
-    for dataset_name, training_loss, validation_loss in zip(dataset_name_list, training_loss_array, validation_loss_array):
-        _, ax = plt.subplots()
+    for (dataset_name, training_loss, validation_loss) in zip(dataset_name_list, training_loss_array, validation_loss_array):
+        (_, ax) = plt.subplots()
         plt.grid(True)
         plt.autoscale(enable=True, axis='x', tight=True)
         plt.ylim([0, 1])
         plt.xlabel('Epochs', fontsize=18)
         if dataset_name == 'MNIST':
             plt.ylabel('loss', fontsize=18)
-        for training_loss_, validation_loss_, activation_function, color in zip(training_loss, validation_loss, activation_function_list, ['b', 'orange']):
+        for (training_loss_, validation_loss_, activation_function, color) in zip(training_loss, validation_loss, activation_function_list, ['b', 'orange']):
             plt.plot(training_loss_, label=f'Training {activation_function}', color=color)
             plt.plot(validation_loss_, label=f'Validation {activation_function}', linestyle='--', color=color)
         plt.title(dataset_name)
