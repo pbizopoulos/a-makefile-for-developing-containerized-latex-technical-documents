@@ -181,7 +181,7 @@ This section provides a use case of the Makefile and also serves as a manual for
 We train, validate and test MobilenetV2 neural networks~\cite{sandler2018mobilenetv2} in PyTorch, on MNIST~\cite{lecun2010mnist}, FashionMNIST~\cite{xiao2017fashion}, KMNIST~\cite{clanuwat2018deep} and QMNIST~\cite{yadav2019cold}.
 We use the default train, validation and test datasets and compare the use of ReLU, ReLU6\cite{dahl2013improving} and SiLU\cite{elfwing2018sigmoid} activation functions in the MobilenetV2 model.
 
-Making use of the \textit{datatool} package the values of the following variables are not directly referred in the main \textit{.tex} file but they are instead read by an intermediate \textit{.tex} file created by the \textit{results code}: the number of epochs is $\DTLfetch{keys-values}{key}{num-epochs}{value}$, the batch size is $\DTLfetch{keys-values}{key}{batch-size}{value}$ and the learning rate for SGD is $\DTLfetch{keys-values}{key}{lr}{value}$.
+Making use of the \textit{datatool} package the values of the following variables are not directly referred in the main \textit{.tex} file but they are instead read by an intermediate \textit{.tex} file created by the \textit{results code}: the number of epochs is $\DTLfetch{keys-values}{key}{epochs-num}{value}$, the batch size is $\DTLfetch{keys-values}{key}{batch-size}{value}$ and the learning rate for SGD is $\DTLfetch{keys-values}{key}{lr}{value}$.
 Additionally, making use of random seed setting we consistenly get the same figures as shown in Fig.\ref{fig:loss} and Fig.\ref{fig:kernels}.
 We also use the \textit{pandas.DataFrame.to\_latex} command which automatically converts a dataframe table to a \LaTeX\ table (as shown in Table~\ref{table:table}):
 

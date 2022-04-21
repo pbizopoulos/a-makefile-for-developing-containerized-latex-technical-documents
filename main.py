@@ -9,9 +9,9 @@ from matplotlib.ticker import MaxNLocator
 from torch import nn, optim
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
-from torchvision import transforms
 from torchvision.datasets import KMNIST, MNIST, QMNIST, FashionMNIST
 from torchvision.models import mobilenet_v2
+from torchvision.transforms import Compose, Lambda, Normalize, ToTensor
 from torchvision.utils import save_image
 
 
@@ -32,12 +32,12 @@ def main():
     dataset_name_list = [dataset.__name__ for dataset in dataset_list]
     activation_function_list = ['ReLU', 'ReLU6', 'SiLU']
     mean_std_list = [((0.1307,), (0.3081,)), ((0.1307,), (0.3081,)), ((0.1307,), (0.3081,)), ((0.1307,), (0.3081,))]
-    num_epochs = 20
+    epochs_num = 20
     training_range_list = [range(50000), range(50000), range(50000), range(50000)]
     validation_range_list = [range(50000, 60000), range(50000, 60000), range(50000, 60000), range(50000, 60000)]
     test_range_list = [range(10000), range(10000), range(10000), range(10000)]
     if not full:
-        num_epochs = 2
+        epochs_num = 2
         training_range_list = [training_range[:10] for training_range in training_range_list]
         validation_range_list = [validation_range[:10] for validation_range in validation_range_list]
         test_range_list = [test_range[:10] for test_range in test_range_list]
@@ -48,31 +48,29 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     lr = 0.01
     batch_size = 64
-    training_loss_array = np.zeros((len(dataset_list), len(activation_function_list), num_epochs))
-    validation_loss_array = np.zeros((len(dataset_list), len(activation_function_list), num_epochs))
+    training_loss_array = np.zeros((len(dataset_list), len(activation_function_list), epochs_num))
+    validation_loss_array = np.zeros((len(dataset_list), len(activation_function_list), epochs_num))
     test_accuracy_array = np.zeros((len(dataset_list), len(activation_function_list)))
     test_batch_size = 1000
-    num_parameters = np.zeros(len(activation_function_list))
     criterion = nn.CrossEntropyLoss()
-    for (index_dataset, (dataset, dataset_name, training_range, validation_range, test_range, mean_std)) in enumerate(zip(dataset_list, dataset_name_list, training_range_list, validation_range_list, test_range_list, mean_std_list)):
-        transform = transforms.Compose([transforms.ToTensor(), transforms.Lambda(lambda x: torch.cat([x, x, x], 0)), transforms.Normalize(mean_std[0], mean_std[1])])
+    for (dataset_index, (dataset, dataset_name, training_range, validation_range, test_range, mean_std)) in enumerate(zip(dataset_list, dataset_name_list, training_range_list, validation_range_list, test_range_list, mean_std_list)):
+        transform = Compose([ToTensor(), Lambda(lambda x: torch.cat([x, x, x], 0)), Normalize(mean_std[0], mean_std[1])])
         training_dataset = dataset(artifacts_dir, transform=transform, download=True)
         test_dataset = dataset(artifacts_dir, train=False, transform=transform, download=True)
         training_dataloader = DataLoader(training_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(training_range))
         validation_dataloader = DataLoader(training_dataset, batch_size=batch_size, sampler=SubsetRandomSampler(validation_range))
         test_dataloader = DataLoader(test_dataset, batch_size=test_batch_size, sampler=SubsetRandomSampler(test_range))
-        for (index_activation_function, activation_function) in enumerate(activation_function_list):
+        for (activation_function_index, activation_function) in enumerate(activation_function_list):
             model = mobilenet_v2().to(device)
             if activation_function == 'SiLU':
                 change_module(model, nn.ReLU6, nn.SiLU)
             elif activation_function == 'ReLU':
                 change_module(model, nn.ReLU6, nn.ReLU)
-            num_parameters[index_activation_function] = sum(p.numel() for p in model.parameters() if p.requires_grad)
             optimizer = optim.SGD(model.parameters(), lr=lr)
             validation_loss_best = float('inf')
-            model_filename = f'{dataset.__name__}-{activation_function}'
-            model_path = join(artifacts_dir, f'{model_filename}.pt')
-            for epoch in range(num_epochs):
+            model_file_name = f'{dataset.__name__}-{activation_function}'
+            model_file_path = join(artifacts_dir, f'{model_file_name}.pt')
+            for epoch in range(epochs_num):
                 training_loss_sum = 0
                 model.train()
                 for (data, target) in training_dataloader:
@@ -85,7 +83,7 @@ def main():
                     optimizer.step()
                     training_loss_sum += loss.item()
                 training_loss = training_loss_sum / len(training_dataloader)
-                training_loss_array[index_dataset, index_activation_function, epoch] = training_loss
+                training_loss_array[dataset_index, activation_function_index, epoch] = training_loss
                 model.eval()
                 validation_loss_sum = 0
                 correct = 0
@@ -100,22 +98,22 @@ def main():
                         correct += prediction.eq(target.view_as(prediction)).sum().item()
                         total += output.shape[0]
                 validation_loss = validation_loss_sum / len(validation_dataloader)
-                validation_loss_array[index_dataset, index_activation_function, epoch] = validation_loss
+                validation_loss_array[dataset_index, activation_function_index, epoch] = validation_loss
                 accuracy = 100.0 * correct / total
-                print(f'{dataset_name = }, {activation_function = }, {epoch = }, {validation_loss = :.4f}, {accuracy = :.2f}%')
+                print(f'{dataset_name=}, {activation_function=}, {epoch=}, {validation_loss=:.4f}, {accuracy=:.2f}%')
                 if validation_loss < validation_loss_best:
                     validation_loss_best = validation_loss
-                    torch.save(model.state_dict(), model_path)
+                    torch.save(model.state_dict(), model_file_path)
                     print('Saving as best model.')
             model = mobilenet_v2().to(device)
             if activation_function == 'SiLU':
                 change_module(model, nn.ReLU6, nn.SiLU)
             elif activation_function == 'ReLU':
                 change_module(model, nn.ReLU6, nn.ReLU)
-            model.load_state_dict(torch.load(model_path))
+            model.load_state_dict(torch.load(model_file_path))
             model.eval()
             kernels = model.features[0][0].weight.detach().clone()
-            save_image(kernels[:25], join(artifacts_dir, f'{model_filename}-kernels.pdf'), padding=1, nrow=5, normalize=True)
+            save_image(kernels[:25], join(artifacts_dir, f'{model_file_name}-kernels.pdf'), padding=1, nrow=5, normalize=True)
             correct = 0
             total = 0
             with torch.no_grad():
@@ -127,10 +125,10 @@ def main():
                     correct += prediction.eq(target.view_as(prediction)).sum().item()
                     total += output.shape[0]
                 accuracy = 100.0 * correct / total
-                test_accuracy_array[index_dataset, index_activation_function] = accuracy
-                print(f'{dataset_name = }, {activation_function = }, {accuracy = :.2f}%')
-    df_keys_values = pd.DataFrame({'key': ['num-epochs', 'batch-size', 'lr'], 'value': [str(int(num_epochs)), str(int(batch_size)), lr]})
-    df_keys_values.to_csv(join(artifacts_dir, 'keys-values.csv'))
+                test_accuracy_array[dataset_index, activation_function_index] = accuracy
+                print(f'{dataset_name=}, {activation_function=}, {accuracy=:.2f}%')
+    keys_values_df = pd.DataFrame({'key': ['epochs-num', 'batch-size', 'lr'], 'value': [str(int(epochs_num)), str(int(batch_size)), lr]})
+    keys_values_df.to_csv(join(artifacts_dir, 'keys-values.csv'))
     for (dataset_name, training_loss, validation_loss) in zip(dataset_name_list, training_loss_array, validation_loss_array):
         (_, ax) = plt.subplots()
         plt.grid(True)
