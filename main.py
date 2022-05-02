@@ -1,11 +1,6 @@
-import os
-from os.path import join
-
-import numpy as np
-import pandas as pd
-import torch
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
+from os.path import join
 from torch import nn, optim
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
@@ -13,6 +8,10 @@ from torchvision.datasets import KMNIST, MNIST, QMNIST, FashionMNIST
 from torchvision.models import mobilenet_v2
 from torchvision.transforms import Compose, Lambda, Normalize, ToTensor
 from torchvision.utils import save_image
+import numpy as np
+import os
+import pandas as pd
+import torch
 
 
 def change_module(model, module_old, module_new):
@@ -100,11 +99,9 @@ def main():
                 validation_loss = validation_loss_sum / len(validation_dataloader)
                 validation_loss_array[dataset_index, activation_function_index, epoch] = validation_loss
                 accuracy = 100.0 * correct / total
-                print(f'{dataset_name=}, {activation_function=}, {epoch=}, {validation_loss=:.4f}, {accuracy=:.2f}%')
                 if validation_loss < validation_loss_best:
                     validation_loss_best = validation_loss
                     torch.save(model.state_dict(), model_file_path)
-                    print('Saving as best model.')
             model = mobilenet_v2().to(device)
             if activation_function == 'SiLU':
                 change_module(model, nn.ReLU6, nn.SiLU)
@@ -126,7 +123,6 @@ def main():
                     total += output.shape[0]
                 accuracy = 100.0 * correct / total
                 test_accuracy_array[dataset_index, activation_function_index] = accuracy
-                print(f'{dataset_name=}, {activation_function=}, {accuracy=:.2f}%')
     keys_values_df = pd.DataFrame({'key': ['epochs-num', 'batch-size', 'lr'], 'value': [str(int(epochs_num)), str(int(batch_size)), lr]})
     keys_values_df.to_csv(join(artifacts_dir, 'keys-values.csv'))
     for (dataset_name, training_loss, validation_loss) in zip(dataset_name_list, training_loss_array, validation_loss_array):
