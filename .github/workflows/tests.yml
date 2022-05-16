@@ -16,4 +16,3 @@ jobs:
           touch ms.tex
           make
           cmp artifacts/ms.pdf artifacts/ms-first-run.pdf
-          sha256sum artifacts/ms.pdf >> $GITHUB_STEP_SUMMARY
