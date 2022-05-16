@@ -1,5 +1,6 @@
 \documentclass[journal]{IEEEtran}
 \usepackage[caption=false,font=footnotesize]{subfig}
+\usepackage[nopdftrailerid=true]{pdfprivacy}
 \usepackage{booktabs}
 \usepackage{datatool}
 \usepackage{listings}
@@ -13,7 +14,7 @@
 \lstdefinestyle{lststyle}{basicstyle=\tt\footnotesize, captionpos=b, frame=single}
 
 \begin{document}
-\DTLloaddb{keys-values}{artifacts/keys-values.csv}
+\DTLloaddb{keys-values}{python/artifacts/keys-values.csv}
 
 \title{A Makefile for Developing Containerized \LaTeX\ Technical Documents}
 
@@ -70,9 +71,9 @@ For the rest of the paper we will refer to:
 				\node[draw, rounded corners, dashed, fill=gray!80, inner sep=2pt, fit=(py) (requirements)](code){};
 				\node[draw, rounded corners, dashed, fill=gray!80, inner sep=2pt, fit=(tex) (bib)](document){};
 			\end{scope}
-			\node[draw, right=1.5cm of code, fill=green!20] (results) {artifacts/results};
+			\node[draw, right=1.5cm of code, fill=green!20] (results) {python/artifacts/results};
 			\path[draw, ->] (code) -- (results);
-			\node[draw, right=4cm of document, fill=green!20] (pdf) {artifacts/ms.pdf};
+			\node[draw, right=4cm of document, fill=green!20] (pdf) {python/artifacts/ms.pdf};
 			\path[draw, ->] (results) |- (pdf);
 			\path[draw, ->] (document) -- (pdf);
 	\end{tikzpicture}
@@ -186,20 +187,20 @@ Additionally, making use of random seed setting we consistenly get the same figu
 We also use the \textit{pandas.DataFrame.to\_latex} command which automatically converts a dataframe table to a \LaTeX\ table (as shown in Table~\ref{table:table}):
 
 \begin{figure}[!t]
-	\subfloat{\includegraphics[width=0.5\columnwidth]{artifacts/MNIST-loss.pdf}}
-	\subfloat{\includegraphics[width=0.5\columnwidth]{artifacts/FashionMNIST-loss.pdf}}
+	\subfloat{\includegraphics[width=0.5\columnwidth]{python/artifacts/MNIST-loss.pdf}}
+	\subfloat{\includegraphics[width=0.5\columnwidth]{python/artifacts/FashionMNIST-loss.pdf}}
 	\\
-	\subfloat{\includegraphics[width=0.5\columnwidth]{artifacts/KMNIST-loss.pdf}}
-	\subfloat{\includegraphics[width=0.5\columnwidth]{artifacts/QMNIST-loss.pdf}}
+	\subfloat{\includegraphics[width=0.5\columnwidth]{python/artifacts/KMNIST-loss.pdf}}
+	\subfloat{\includegraphics[width=0.5\columnwidth]{python/artifacts/QMNIST-loss.pdf}}
 	\caption{Comparison of the train and validation loss of MobilenetV2 with ReLU, ReLU6 and SiLU for all datasets.}\label{fig:loss}
 \end{figure}
 
 \begin{figure}[!t]
-	\subfloat{\includegraphics[width=0.5\columnwidth]{artifacts/MNIST-ReLU-kernels.pdf}}
-	\subfloat{\includegraphics[width=0.5\columnwidth]{artifacts/FashionMNIST-ReLU-kernels.pdf}}
+	\subfloat{\includegraphics[width=0.5\columnwidth]{python/artifacts/MNIST-ReLU-kernels.pdf}}
+	\subfloat{\includegraphics[width=0.5\columnwidth]{python/artifacts/FashionMNIST-ReLU-kernels.pdf}}
 	\\
-	\subfloat{\includegraphics[width=0.5\columnwidth]{artifacts/KMNIST-ReLU-kernels.pdf}}
-	\subfloat{\includegraphics[width=0.5\columnwidth]{artifacts/QMNIST-ReLU-kernels.pdf}}
+	\subfloat{\includegraphics[width=0.5\columnwidth]{python/artifacts/KMNIST-ReLU-kernels.pdf}}
+	\subfloat{\includegraphics[width=0.5\columnwidth]{python/artifacts/QMNIST-ReLU-kernels.pdf}}
 	\caption{The first 25 kernels of the first convolutional layer of MobilenetV2 with ReLU for MNIST (upper-left), FashionMNIST (upper-right), KMNIST (lower-left) and QMNIST (lower-right).}\label{fig:kernels}
 \end{figure}
 
@@ -207,7 +208,7 @@ We also use the \textit{pandas.DataFrame.to\_latex} command which automatically 
 	\centering
 	\caption{MobilenetV2 test dataset accuracies.}\label{table:table}
 	\setlength\tabcolsep{4pt}
-	\input{artifacts/metrics.tex}
+	\input{python/artifacts/metrics.tex}
 \end{table}
 
 \section{Discussion}

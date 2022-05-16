@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
+from os import environ
 from os.path import join
 from torch import nn, optim
 from torch.utils.data import DataLoader
@@ -9,7 +10,6 @@ from torchvision.models import mobilenet_v2
 from torchvision.transforms import Compose, Lambda, Normalize, ToTensor
 from torchvision.utils import save_image
 import numpy as np
-import os
 import pandas as pd
 import torch
 
@@ -23,8 +23,8 @@ def change_module(model, module_old, module_new):
 
 
 def main():
-    artifacts_dir = os.getenv('ARTIFACTSDIR')
-    full = os.getenv('FULL')
+    artifacts_dir = environ['ARTIFACTSDIR']
+    full = environ['FULL']
     plt.rcParams['font.size'] = 18
     plt.rcParams['savefig.format'] = 'pdf'
     dataset_list = [MNIST, FashionMNIST, KMNIST, QMNIST]
