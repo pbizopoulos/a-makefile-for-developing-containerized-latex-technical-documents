@@ -14,12 +14,12 @@ import pandas as pd
 import torch
 
 
-def change_module(model, module_old, module_new):
+def change_module(model, module_new, module_old):
     for (child_name, child) in model.named_children():
         if isinstance(child, module_old):
             setattr(model, child_name, module_new())
         else:
-            change_module(child, module_old, module_new)
+            change_module(child, module_new, module_old)
 
 
 def main():
@@ -62,9 +62,9 @@ def main():
         for (activation_function_index, activation_function) in enumerate(activation_function_list):
             model = mobilenet_v2().to(device)
             if activation_function == 'SiLU':
-                change_module(model, nn.ReLU6, nn.SiLU)
+                change_module(model, nn.SiLU, nn.ReLU6)
             elif activation_function == 'ReLU':
-                change_module(model, nn.ReLU6, nn.ReLU)
+                change_module(model, nn.ReLU, nn.ReLU6)
             optimizer = optim.SGD(model.parameters(), lr=lr)
             validation_loss_best = float('inf')
             model_file_name = f'{dataset.__name__}-{activation_function}'
@@ -104,9 +104,9 @@ def main():
                     torch.save(model.state_dict(), model_file_path)
             model = mobilenet_v2().to(device)
             if activation_function == 'SiLU':
-                change_module(model, nn.ReLU6, nn.SiLU)
+                change_module(model, nn.SiLU, nn.ReLU6)
             elif activation_function == 'ReLU':
-                change_module(model, nn.ReLU6, nn.ReLU)
+                change_module(model, nn.ReLU, nn.ReLU6)
             model.load_state_dict(torch.load(model_file_path))
             model.eval()
             kernels = model.features[0][0].weight.detach().clone()
