@@ -23,5 +23,5 @@ jobs:
         uses: actions/checkout@v3
       - name: Test
         run: |
-          sudo apt-get install -y ksh yash zsh bmake
+          sudo apt-get install -y ash ksh posh yash zsh bmake
           bash makefile-tests.sh
