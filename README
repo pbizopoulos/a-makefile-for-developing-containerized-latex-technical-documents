@@ -1,0 +1,19 @@
+A Makefile for Developing Containerized LaTeX Technical Documents:
+- https://arxiv.org/abs/2005.12660
+
+Requirements:
+- POSIX compliant shell (ash, bash, dash, ksh, posh, yash or zsh)
+- Git (Any version)
+- Make (bmake or GNU Make)
+- Docker (Any version or >= 19.03 for NVIDIA Container Toolkit)
+- [Optional] NVIDIA Container Toolkit
+
+Preparation:
+git clone https://github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents
+cd a-makefile-for-developing-containerized-latex-technical-documents/
+sudo systemctl start docker
+
+Basic usage:
+make -C python/ && make	# Generate draft python and tex artifacts.
+make -C python/ help	# Show all python commands.
+make help		# Show all tex commands.
