@@ -34,8 +34,8 @@ $(artifacts_dir)/code-format: $(artifacts_dir) $(code_file_name) ## Format $(cod
 		--workdir $(work_dir)/ \
 		python /bin/bash -c '\
 		python3 -m pip install --no-cache-dir --upgrade pip && \
-		python3 -m pip install --no-cache-dir https://github.com/pbizopoulos/source-code-normalizer/archive/main.zip && \
-		$(artifacts_dir)/.local/bin/source_code_normalizer $(code_file_name) > $(artifacts_dir)/tmp.py && \
+		python3 -m pip install --no-cache-dir https://github.com/pbizopoulos/source-code-simplifier/archive/main.zip && \
+		$(artifacts_dir)/.local/bin/source_code_simplifier $(code_file_name) > $(artifacts_dir)/tmp.py && \
 		mv $(artifacts_dir)/tmp.py $(code_file_name)'
 	touch $(artifacts_dir)/code-format
 

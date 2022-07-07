@@ -5,7 +5,7 @@ from os.path import join
 from torch import nn, optim
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
-from torchvision.datasets import KMNIST, MNIST, QMNIST, FashionMNIST
+from torchvision.datasets import FashionMNIST, KMNIST, MNIST, QMNIST
 from torchvision.models import mobilenet_v2
 from torchvision.transforms import Compose, Lambda, Normalize, ToTensor
 from torchvision.utils import save_image
