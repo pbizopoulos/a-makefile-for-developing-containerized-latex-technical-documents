@@ -12,7 +12,6 @@ git clone https://github.com/pbizopoulos/a-makefile-for-developing-containerized
 cd a-makefile-for-developing-containerized-latex-technical-documents/
 sudo systemctl start docker
 
-# Basic usage
-make -C python/ && make	# Generate draft python and tex artifacts.
-make -C python/ help	# Show all python commands.
-make help		# Show all tex commands.
+# Usage
+make help -C python/	# Show help for python.
+make help		# Show help for tex.

@@ -23,7 +23,6 @@ def change_module(model, module_new, module_old):
 
 
 def main():
-    artifacts_dir = environ['ARTIFACTS_DIR']
     full = environ['FULL']
     plt.rcParams['font.size'] = 18
     plt.rcParams['savefig.format'] = 'pdf'
@@ -54,8 +53,8 @@ def main():
     cross_entropy_loss = nn.CrossEntropyLoss()
     for (dataset_index, (dataset, dataset_name, range_training, range_validation, test_range, std_mean)) in enumerate(zip(dataset_list, dataset_name_list, range_training_list, range_validation_list, test_range_list, std_mean_list)):
         transform = Compose([ToTensor(), Lambda(lambda tensor: torch.cat([tensor, tensor, tensor], 0)), Normalize(std_mean[0], std_mean[1])])
-        dataset_training = dataset(artifacts_dir, transform=transform, download=True)
-        dataset_test = dataset(artifacts_dir, train=False, transform=transform, download=True)
+        dataset_training = dataset('bin', transform=transform, download=True)
+        dataset_test = dataset('bin', train=False, transform=transform, download=True)
         dataloader_training = DataLoader(dataset_training, batch_size=batch_size, sampler=SubsetRandomSampler(range_training))
         dataloader_validation = DataLoader(dataset_training, batch_size=batch_size, sampler=SubsetRandomSampler(range_validation))
         dataloader_test = DataLoader(dataset_test, batch_size=batch_size_test, sampler=SubsetRandomSampler(test_range))
@@ -68,7 +67,7 @@ def main():
             optimizer = optim.SGD(model.parameters(), lr=lr)
             loss_validation_best = float('inf')
             model_file_name = f'{dataset.__name__}-{activation_function_name}'
-            model_file_path = join(artifacts_dir, f'{model_file_name}.pt')
+            model_file_path = join('bin', f'{model_file_name}.pt')
             for epoch in range(epochs_num):
                 loss_training_sum = 0
                 predictions_num = 0
@@ -107,7 +106,7 @@ def main():
                 change_module(model, nn.ReLU, nn.ReLU6)
             model.load_state_dict(torch.load(model_file_path))
             kernels = model.features[0][0].weight.detach().clone()
-            save_image(kernels[:25], join(artifacts_dir, f'{model_file_name}-kernels.pdf'), padding=1, nrow=5, normalize=True)
+            save_image(kernels[:25], join('bin', f'{model_file_name}-kernels.pdf'), padding=1, nrow=5, normalize=True)
             predictions_correct_num = 0
             predictions_num = 0
             model.eval()
@@ -121,7 +120,7 @@ def main():
                     predictions_num += output.shape[0]
                 accuracy_test_array[dataset_index, activation_function_name_index] = 100.0 * predictions_correct_num / predictions_num
     keys_values_df = pd.DataFrame({'key': ['epochs-num', 'batch-size', 'lr'], 'value': [str(int(epochs_num)), str(int(batch_size)), lr]})
-    keys_values_df.to_csv(join(artifacts_dir, 'keys-values.csv'))
+    keys_values_df.to_csv(join('bin', 'keys-values.csv'))
     for (dataset_name, loss_training, loss_validation) in zip(dataset_name_list, loss_training_array, loss_validation_array):
         (_, ax) = plt.subplots()
         plt.grid(True)
@@ -138,12 +137,12 @@ def main():
         ax.tick_params(axis='both', which='minor', labelsize='large')
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.legend()
-        plt.savefig(join(artifacts_dir, f'{dataset_name}-loss'), bbox_inches='tight')
+        plt.savefig(join('bin', f'{dataset_name}-loss'), bbox_inches='tight')
         plt.close()
     styler = pd.DataFrame(accuracy_test_array.T, index=activation_function_name_list, columns=dataset_name_list).style
     styler.format(precision=2)
     styler.highlight_max(props='bfseries: ;')
-    styler.to_latex(join(artifacts_dir, 'metrics.tex'), hrules=True)
+    styler.to_latex(join('bin', 'metrics.tex'), hrules=True)
 
 
 if __name__ == '__main__':
