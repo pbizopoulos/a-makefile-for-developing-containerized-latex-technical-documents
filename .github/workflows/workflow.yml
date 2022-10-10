@@ -6,11 +6,11 @@ jobs:
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v3
-      - name: Check code
+      - name: Check code.
         run: |
           make -C python/ check
           make check
-      - name: Test binary reproducibility
+      - name: Test binaries reproducibility.
         run: |
           make -C python/ && make && cp bin/ms.pdf bin/ms-first-run.pdf
           touch python/main.py ms.tex
@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v3
-      - name: Test Makefile
+      - name: Test Makefile.
         run: |
           sudo apt-get install -y ash ksh posh yash zsh bmake
           bash makefile-tests.sh
