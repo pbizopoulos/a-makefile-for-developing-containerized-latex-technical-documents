@@ -23,7 +23,6 @@ def change_module(model, module_new, module_old):
 
 
 def main():
-    debug = environ['debug']
     plt.rcParams['font.size'] = 18
     plt.rcParams['savefig.format'] = 'pdf'
     dataset_list = [MNIST, FashionMNIST, KMNIST, QMNIST]
@@ -34,7 +33,7 @@ def main():
     range_training_list = [range(50000), range(50000), range(50000), range(50000)]
     range_validation_list = [range(50000, 60000), range(50000, 60000), range(50000, 60000), range(50000, 60000)]
     test_range_list = [range(10000), range(10000), range(10000), range(10000)]
-    if debug:
+    if environ['debug'] == '1':
         epochs_num = 2
         range_training_list = [range_training[:10] for range_training in range_training_list]
         range_validation_list = [range_validation[:10] for range_validation in range_validation_list]
