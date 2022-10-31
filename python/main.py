@@ -33,7 +33,7 @@ def main():
     range_training_list = [range(50000), range(50000), range(50000), range(50000)]
     range_validation_list = [range(50000, 60000), range(50000, 60000), range(50000, 60000), range(50000, 60000)]
     test_range_list = [range(10000), range(10000), range(10000), range(10000)]
-    if environ['debug'] == '1':
+    if environ['DEBUG'] == '1':
         epochs_num = 2
         range_training_list = [range_training[:10] for range_training in range_training_list]
         range_validation_list = [range_validation[:10] for range_validation in range_validation_list]
