@@ -15,7 +15,7 @@ import torch
 
 
 def change_module(model, module_new, module_old):
-    for (child_name, child) in model.named_children():
+    for child_name, child in model.named_children():
         if isinstance(child, module_old):
             setattr(model, child_name, module_new())
         else:
@@ -50,14 +50,14 @@ def main():
     accuracy_test_array = np.zeros((len(dataset_list), len(activation_function_name_list)))
     batch_size_test = 1000
     cross_entropy_loss = nn.CrossEntropyLoss()
-    for (dataset_index, (dataset, dataset_name, range_training, range_validation, test_range, std_mean)) in enumerate(zip(dataset_list, dataset_name_list, range_training_list, range_validation_list, test_range_list, std_mean_list)):
+    for dataset_index, (dataset, dataset_name, range_training, range_validation, test_range, std_mean) in enumerate(zip(dataset_list, dataset_name_list, range_training_list, range_validation_list, test_range_list, std_mean_list)):
         transform = Compose([ToTensor(), Lambda(lambda tensor: torch.cat([tensor, tensor, tensor], 0)), Normalize(std_mean[0], std_mean[1])])
         dataset_training = dataset('bin', transform=transform, download=True)
         dataset_test = dataset('bin', train=False, transform=transform, download=True)
         dataloader_training = DataLoader(dataset_training, batch_size=batch_size, sampler=SubsetRandomSampler(range_training))
         dataloader_validation = DataLoader(dataset_training, batch_size=batch_size, sampler=SubsetRandomSampler(range_validation))
         dataloader_test = DataLoader(dataset_test, batch_size=batch_size_test, sampler=SubsetRandomSampler(test_range))
-        for (activation_function_name_index, activation_function_name) in enumerate(activation_function_name_list):
+        for activation_function_name_index, activation_function_name in enumerate(activation_function_name_list):
             model = mobilenet_v2().to(device)
             if activation_function_name == 'SiLU':
                 change_module(model, nn.SiLU, nn.ReLU6)
@@ -71,7 +71,7 @@ def main():
                 loss_training_sum = 0
                 predictions_num = 0
                 model.train()
-                for (data, target) in dataloader_training:
+                for data, target in dataloader_training:
                     data = data.to(device)
                     target = target.to(device)
                     output = model(data)
@@ -87,7 +87,7 @@ def main():
                 predictions_num = 0
                 model.eval()
                 with torch.no_grad():
-                    for (data, target) in dataloader_validation:
+                    for data, target in dataloader_validation:
                         data = data.to(device)
                         target = target.to(device)
                         output = model(data)
@@ -110,7 +110,7 @@ def main():
             predictions_num = 0
             model.eval()
             with torch.no_grad():
-                for (data, target) in dataloader_test:
+                for data, target in dataloader_test:
                     data = data.to(device)
                     target = target.to(device)
                     output = model(data)
@@ -120,15 +120,15 @@ def main():
                 accuracy_test_array[dataset_index, activation_function_name_index] = 100.0 * predictions_correct_num / predictions_num
     keys_values_df = pd.DataFrame({'key': ['epochs-num', 'batch-size', 'lr'], 'value': [str(int(epochs_num)), str(int(batch_size)), lr]})
     keys_values_df.to_csv(join('bin', 'keys-values.csv'))
-    for (dataset_name, loss_training, loss_validation) in zip(dataset_name_list, loss_training_array, loss_validation_array):
-        (_, ax) = plt.subplots()
+    for dataset_name, loss_training, loss_validation in zip(dataset_name_list, loss_training_array, loss_validation_array):
+        _, ax = plt.subplots()
         plt.grid(True)
         plt.autoscale(enable=True, axis='x', tight=True)
         plt.ylim([0, 1])
         plt.xlabel('Epochs', fontsize=18)
         if dataset_name == 'MNIST':
             plt.ylabel('loss', fontsize=18)
-        for (loss_training_, loss_validation_, activation_function_name, color) in zip(loss_training, loss_validation, activation_function_name_list, ['b', 'orange']):
+        for loss_training_, loss_validation_, activation_function_name, color in zip(loss_training, loss_validation, activation_function_name_list, ['b', 'orange']):
             plt.plot(loss_training_, label=f'Training {activation_function_name}', color=color)
             plt.plot(loss_validation_, label=f'Validation {activation_function_name}', linestyle='--', color=color)
         plt.title(dataset_name)
