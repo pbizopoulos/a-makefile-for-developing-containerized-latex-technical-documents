@@ -8,8 +8,9 @@ jobs:
         uses: actions/checkout@v3
       - name: Check code and build binaries for python.
         run: |
-          make -C python/ check
-          make -C python/
+          cd python/
+          make check
+          make
       - name: Check code and build binaries for tex.
         run: |
           make check
@@ -18,8 +19,9 @@ jobs:
         run: |
           cp bin/ms.pdf bin/ms-first-run.pdf
           touch python/main.py ms.tex
-          make -C python/
+          cd python/
           make
+          cd ..
           cmp bin/ms.pdf bin/ms-first-run.pdf
   make-test:
     runs-on: ubuntu-20.04

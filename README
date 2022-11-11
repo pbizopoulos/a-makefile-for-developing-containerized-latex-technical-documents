@@ -12,5 +12,5 @@ git clone https://github.com/pbizopoulos/a-makefile-for-developing-containerized
 cd a-makefile-for-developing-containerized-latex-technical-documents/
 
 # Usage
-make -C python/	help	# Show help for python.
+cd python/ && make help	# Show help for python.
 make help		# Show help for tex.
