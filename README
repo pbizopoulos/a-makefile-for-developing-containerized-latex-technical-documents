@@ -7,10 +7,7 @@ Make
 Docker (>= 19.03 for NVIDIA Container Toolkit)
 NVIDIA Container Toolkit (Optional)
 
-# Preparation
+# Build
 git clone https://github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents
 cd a-makefile-for-developing-containerized-latex-technical-documents/
-
-# Usage
-cd python/ && make help	# Show help for python.
-make help		# Show help for tex.
+cd python/ && make DEBUG=0 && cd .. && make DEBUG=0
