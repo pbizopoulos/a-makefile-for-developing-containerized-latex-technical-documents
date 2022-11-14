@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -o errexit
 
 # Requirements: ash, bash, dash, ksh, posh, yash, zsh, bmake and make
