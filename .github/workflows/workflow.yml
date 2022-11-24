@@ -6,29 +6,14 @@ jobs:
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v3
-      - name: Check code and build binaries for python.
+      - name: Check code and build
         run: |
-          cd python/
-          make check
-          make
-      - name: Check code and build binaries for tex.
-        run: |
-          make check
-          make
-      - name: Test binaries reproducibility.
+          cd python/ && make check all && cd ..
+          make check all
+      - name: Test binaries reproducibility
         run: |
           cp bin/ms.pdf bin/ms-first-run.pdf
           touch python/main.py ms.tex
-          cd python/
+          cd python/ && make && cd ..
           make
-          cd ..
           cmp bin/ms.pdf bin/ms-first-run.pdf
-  make-test:
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Set up Git repository
-        uses: actions/checkout@v3
-      - name: Test Makefile.
-        run: |
-          sudo apt-get install -y ash ksh posh yash zsh bmake
-          bash makefile-tests.sh
