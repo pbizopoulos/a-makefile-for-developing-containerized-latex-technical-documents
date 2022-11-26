@@ -9,6 +9,7 @@ from torchvision.datasets import FashionMNIST, KMNIST, MNIST, QMNIST
 from torchvision.models import mobilenet_v2
 from torchvision.transforms import Compose, Lambda, Normalize, ToTensor
 from torchvision.utils import save_image
+import hashlib
 import numpy as np
 import pandas as pd
 import torch
@@ -142,6 +143,9 @@ def main():
     styler.format(precision=2)
     styler.highlight_max(props='bfseries: ;')
     styler.to_latex(join('bin', 'metrics.tex'), hrules=True)
+    if environ['DEBUG'] == '1':
+        with open(join('bin', 'metrics.tex'), 'rb') as file:
+            assert hashlib.sha256(file.read()).hexdigest() == 'aaec2ea032278b725dfdc212b2ce40c120b1a76c077b1bf7f9c7e5a50216f6e1'
 
 
 if __name__ == '__main__':
