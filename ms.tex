@@ -27,8 +27,9 @@
 \end{abstract}
 
 \section{Introduction}
-Action is ...
-Principle of least action is ...
+Action is this.
+Principle of least action is that.
+So this is a sentence.
 
 \section{Action and software development}
 The principle of least action can be used throughout all decision of a software project.
@@ -50,7 +51,7 @@ present the design and implementation of fswm, then the Makefile for python and 
 creating a program (the target) sometimes requires creating tools (as intermediate targets) that can be use to reduce the development time (the path length to the target)
 it is not just about minimizing time or being completely accurate in satisfying the requirements. A combination of these is required
 the path to the target is the source code which can be evaluated with make check. The path should fulfill the needs of the developers and can change
-the target is the the final program which can be reached with make. The target should fulfill the needs of the users and can change
+the target is the final program which can be reached with make. The target should fulfill the needs of the users and can change
 both users and developers want to reduce their relative action. Balance is achieved at a point
 
 \section{Development environment/tools}
@@ -68,9 +69,9 @@ although we could have a target regarding downloading external data this makes t
 consistency across time from the developer perspective means that the technology used to program it will be available in the future
 consistency across time from the user perspective practically means that the program should be finished from the point of view of features and only bug fixes might be developed
 makes use of pre-existing standards: GNU standard for Makefile conventions and POSIX for the use of UNIX tools
-the portability of the Makefile is achieved by using the mandatory UNIX utilities also mentioned by the GNU standard with the exception of docker or npm where needed
+the portability of the Makefile is achieved by using the mandatory UNIX utilities also mentioned by the GNU standard except for docker where needed
 there is an inverse relationship between consistency and configurability
-think about that I have used subsets of standards
+think about that subsets of standards have been used
 time includes user interation to reach the target and total development time (including maintainance)
 users care about the program, developers care about the code
 we define a target of reducing the time required to create and navigate windows in a computing environment
@@ -92,7 +93,7 @@ the concept of tiling window managers is oriented towards multitasking
 the key shortcuts of a window manager should be predictable by resembling as close as possible most other window managers and development environemnts
 the need to be portable across different keyboards demands the use of an additional requirement (xcb-util-keysyms)
 the set of functionalities that should be integrated to a window manager are: Enter next/previous window and open program in new window
-the windows could be easily represented as a cyclic doubly linked list
+the windows could be represented as a cyclic doubly linked list
 thus C89 was chosen for optimal portability and xcb as the main library
 an additional advantage of non-configurability is that the program is ready to be used when installed
 
@@ -103,7 +104,7 @@ We use the default train, validation and test datasets and compare the use of Re
 
 Making use of the \textit{datatool} package the values of the following variables are not directly referred in the main \textit{.tex} file but they are instead read by an intermediate \textit{.tex} file created by the \textit{results code}: the number of epochs is $\DTLfetch{keys-values}{key}{epochs-num}{value}$, the batch size is $\DTLfetch{keys-values}{key}{batch-size}{value}$ and the learning rate for SGD is $\DTLfetch{keys-values}{key}{lr}{value}$.
 Additionally, making use of random seed setting we consistenly get the same figures as shown in Fig.\ref{fig:loss} and Fig.\ref{fig:kernels}.
-We also use the \textit{pandas.DataFrame.to\_latex} command which automatically converts a dataframe table to a \LaTeX\ table (as shown in Table~\ref{table:table}):
+We also use the \textit{to\_latex} command which automatically converts a dataframe table to a \LaTeX\ table (as shown in Table~\ref{table:table}):
 
 \begin{figure}[!t]
 	\subfloat{\includegraphics[width=0.5\columnwidth]{python/bin/MNIST-loss.pdf}}
@@ -139,7 +140,7 @@ Use cases of the Makefile include:
 \begin{itemize}
 	\item regression testing and debugging, to ensure that changes to \textit{code} do not alter \textit{results},
 	\item common development environment across multiple \textit{authors},
-	\item coauthors, reviewers, journal editors or other researchers can easily reproduce the \textit{document} with few requirements.
+	\item coauthors, reviewers, journal editors or other researchers can reproduce the \textit{document} with few requirements.
 \end{itemize}
 
 \section*{Conclusion}
