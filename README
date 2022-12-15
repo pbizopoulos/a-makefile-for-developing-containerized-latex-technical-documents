@@ -10,5 +10,4 @@ NVIDIA Container Toolkit (Optional)
 # Check code and build
 git clone https://github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents
 cd a-makefile-for-developing-containerized-latex-technical-documents/
-cd python/ && make check all && cd ..
 make check all

@@ -1,18 +1,7 @@
 \documentclass[journal]{IEEEtran}
-\usepackage[caption=false,font=footnotesize]{subfig}
 \usepackage[nopdftrailerid=true]{pdfprivacy}
-\usepackage{booktabs}
-\usepackage{datatool}
-\usepackage{listings}
-\usepackage{tikz}
-\usetikzlibrary{positioning}
-\usetikzlibrary{trees}
-\usetikzlibrary{fit}
-\usetikzlibrary{backgrounds}
-\usepackage{hyperref}
 
 \begin{document}
-\DTLloaddb{keys-values}{python/bin/keys-values.csv}
 
 \title{Principle of least action as a software development method}
 
@@ -30,6 +19,7 @@
 Action is this.
 Principle of least action is that.
 So this is a sentence.
+Software development practices like agile~\cite{abrahamsson2017agile}.
 
 \section{Action and software development}
 The principle of least action can be used throughout all decision of a software project.
@@ -77,6 +67,8 @@ users care about the program, developers care about the code
 we define a target of reducing the time required to create and navigate windows in a computing environment
 we use Makefile to create the isolated environment (container) by bootstraping all required files if not already present and to make sure that subsequent changes to the requirements update the environment. The DAG should be as project agnostic as possible thus sentinel files are used
 we use these specific targets for the Makefile (all, check, clean, help) because the first three are standard targets recommended by GNU standard targets and the fourth one is used in the linux kernel
+The Makefile is only responsible for install the requirements inside the container.
+The specific command arguments that e.g. check applications take should be done outside of the container to prevent the cache invalidation of the container.
 
 \section{Various}
 semantic html is a standard. And standards should be used if no personal opinion is required in the subject.
@@ -99,37 +91,9 @@ an additional advantage of non-configurability is that the program is ready to b
 
 \section{Example use case: technical document}
 This section provides a use case of the Makefile and also serves as a manual for developing using this method.
-We train, validate and test MobilenetV2 neural networks~\cite{sandler2018mobilenetv2} in PyTorch, on MNIST~\cite{lecun2010mnist}, FashionMNIST~\cite{xiao2017fashion}, KMNIST~\cite{clanuwat2018deep} and QMNIST~\cite{yadav2019cold}.
-We use the default train, validation and test datasets and compare the use of ReLU, ReLU6\cite{dahl2013improving} and SiLU\cite{elfwing2018sigmoid} activation functions in the MobilenetV2 model.
-
-Making use of the \textit{datatool} package the values of the following variables are not directly referred in the main \textit{.tex} file but they are instead read by an intermediate \textit{.tex} file created by the \textit{results code}: the number of epochs is $\DTLfetch{keys-values}{key}{epochs-num}{value}$, the batch size is $\DTLfetch{keys-values}{key}{batch-size}{value}$ and the learning rate for SGD is $\DTLfetch{keys-values}{key}{lr}{value}$.
-Additionally, making use of random seed setting we consistenly get the same figures as shown in Fig.\ref{fig:loss} and Fig.\ref{fig:kernels}.
-We also use the \textit{to\_latex} command which automatically converts a dataframe table to a \LaTeX\ table (as shown in Table~\ref{table:table}):
-
-\begin{figure}[!t]
-	\subfloat{\includegraphics[width=0.5\columnwidth]{python/bin/MNIST-loss.pdf}}
-	\subfloat{\includegraphics[width=0.5\columnwidth]{python/bin/FashionMNIST-loss.pdf}}
-	\\
-	\subfloat{\includegraphics[width=0.5\columnwidth]{python/bin/KMNIST-loss.pdf}}
-	\subfloat{\includegraphics[width=0.5\columnwidth]{python/bin/QMNIST-loss.pdf}}
-	\caption{Comparison of the train and validation loss of MobilenetV2 with ReLU, ReLU6 and SiLU for all datasets.}\label{fig:loss}
-\end{figure}
-
-\begin{figure}[!t]
-	\subfloat{\includegraphics[width=0.5\columnwidth]{python/bin/MNIST-ReLU-kernels.pdf}}
-	\subfloat{\includegraphics[width=0.5\columnwidth]{python/bin/FashionMNIST-ReLU-kernels.pdf}}
-	\\
-	\subfloat{\includegraphics[width=0.5\columnwidth]{python/bin/KMNIST-ReLU-kernels.pdf}}
-	\subfloat{\includegraphics[width=0.5\columnwidth]{python/bin/QMNIST-ReLU-kernels.pdf}}
-	\caption{The first 25 kernels of the first convolutional layer of MobilenetV2 with ReLU for MNIST (upper-left), FashionMNIST (upper-right), KMNIST (lower-left) and QMNIST (lower-right).}\label{fig:kernels}
-\end{figure}
-
-\begin{table}[ht]
-	\centering
-	\caption{MobilenetV2 test dataset accuracies.}\label{table:table}
-	\setlength\tabcolsep{4pt}
-	\input{python/bin/metrics.tex}
-\end{table}
+Making use of the \textit{datatool} package the values of the following variables are not directly referred in the main \textit{.tex} file but they are instead read by an intermediate \textit{.tex} file created by the \textit{results code}.
+Additionally, making use of random seed setting we consistenly get the same figures.
+We also use the \textit{to\_latex} command which automatically converts a dataframe table to a \LaTeX\ table.
 
 \section{About the use of Make}
 The proposed Makefile is based on plain text file editing and can be used with any operating system that supports containers and Make.
