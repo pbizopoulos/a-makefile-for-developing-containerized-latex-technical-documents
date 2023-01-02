@@ -65,7 +65,6 @@ consistency across time from the user perspective practically means that the app
 makes use of pre-existing standards: GNU standard for Makefile conventions and POSIX for the use of UNIX tools
 the portability of the Makefile is achieved by using the mandatory UNIX utilities also mentioned by the GNU standard except for docker where needed
 there is an inverse relationship between consistency and configurability
-think about that subsets of standards have been used
 time includes user interation to reach the target and total development time (including maintainance)
 users care about the application, developers care about the code
 we define a target of reducing the time required to create and navigate windows in a computing environment
@@ -73,9 +72,6 @@ we use Makefile to create the isolated environment (container) by bootstraping a
 we use these specific targets for the Makefile (all, check, clean, help) because the first three are standard targets recommended by GNU standard targets and the fourth one is used in the linux kernel
 The Makefile is only responsible for install the requirements inside the container.
 The specific command arguments that e.g. check applications take should be done outside of the container to prevent the cache invalidation of the container.
-
-\section{Various}
-semantic html is a standard. And standards should be used if no personal opinion is required in the subject.
 
 \section{Variable naming}
 think prime-modifier-class naming scheme and how it relates to the action-as-information
