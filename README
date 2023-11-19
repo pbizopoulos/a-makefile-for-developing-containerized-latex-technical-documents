@@ -13,3 +13,4 @@ cd a-makefile-for-developing-containerized-latex-technical-documents/
 
 # Development
 cd latex/ && make clean check all && cd ..
+
