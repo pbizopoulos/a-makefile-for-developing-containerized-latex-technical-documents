@@ -20,12 +20,12 @@ Action is this.
 Principle of least action (PLA) is that.
 Software development practices like agile~\cite{abrahamsson2017agile}.
 
-PLA can be used throughout all software-related decisions:
+PLA can be used throughout all software-related decisions. For example:
 \begin{enumerate}
 	\item whether to use dependencies (e.g.\ libraries, frameworks) or implement a build-in solution
 	\item whether to use standards or extend/restrict/ignore them
 	\item whether to implement/drop a feature
-	\item whether to use a tool (e.g.\ text editor, IDE)
+	\item whether to use a development tool (e.g.\ text editor, IDE)
 \end{enumerate}
 
 PLA can be used for both the user and the developer across two axis: space (other machines) and time
@@ -50,6 +50,17 @@ creating an application (the target) sometimes requires creating tools (as inter
 it is not just about minimizing time or being completely accurate in satisfying the requirements. A combination of these is required
 the path to the target is the source code which can be evaluated with make check. The path should fulfill the needs of the developers and can change
 the target is the application which can be reached with make. The target should fulfill the needs of the users and can change
+
+It starts with a user requirement.
+Is it important?
+If yes then, should it be solved with software?
+If yes, then does it already exist?
+If no, then can it programmed as a feature to an existing repo?
+If no then create new repo.
+If yes, then is it a new directory in the existing repo?
+If yes then does it use an artifact of another repo?
+If yes, then make it a parent directory of the another repo.
+If no, then program the user requirement into the main.py.
 
 \section{Development environment/tools}
 Mention install-archlinux.
@@ -77,6 +88,12 @@ The specific command arguments that e.g.\ check applications take should be done
 
 \section{Variable naming}
 think prime-modifier-class naming scheme and how it relates to the action-as-information
+\begin{itemize}
+	\item Single-function repositories to a verb-noun naming convention.
+	\item Multi-function repositories are appended with -tool.
+	\item Research papers are a whole sentence.
+	\item Repositories with URL are named as the URL\@.
+\end{itemize}
 
 \section{Example use case: window manager}
 an extreme example of configurable window managers is `ricing' where the window manager is configured mostly for form and not function
@@ -107,6 +124,15 @@ Use cases of the Makefile include:
 	\item regression testing and debugging, to ensure that changes to \textit{code} do not alter \textit{results},
 	\item common development environment across multiple \textit{authors},
 	\item coauthors, reviewers, journal editors or other researchers can reproduce the \textit{document} with few requirements.
+\end{itemize}
+
+\section{Folder structure}
+\begin{itemize}
+	\item prm/: permanent data
+	\item tmp/: temporary data
+	\item main.py: code
+	\item Dockerfile: code for the environment
+	\item pyproject.toml: data for the environment
 \end{itemize}
 
 \section*{Conclusion}
