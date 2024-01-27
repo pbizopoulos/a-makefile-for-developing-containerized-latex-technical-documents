@@ -8,8 +8,8 @@ Docker
 NVIDIA Container Toolkit (Optional)
 
 # Download
-git clone https://github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents
-cd a-makefile-for-developing-containerized-latex-technical-documents/
+git clone https://github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents $HOME/github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents
+cd $HOME/github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents/
 
 # Development
 cd latex/ && make clean check all && cd ..
