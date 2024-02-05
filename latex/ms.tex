@@ -1,9 +1,11 @@
 \documentclass[journal]{IEEEtran}
+\usepackage{dirtree}
+\usepackage[boxed]{algorithm2e}
 \usepackage[nopdftrailerid=true]{pdfprivacy}
 
 \begin{document}
 
-\title{Principle of least action as a software development method}
+\title{Portable Development Methodology}
 
 \author{Paschalis~Bizopoulos
 \thanks{P. Bizopoulos is an Independent Researcher, Thessaloniki, Greece e-mail: pbizop@gmail.com}}
@@ -11,131 +13,88 @@
 \maketitle
 
 \begin{abstract}
-	This paper proposes the principle of least action as a software development method.
-	We release open source repositories of the examples use cases of this method.
+	This paper proposes a portable development methodology.
+	We release open source repositories of the examples use cases of this.
 \end{abstract}
 
 \section{Introduction}
-Action is this.
-Principle of least action (PLA) is that.
-Software development practices like agile~\cite{abrahamsson2017agile}.
+Widespread software development practices like agile~\cite{abrahamsson2017agile} are not concrete enough thus multiple versions of it exist in software development.
+This non-portability of software development practices is a lost potential in reducing software development time.
 
-PLA can be used throughout all software-related decisions. For example:
-\begin{enumerate}
-	\item whether to use dependencies (e.g.\ libraries, frameworks) or implement a build-in solution
-	\item whether to use standards or extend/restrict/ignore them
-	\item whether to implement/drop a feature
-	\item whether to use a development tool (e.g.\ text editor, IDE)
-\end{enumerate}
+In this paper we present the design and implementation of the Makefile for python and tex for document generation and then the Makefile for website creation.
 
-PLA can be used for both the user and the developer across two axis: space (other machines) and time
-\begin{enumerate}
-	\item characteristics of the user (e.g.\ technical capabilities)
-	\item characteristics of the user environment (e.g.\ Operating system)
-	\item characteristics of the developer (e.g.\ technical capabilities)
-	\item characteristics of the developer environment (e.g.\ Operating system)
-\end{enumerate}
-Choose the technologies that allow the developer to minimize the development and user path length through space (other computers) and time (in the future).
-
-Action is relative to the observer.
-The developer sees the path that corresponds to the development procedure while the user sees the path that corresponds the usage of the binary
-both developers and users want to reduce their relative action. A minimum is achieved at a point
-moreover the cost and benefits are relative to the user and developer respectively
-if the benefit is greater than the cost then it is implemented
-the benefit of achieving a target is balanced with the cost of the time required to achieve it
-
-The aim of this paper is translating the idea of action and PLA to software development and then show the implementation that uses Makefile and containers.
-Present the design and implementation of fswm, then the Makefile for python and tex for document generation and then the Makefile for website creation
-creating an application (the target) sometimes requires creating tools (as intermediate targets) that can be use to reduce the development time (the path length to the target)
-it is not just about minimizing time or being completely accurate in satisfying the requirements. A combination of these is required
-the path to the target is the source code which can be evaluated with make check. The path should fulfill the needs of the developers and can change
-the target is the application which can be reached with make. The target should fulfill the needs of the users and can change
-
-It starts with a user requirement.
-Is it important?
-If yes then, should it be solved with software?
-If yes, then does it already exist?
-If no, then can it programmed as a feature to an existing repo?
-If no then create new repo.
-If yes, then is it a new directory in the existing repo?
-If yes then does it use an artifact of another repo?
-If yes, then make it a parent directory of the another repo.
-If no, then program the user requirement into the main.py.
-
-\section{Development environment/tools}
-Mention install-archlinux.
-Mention vim etc.
-
-\section{The Makefile}
-PLA has been applied in the following aspects of the Makefile:
-\begin{itemize}
-	\item this
-	\item that
-\end{itemize}
-
-consistency across time from the developer perspective means that the technology used to program it will be available in the future
-consistency across time from the user perspective practically means that the application should be finished from the point of view of features and only bug fixes might be developed
-makes use of pre-existing standards: GNU standard for Makefile conventions and POSIX for the use of UNIX tools
-the portability of the Makefile is achieved by using the mandatory UNIX utilities also mentioned by the GNU standard except for docker where needed
-there is an inverse relationship between consistency and configurability
-time includes user interation to reach the target and total development time (including maintainance)
-users care about the application, developers care about the code
-we define a target of reducing the time required to create and navigate windows in a computing environment
-we use Makefile to create the isolated environment (container) by bootstraping all required files if not already present and to make sure that subsequent changes to the requirements update the environment. The DAG should be as project agnostic as possible thus sentinel files are used
-we use these specific targets for the Makefile (all, check, clean, help) because the first three are standard targets recommended by GNU standard targets and the fourth one is used in the linux kernel
-The Makefile is only responsible for install the requirements inside the container.
-The specific command arguments that e.g.\ check applications take should be done outside of the container to prevent the cache invalidation of the container.
-
-\section{Variable naming}
-think prime-modifier-class naming scheme and how it relates to the action-as-information
-\begin{itemize}
-	\item Single-function repositories to a verb-noun naming convention.
-	\item Multi-function repositories are appended with -tool.
-	\item Research papers are a whole sentence.
-	\item Repositories with URL are named as the URL\@.
-\end{itemize}
-
-\section{Example use case: window manager}
-an extreme example of configurable window managers is `ricing' where the window manager is configured mostly for form and not function
-fswm targets users with high technical capabilities (therefore no visual indication is needed regarding which window they are in every time etc.)
-if keyboard portability is not so important then keycodes are hardcoded for the specific user environment
-moreover a window manager should open windows only in full screen
-the concept of tiling window managers is oriented towards multitasking
-the key shortcuts of a window manager should be predictable by resembling as close as possible most other window managers and development environemnts
-the need to be portable across different keyboards demands the use of an additional requirement (xcb-util-keysyms)
-the set of functionalities that should be integrated to a window manager are: Enter next/previous window and open program in new window
-the windows could be represented as a cyclic doubly linked list
-thus C89 was chosen for optimal portability and xcb as the main library
-an additional advantage of non-configurability is that the application is ready to be used when installed
-
-\section{Example use case: technical document}
-This section provides a use case of the Makefile and also serves as a manual for developing using this method.
-Making use of the \textit{datatool} package the values of the following variables are not directly referred in the main \textit{.tex} file but they are instead read by an intermediate \textit{.tex} file created by the \textit{results code}.
-Additionally, making use of random seed setting we consistenly get the same figures.
-We also use the \textit{to\_latex} command which automatically converts a dataframe table to a \LaTeX\ table.
-
-\section{About the use of Make}
-The proposed Makefile is based on plain text file editing and can be used with any operating system that supports containers and Make.
+\section{Make}
 Make has existed for decades and has passed the test of time, while the container technology was standardized with the Open Container Initiative and there exist alternatives such as Podman that could be used as drop-in replacements for Docker.
 Moreover the Makefile can be combined with any version control system, container registry provider and text editor thus preventing `app/vendor lock-in' situations.
 
 Use cases of the Makefile include:
 \begin{itemize}
-	\item regression testing and debugging, to ensure that changes to \textit{code} do not alter \textit{results},
-	\item common development environment across multiple \textit{authors},
-	\item coauthors, reviewers, journal editors or other researchers can reproduce the \textit{document} with few requirements.
+	\item regression testing and debugging, to ensure that changes to \texttt{code} do not alter the \texttt{artifacts},
+	\item portable development environment across multiple \texttt{developers},
+	\item portable development environment across time.
 \end{itemize}
+
+Makes use of pre-existing standards:
+\begin{itemize}
+	\item GNU standard targets for Makefile~\cite{stallman1992gnu}
+	\item POSIX Utilities and Shell~\cite{lewine1991posix}
+\end{itemize}
+
+We use Makefile to create the isolated environment (container) by creating all required files if not already present and to make sure that subsequent changes to the requirements update the environment.
+
+The interface of the Makefile is a subset of the GNU standard targets:
+\begin{verbatim}
+make           # execute code 
+make STAGING=1 # execute staging code 
+make check     # check code
+make clean     # remove tmp/
+\end{verbatim}
+
+With the \texttt{STAGING} environment variable which can be used for debugging purposes and having fast development iteration.
 
 \section{Folder structure}
-\begin{itemize}
-	\item prm/: permanent data
-	\item tmp/: temporary data
-	\item main.py: code
-	\item Dockerfile: code for the environment
-	\item pyproject.toml: data for the environment
-\end{itemize}
+\dirtree{%
+.0 python.
+.1 \texttt{.dockerignore}.
+.1 \texttt{.gitignore}.
+.1 Dockerfile.
+.1 Makefile.
+.1 main.py.
+.1 prm/.
+.1 pyproject.toml.
+.1 tmp/.
+}
 
-\section*{Conclusion}
+\section{Workflow}
+
+\begin{algorithm}
+	\KwData{User requirement}
+	\If{user requirement is unimportant}{
+		\Return{}
+	}
+	\If{it can be solved without software}{
+		\Return{}
+	}
+	\If{a package already exists}{
+		Introduce the package as a dependency in the relevant main.py\;
+		\Return{}
+	}
+	\If{a relevant repository exists}{
+		Make repository compatible with stack/method\;
+		\Return{}
+	}
+	\If{it can be programmed within a relevant main.py}{
+		Program it in a relevant main.py\;
+		\Return{}
+	}
+	\If{it can be programmed as a dependency/dependent of another directory}{
+		Create a new dependent directory\;
+		\Return{}
+	}
+	Create a new repository\;
+	\Return{}
+	\caption{Workflow}
+\end{algorithm}
 
 \bibliographystyle{IEEEtran}
 \bibliography{ms.bib}
