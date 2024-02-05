@@ -18,24 +18,17 @@
 \end{abstract}
 
 \section{Introduction}
-Widespread software development practices like agile~\cite{abrahamsson2017agile} are not concrete enough thus multiple versions of each of them exist in software development.
+Widespread software development practices like agile~\cite{abrahamsson2017agile} are not concrete enough, thus multiple versions of each of them exist in software development.
 Loosely defined practices introduce non-portability issues through time and space, increasing development costs.
 
 In this paper we present a portable development methodology which is concrete enough to be portable and abstract enough to be of general use.
 We also present example use cases for python and tex document generation and website creation.
 
-\section{Make}
-Make~\cite{fowler1990case} has been used since 1970s and some of its basic features were standardized by POSIX\@.
-Moreover the Makefile can be combined with any version control system, container registry provider and text editor thus preventing `app/vendor lock-in' situations.
+\section{Requirements}
+POSIX utilities and shell are the base of any Unix system today.
+However, by itself is not enough to cover most of the modern needs of software development, namely: machine learning and web applications.
 
-Use cases of the Makefile include:
-\begin{itemize}
-	\item regression testing and debugging, to ensure that changes to \texttt{code} do not alter the generated data,
-	\item portable development environment across multiple \texttt{developers},
-	\item portable development environment across time.
-\end{itemize}
-
-\section{Containers}
+Containers combined with POSIX utilities and shell can be used to create isolated environments.
 Containers were standardized with the Open Container Initiative\footnote{\url{https://opencontainers.org/}} and there exist alternatives such as Podman that could be used as drop-in replacements for Docker.
 
 \section{Directory structure}
