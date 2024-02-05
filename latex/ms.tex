@@ -33,6 +33,7 @@ Containers were standardized with the Open Container Initiative\footnote{\url{ht
 
 \section{Directory structure}
 The following directory structure is the superset of files and directories that the \texttt{python/} directory can consist.
+File and directory name whitelisting is enforced with the target of having one file per `technology'.
 The interface of the Makefile is a subset of the GNU standard targets:
 \begin{itemize}
 	\item \texttt{.dockerignore}: Consists of:
@@ -60,7 +61,7 @@ The interface of the Makefile is a subset of the GNU standard targets:
 			\item It should create all files and directories from the structure if they do not already exist.
 		\end{itemize}
 	\item \texttt{main.py}: Frequently editable. The developer writes \texttt{code} in here that generates data saved in \texttt{tmp/}.
-	\item \texttt{prm/}: The developer can place here all the files/directories for which generation from code is infeasible. This should be as small as possible.
+	\item \texttt{prm/}: The developer can place here all the files/directories for which generation from code is infeasible. It is a practical `backdoor' out of the file/directory name whitelisting of the Makefile. The contents of this directory should be as few as possible.
 	\item \texttt{pyproject.toml}: Rarely editable. The developer edits:
 		\begin{itemize}
 			\item the dependencies and
