@@ -1,11 +1,12 @@
 \documentclass[journal]{IEEEtran}
+\usepackage{dirtree}
 \usepackage[boxed]{algorithm2e}
 \usepackage[nopdftrailerid=true]{pdfprivacy}
 \usepackage{hyperref}
 
 \begin{document}
 
-\title{Portable Development Methodology}
+\title{Development Methodology}
 
 \author{Paschalis~Bizopoulos
 \thanks{P. Bizopoulos is an Independent Researcher, Thessaloniki, Greece e-mail: pbizop@gmail.com}}
@@ -13,28 +14,38 @@
 \maketitle
 
 \begin{abstract}
-	This paper proposes a portable development methodology.
-	Repository example use cases are also presented.
+	This paper proposes a development methodology and also presents example use cases.
 \end{abstract}
 
 \section{Introduction}
-Widespread software development practices like agile~\cite{abrahamsson2017agile} are not concrete enough, thus multiple versions of each of them exist in software development.
-Loosely defined practices introduce non-portability issues through time and space, increasing development costs.
+Software development practices like agile~\cite{abrahamsson2017agile} are not concrete enough, thus multiple subversions of each of them exist in software development.
+Loosely defined practices introduce non-portability issues between developers and through time, increasing development costs.
 
-In this paper we present a portable development methodology which is concrete enough to be portable and abstract enough to be of general use.
+In this paper we present a development methodology which is concrete enough to be portable and abstract enough to be of general use.
 We also present example use cases for python and tex document generation and website creation.
 
 \section{Requirements}
 POSIX utilities and shell are the base of any Unix system today.
-However, by itself is not enough to cover most of the modern needs of software development, namely: machine learning and web applications.
+However, they are not enough to cover modern user/developer requirements, such as machine learning and web applications.
 
-Containers combined with POSIX utilities and shell can be used to create isolated environments.
+Containers such as Docker, can be used to create isolated environments.
 Containers were standardized with the Open Container Initiative\footnote{\url{https://opencontainers.org/}} and there exist alternatives such as Podman that could be used as drop-in replacements for Docker.
 
 \section{Directory structure}
+\dirtree{.0 python/|docs/|latex/.
+.1 \texttt{.dockerignore}.
+.1 \texttt{.gitignore}.
+.1 Dockerfile.
+.1 Makefile.
+.1 main.py|index.html|ms.tex.
+.1 prm/.
+.1 pyproject.toml|package.json.
+.1 tmp/.
+}
+
 The following directory structure is the superset of files and directories that the \texttt{python/} directory can consist.
+The interface of the Makefile is a subset of the GNU standard targets.
 File and directory name whitelisting is enforced with the target of having one file per `technology'.
-The interface of the Makefile is a subset of the GNU standard targets:
 \begin{itemize}
 	\item \texttt{.dockerignore}: Consists of:
 		\begin{itemize}
@@ -73,8 +84,8 @@ The interface of the Makefile is a subset of the GNU standard targets:
 \section{Workflows}
 
 \begin{algorithm}
-	\KwData{New user requirement}
-	\If{user requirement is unimportant}{
+	\KwData{New user/developer requirement}
+	\If{requirement is unimportant}{
 		\Return{}
 	}
 	\If{it can be solved without software}{
@@ -98,7 +109,7 @@ The interface of the Makefile is a subset of the GNU standard targets:
 	}
 	Create a new repository\;
 	\Return{}
-	\caption{Workflow for new user requirement}
+	\caption{Workflow for new user/developer requirement}
 \end{algorithm}
 
 \bibliographystyle{IEEEtran}
