@@ -6,7 +6,7 @@
 
 \begin{document}
 
-\title{Development Methodology}
+\title{Software Development Methodology}
 
 \author{Paschalis~Bizopoulos
 \thanks{P. Bizopoulos is an Independent Researcher, Thessaloniki, Greece e-mail: pbizop@gmail.com}}
@@ -14,24 +14,38 @@
 \maketitle
 
 \begin{abstract}
-	This paper proposes a development methodology and also presents example use cases.
+	We propose a portable and consistent software development methodology and also refer to example use cases.
 \end{abstract}
 
 \section{Introduction}
-Software development practices like agile~\cite{abrahamsson2017agile} are not concrete enough, thus multiple subversions of each of them exist in software development.
-Loosely defined practices introduce non-portability issues between developers and through time, increasing development costs.
-
-In this paper we present a development methodology which is concrete enough to be portable and abstract enough to be of general use.
-We also present example use cases for python and tex document generation and website creation.
+Code is usually targeted to be executed by multiple machines and developed by multiple humans.
+Therefore, it is vital to have a portable way for machines to execute code and a consistent way for humans to develop code.
+In this paper we present a simple software development methodology which satisfies these conditions.
+We also refer example use cases for python machine learning applications, \LaTeX{} documents generation and web applications.
 
 \section{Requirements}
-POSIX utilities and shell are the base of any Unix system today.
+Portable code execution is handled by:
+\begin{itemize}
+	\item POSIX Shell and Utilities
+	\item Containers
+\end{itemize}
+
+POSIX is the base of all Unix-based systems today.
+POSIX is maintained by the Austin Group.
 However, they are not enough to cover modern user/developer requirements, such as machine learning and web applications.
 
 Containers such as Docker, can be used to create isolated environments.
 Containers were standardized with the Open Container Initiative\footnote{\url{https://opencontainers.org/}} and there exist alternatives such as Podman that could be used as drop-in replacements for Docker.
 
+Code consistency is handled by:
+\begin{itemize}
+	\item applying a subset of the GNU standard targets for the interface of the Makefile.
+	\item enforcing a directory structure.
+\end{itemize}
+
 \section{Directory structure}
+The following directory structure is the superset of files and directories that the \texttt{python/} directory can consist.
+File and directory name whitelisting is enforced with the target of having one file per `technology'.
 \dirtree{.0 python/|docs/|latex/.
 .1 \texttt{.dockerignore}.
 .1 \texttt{.gitignore}.
@@ -43,9 +57,7 @@ Containers were standardized with the Open Container Initiative\footnote{\url{ht
 .1 tmp/.
 }
 
-The following directory structure is the superset of files and directories that the \texttt{python/} directory can consist.
-The interface of the Makefile is a subset of the GNU standard targets.
-File and directory name whitelisting is enforced with the target of having one file per `technology'.
+More specifically:
 \begin{itemize}
 	\item \texttt{.dockerignore}: Consists of:
 		\begin{itemize}
