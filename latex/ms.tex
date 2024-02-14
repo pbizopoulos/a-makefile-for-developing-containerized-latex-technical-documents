@@ -35,15 +35,16 @@ Containers were standardized with the Open Container Initiative\footnote{\url{ht
 \section{Code Consistency}
 The following directory structure is the superset of files and directories that the \texttt{python/} directory can consist.
 File and directory name whitelisting is enforced with the target of having one file per `technology'.
-\dirtree{.0 python/|docs/|latex/.
-.1 \texttt{.dockerignore}.
-.1 \texttt{.gitignore}.
-.1 Dockerfile.
-.1 Makefile.
-.1 main.py|index.html|ms.tex.
-.1 prm/.
-.1 pyproject.toml|package.json.
-.1 tmp/.
+\dirtree{%
+.1 python/|docs/|latex/.
+.2 \texttt{.dockerignore}.
+.2 \texttt{.gitignore}.
+.2 Dockerfile.
+.2 Makefile.
+.2 main.py|index.html|ms.tex.
+.2 prm/.
+.2 pyproject.toml|package.json.
+.2 tmp/.
 }
 
 More specifically:
@@ -83,14 +84,20 @@ More specifically:
 \end{itemize}
 
 On a higher level the directory should look like this:
-\begin{verbatim}
-$HOME/$PLATFORM_DOMAIN_NAME/$REPOSITORY_OWNER/$REPOSITORY_NAME/
-\end{verbatim}
+\dirtree{%
+.1 \texttt{\$HOME/}.
+.2 \texttt{\$PLATFORM\_DOMAIN\_NAME/}.
+.3 \texttt{\$REPOSITORY\_OWNER/}.
+.4 \texttt{\$REPOSITORY\_NAME/}.
+}
 
 For example the directory structure that corresponds to the repository that hosts the source code of this paper is:
-\begin{verbatim}
-$HOME/github.com/pbizopoulos/a-makefile-for-developing-containerized-latex-technical-documents/
-\end{verbatim}
+\dirtree{%
+.1 \texttt{\$HOME/}.
+.2 \texttt{github.com/}.
+.3 \texttt{pbizopoulos/}.
+.4 \texttt{software-development-methodology/}.
+}
 
 In that way version control related commands could work between different machines. For example the following incorporates changes from all \texttt{github.com} remote repositories into the current branches using \texttt{git}:
 \begin{verbatim}
