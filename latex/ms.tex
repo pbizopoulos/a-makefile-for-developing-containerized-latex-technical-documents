@@ -6,7 +6,7 @@
 
 \begin{document}
 
-\title{Software Development Methodology}
+\title{Abstraction-averse programming}
 
 \author{Paschalis~Bizopoulos
 \thanks{P. Bizopoulos is an Independent Researcher, Thessaloniki, Greece e-mail: pbizop@gmail.com}}
@@ -14,15 +14,23 @@
 \maketitle
 
 \begin{abstract}
-	We propose a portable and consistent software development methodology and also refer to example use cases.
+	We propose a software development methodology for portable and consistent code and also refer to example use cases.
 \end{abstract}
 
 \section{Introduction}
+The most important problem today with software is its increasing complexity which can be attributed to the use of unnessesary abstractions.
+Abstractions can be variables, functions, classes, modules, files, directories, third-party dependencies.
+Most of the times using already existing abstractions is better than creating/introducing new ones.
+
 Code is usually targeted to be executed by multiple machines and developed by multiple humans.
 Therefore, it is vital to have a portable way for machines to execute code and a consistent way for humans to develop code.
 In this paper we present a simple software development methodology which satisfies these conditions.
 We propose using POSIX XCU and Containers for code portability and a directory structure enforcement for code consistency.
-We also refer example use cases for python machine learning applications, \LaTeX{} documents generation and web applications.
+We also refer example use cases for python machine learning applications, \LaTeX{} documents generation, web applications and python packages.
+
+\section{Abstraction-averse programming}
+The phrase "Abstraction-averse" is in contrast to "Abstraction-free" where would need to program in machine language (0s and 1s) exactly as the CPU sees them.
+However "Abstraction-averse" recognizes the practical aspect of abstraction but instructs that the introduction/creation of abstractions should be avoided as much as possible.
 
 \section{Code portability}
 POSIX (Portable Operating System Interface) is a set of standards developed by the Austin Group with the target of maintaining compatibility between operating systems.
